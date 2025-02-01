@@ -1,0 +1,167 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  
+  body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+  }
+  
+  /* Dashboard Layout */
+  .dashboard {
+    display: flex;
+    min-height: 100vh;
+  }
+  
+  /* Header */
+  .header {
+    background-color: #333;
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+    width: 100%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .header h1 {
+    margin-bottom: 10px;
+  }
+  
+  .header nav a {
+    color: #fff;
+    text-decoration: none;
+    margin: 0 10px;
+  }
+  
+  .header nav a:hover {
+    text-decoration: underline;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+    width: 250px;
+    background-color: #444;
+    color: #fff;
+    padding-top: 80px; /* To account for the fixed header */
+    height: 100vh;
+    position: fixed;
+  }
+  
+  .sidebar ul {
+    list-style: none;
+  }
+  
+  .sidebar ul li {
+    margin: 15px 0;
+  }
+  
+  .sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    padding: 10px 20px;
+    display: block;
+  }
+  
+  .sidebar ul li a.active {
+    background-color: #555;
+    border-left: 4px solid #ff5722;
+  }
+  
+  .sidebar ul li a:hover {
+    background-color: #555;
+  }
+  
+  /* Main Content */
+  .main-content {
+    margin-left: 250px; /* To account for the sidebar */
+    padding: 100px 20px 20px; /* To account for the fixed header */
+    width: calc(100% - 250px);
+  }
+  
+  /* Personal Information Section */
+  .personal-info {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+  }
+  
+  .personal-info h2 {
+    margin-bottom: 15px;
+  }
+  
+  .info-card {
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 8px;
+  }
+  
+  .info-card p {
+    margin: 10px 0;
+  }
+  
+  .edit-btn {
+    background-color: #ff5722;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .edit-btn:hover {
+    background-color: #e64a19;
+  }
+  
+  /* Order History Section */
+  .order-history {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .order-history h2 {
+    margin-bottom: 15px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table th, table td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+  }
+  
+  table th {
+    background-color: #f4f4f4;
+  }
+  
+  .action-btn {
+    background-color: #ff5722;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-right: 5px;
+  }
+  
+  .action-btn:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+  }
+  
+  .action-btn:hover:not(:disabled) {
+    background-color: #e64a19;
+  }
