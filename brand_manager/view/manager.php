@@ -1,5 +1,5 @@
 <?php
-//session_start();
+session_start();
 
 include_once '../control/Logincontroller.php'; // Ensure this file exists
 
@@ -9,14 +9,14 @@ if (!class_exists('LoginController')) {
 }
 
 // Handle logout action
-if (isset($_GET['action']) && $_GET['action'] === 'logout') {
-    // Destroy the session
-    session_destroy();
+// if (isset($_GET['action']) && $_GET['action'] === 'logout') {
+//     // Destroy the session
+//     session_destroy();
     
-    // Redirect to the login page
-    header("Location: login.php");
-    exit;
-}
+//     // Redirect to the login page
+//     header("Location: login.php");
+//     exit;
+// }
 
 // Session validation to ensure user is logged in
 if (!isset($_SESSION['email'])) {
