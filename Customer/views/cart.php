@@ -1,99 +1,122 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Shopping Cart</title>
-    <link rel="stylesheet" href="../css/style.css">
-    <link rel="stylesheet" href="../css/nav.css">
-    <link rel="stylesheet" href="../css/footer.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <style>
-        .cart__items-action .btn i {
-            font-size: 1.2rem; /* Increased icon size */
-            padding: 0.3rem; /* Added padding for better clarity */
-        }
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="this is an ecommerce project for making anis express"
+    />
+    <title>Ecommerce project</title>
 
-        .cart__items-action .btn {
-            margin-left: 0.5rem; /* Added spacing between buttons */
-        }
-
-        .cart__payment-summary select {
-            margin-top: 1rem;
-            padding: 0.5rem;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-            width: 100%;
-            font-size: 1rem;
-        }
-    </style>
-</head>
-<body>
-    <?php include '../layout/navbar.php'; ?>
+    <!-- font awesome cdn  -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
+  </head>
+  <body>
+    <!-- navbar starts here  -->
+    
+    <!-- navbar ends here  -->
     <main>
-        <div class="cart flex-center">
-            <div class="cart__items">
-                <div class="cart__items-heading card">
-                    <h2>Shopping Cart <span id="item-count">[0 items]</span></h2>
-                    <div class="cart__items-action">
-                        <label for="select">
-                            <input type="checkbox" name="select" id="select" />
-                            Select all items
-                        </label>
-                        <button class="btn" id="clear-cart">
-                            <i class="fas fa-trash-alt"></i> Clear Cart
-                        </button>
-                        <button class="btn">Shop More</button>
-                    </div>
-                </div>
+      <div class="cart flex-center">
+        <div class="cart__items">
+          <div class="cart__items-heading card">
+            <h2>Shopping Cart [2 items]</h2>
+            <div class="cart__items-action">
+              <label for="select">
+                <input type="checkbox" name="select" id="select" />
+                Select all items
+              </label>
+              <button class="btn">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+              <button class="btn">Shop More</button>
+            </div>
+          </div>
 
-                <div id="cart-items-container">
-                    <!-- Cart items will be dynamically loaded here -->
-                    <div class="cart-item">
-                        <p>Example Item</p>
-                        <div class="cart-item-controls">
-                            <button class="btn">
-                                <i class="fas fa-minus-circle"></i>
-                            </button>
-                            <span>1</span>
-                            <button class="btn">
-                                <i class="fas fa-plus-circle"></i>
-                            </button>
-                            <button class="btn">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
+          <div class="cart__item card flex-space-around">
+            <input type="checkbox" name="" id="" />
+            <img
+              src="./images/product1.jpg"
+              alt="product 1"
+              class="cart__item-img"
+            />
+            <div class="cart__item-description">
+              <h3 class="product__name">Sony v-4 Headphone</h3>
+              <h4 class="product__price">Price: $225.99</h4>
+              <p class="cart__item-shipping">Free Shipping</p>
             </div>
-            <div class="cart__payment">
-                <div class="cart__payment-summary card">
-                    <h2>Payment Summary</h2>
-                    <div>
-                        <p>Subtotal:</p>
-                        <p id="subtotal">$0.00</p>
-                    </div>
-                    <div>
-                        <p>Shipping Cost:</p>
-                        <p id="shipping-cost">$0.00</p>
-                    </div>
-                    <div>
-                        <p>Total Cost:</p>
-                        <p id="total-cost">$0.00</p>
-                    </div>
-                    <label for="payment-method">Payment Method:</label>
-                    <select id="payment-method">
-                        <option value="credit-card">Credit Card</option>
-                        <option value="paypal">PayPal</option>
-                        <option value="bank-transfer">Bank Transfer</option>
-                    </select>
-                    <button class="btn cart__payment-btn">Pay Now</button>
-                </div>
+            <div class="cart__item-actions">
+              <button class="btn"><i class="fas fa-trash-alt"></i></button>
+              <div>
+                <button class="btn"><i class="fas fa-add"></i></button>
+                <span>3</span>
+                <button class="btn"><i class="fas fa-minus"></i></button>
+              </div>
             </div>
+          </div>
+          <div class="cart__item card flex-space-around">
+            <input type="checkbox" name="" id="" />
+            <img
+              src="./images/product4.jpg"
+              alt="product 4"
+              class="cart__item-img"
+            />
+            <div class="cart__item-description">
+              <h3 class="product__name">Nike Shoes</h3>
+              <h4 class="product__price">Price: $115.99</h4>
+              <p class="cart__item-shipping">Shipping cost $2.50</p>
+            </div>
+            <div class="cart__item-actions">
+              <button class="btn"><i class="fas fa-trash-alt"></i></button>
+              <div>
+                <button class="btn"><i class="fas fa-add"></i></button>
+                <span>1</span>
+                <button class="btn"><i class="fas fa-minus"></i></button>
+              </div>
+            </div>
+          </div>
         </div>
+        <div class="cart__payment">
+          <div class="cart__payment-summary card">
+            <h2>Payment Summary</h2>
+            <div>
+              <p>subtotal:</p>
+              <p>$341.44</p>
+            </div>
+            <div>
+              <p>Shipping Cost:</p>
+              <p>$2.50</p>
+            </div>
+            <div>
+              <p>Total Cost:</p>
+              <p>$344.38</p>
+            </div>
+            <button class="btn cart__payment-btn">Pay Now</button>
+          </div>
+          <div class="cart__payment-methods card">
+            <h2>Payment Methods</h2>
+            <div>
+              <i class="fa-brands fa-cc-visa fa-3x"></i>
+              <i class="fa-brands fa-cc-apple-pay fa-3x"></i>
+              <i class="fa-brands fa-cc-amex fa-3x"></i>
+              <i class="fa-brands fa-cc-amazon-pay fa-3x"></i>
+              <i class="fa-brands fa-cc-paypal fa-3x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
     </main>
-    <?php include '../layout/footer.php'; ?>
-
+    <!-- footer starts here  -->
+    
+    <!-- footer ends here  -->
     <script src="../scripts/cart.js"></script>
-</body>
+  </body>
 </html>

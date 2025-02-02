@@ -8,24 +8,42 @@ class UserController {
     // Method to handle user login
     public function login($email, $password) {
         $db = new Database();
-
+    
         // Prepare and execute the query to check if the user exists
         $query = "SELECT * FROM users WHERE email = ?";
         $user = $db->select($query, [$email]);
-
+    
         // If the user exists and password matches
         if ($user && $password === $user[0]['password']) { 
             // Start the session and store user details
-
+            session_start();
             $_SESSION['user_id'] = $user[0]['user_id'];
             $_SESSION['username'] = $user[0]['username'];
             $_SESSION['role'] = $user[0]['role'];
-
-            // Get cart data for the user
-            $this->getCartData($user[0]['user_id']);
-
-            // Redirect the user to the homepage or cart
-            header('Location: ../views/index.php');
+    
+            // Get cart data for the user (if applicable)
+            if ($_SESSION['role'] === 'customer') {
+                $this->getCartData($user[0]['user_id']);
+            }
+    
+            // Redirect based on the user's role
+            switch ($_SESSION['role']) {
+                case 'admin':
+                    header('Location: ../views/admin_dashboard.php');
+                    break;
+                case 'customer':
+                    header('Location: ../views/customer_dashboard.php');
+                    break;
+                case 'Brand Manager':
+                    header('Location: ../../brand_manager/view/manager.php');
+                    break;
+                case 'shipping_handler':
+                    header('Location: ../views/shipping_handler_dashboard.php');
+                    break;
+                default:
+                    header('Location: ../views/index.php');
+                    break;
+            }
             exit();
         } else {
             return "Invalid email or password.";

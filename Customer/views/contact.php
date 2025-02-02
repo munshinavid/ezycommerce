@@ -51,7 +51,7 @@
             <address>
               <h4>Address:</h4>
               <p>123 high street</p>
-              <p>Nikunja, Dhaka</p>
+              <p>Tampere, Finland</p>
               <br />
 
               <span>Call: </span>

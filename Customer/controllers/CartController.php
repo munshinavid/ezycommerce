@@ -1,4 +1,6 @@
 <?php
+ini_set('display_errors', 1);
+error_reporting(E_ALL);
 
 
 require_once '../models/CartModel.php';
@@ -79,10 +81,10 @@ if ($_GET['action'] === 'addToCart') {
 }
 
 
-
 // Action: Remove from Cart
-if (isset($_POST['action']) && $_POST['action'] == 'removeFromCart') {
-    $cartItemId = $_POST['cart_item_id'];
+if (isset($_GET['action']) && $_GET['action'] == 'removeFromCart') {
+    $cartItemId = $_GET['cart_item_id'];
+    //echo "remove is working";
 
     // Debugging: Log request
     error_log("Removing cart item ID: " . $cartItemId);
@@ -98,15 +100,18 @@ if (isset($_POST['action']) && $_POST['action'] == 'removeFromCart') {
     exit;
 }
 
-// Action: Update Cart Quantity
-if (isset($_POST['action']) && $_POST['action'] == 'updateQuantity') {
-    $cartItemId = $_POST['cart_item_id'];
-    $quantity = $_POST['quantity'];
+// Action: Update Quantity
+if (isset($_GET['action']) && $_GET['action'] == 'updateQuantity') {
+    //echo "it is working";
+
+    // Retrieve parameters from GET request
+    $cartItemId = $_GET['cart_item_id'];
+    $quantity = $_GET['quantity'];
 
     // Debugging: Log request
     error_log("Updating quantity: Item ID: " . $cartItemId . " New Qty: " . $quantity);
 
-    // Update quantity
+    // Assuming $cartModel is correctly initialized and accessible
     $result = $cartModel->updateQuantity($cartItemId, $quantity);
 
     if ($result) {
@@ -116,4 +121,5 @@ if (isset($_POST['action']) && $_POST['action'] == 'updateQuantity') {
     }
     exit;
 }
+
 ?>
