@@ -7,7 +7,7 @@ if (!isset($_SESSION['email'])) {
     header("Location: ../view/login.php");
     exit;
 }
-
+//HELLO THERE
 if ($_SERVER['REQUEST_METHOD'] == 'GET' || $_SERVER['REQUEST_METHOD'] == 'POST') {
     $model = new Model();
     $conn = $model->OpenCon();
