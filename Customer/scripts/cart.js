@@ -1,94 +1,114 @@
-document.addEventListener('DOMContentLoaded', () => {
-    fetchCart();
-});
+document.addEventListener("DOMContentLoaded", function () {
+    fetchCartItems();
 
-// Fetch Cart Items via AJAX
-function fetchCart() {
-    const xhr = new XMLHttpRequest();
-    xhr.open('GET', '/Web_project/Customer/controllers/CartController.php?action=fetchCart', true);
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.success) {
-                renderCartItems(response.cartItems);
-                updatePaymentSummary(response.subtotal, response.shippingCost, response.totalCost);
-            } else {
-                alert('Failed to load cart');
+    function fetchCartItems() {
+        let xhr = new XMLHttpRequest();
+        xhr.open("GET", "../controllers/CartController.php?action=fetchCart", true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                let response = JSON.parse(xhr.responseText);
+                if (response.success) {
+                    updateCartUI(response.cartItems, response.subtotal, response.shippingCost, response.totalCost);
+                }
             }
-        }
-    };
-    xhr.send();
-}
+        };
+        xhr.send();
+    }
 
-// Render Cart Items Dynamically
-function renderCartItems(cartItems) {
-    const container = document.getElementById('cart-items-container');
-    const itemCount = document.getElementById('item-count');
-    container.innerHTML = ''; // Clear previous items
-    cartItems.forEach(item => {
-        const itemElement = document.createElement('div');
-        itemElement.classList.add('cart__item', 'card', 'flex-space-around');
-        itemElement.setAttribute("data-id", item.cart_item_id);
-        itemElement.innerHTML = `
-            <input type="checkbox" name="cart_item" />
-            <img src="../${item.image_url}" alt="${item.name}" class="cart__item-img" />
-            <div class="cart__item-description">
-                <h3 class="product__name">${item.name}</h3>
-                <h4 class="product__price">Price: TK ${item.price}</h4>
-            </div>
-            <div class="cart__item-actions">
-                <button class="btn" onclick="removeItem(${item.cart_item_id})"><i class="fas fa-trash-alt"></i></button>
-                <div>
-                    <button class="btn" onclick="updateQuantity(${item.cart_item_id}, 1)"><i class="fas fa-plus"></i></button>
-                    <span>${item.quantity}</span>
-                    <button class="btn" onclick="updateQuantity(${item.cart_item_id}, -1)"><i class="fas fa-minus"></i></button>
+    function updateCartUI(cartItems, subtotal, shippingCost, totalCost) {
+        let cartContainer = document.querySelector(".cart__items");
+        let paymentSummary = document.querySelector(".cart__payment-summary");
+        cartContainer.innerHTML = "";
+        
+        cartItems.forEach(item => {
+            let cartItem = document.createElement("div");
+            cartItem.classList.add("cart__item", "card", "flex-space-around");
+            cartItem.innerHTML = `
+                <input type="checkbox" />
+                <img src=".${item.image_url}" alt="${item.name}" class="cart__item-img" />
+                <div class="cart__item-description">
+                    <h3 class="product__name">${item.name}</h3>
+                    <h4 class="product__price">Price: $${item.price}</h4>
+                    <p class="cart__item-shipping">Shipping cost $2.50</p>
                 </div>
-            </div>
+                <div class="cart__item-actions">
+                    <button class="btn delete-item" data-id="${item.cart_item_id}"><i class="fas fa-trash-alt"></i></button>
+                    <div>
+                        <button class="btn increase-qty" data-id="${item.cart_item_id}"><i class="fas fa-add"></i></button>
+                        <span class="quantity">${item.quantity}</span>
+                        <button class="btn decrease-qty" data-id="${item.cart_item_id}"><i class="fas fa-minus"></i></button>
+                    </div>
+                </div>
+            `;
+            cartContainer.appendChild(cartItem);
+        });
+        
+        paymentSummary.innerHTML = `
+            <h2>Payment Summary</h2>
+            <div><p>Subtotal:</p><p>$${subtotal}</p></div>
+            <div><p>Shipping Cost:</p><p>$${shippingCost}</p></div>
+            <div><p>Total Cost:</p><p>$${totalCost}</p></div>
+            <button class="btn cart__payment-btn">Pay Now</button>
         `;
-        container.appendChild(itemElement);
-    });
-    itemCount.textContent = `[${cartItems.length} items]`;
-}
 
-// Update Payment Summary
-function updatePaymentSummary(subtotal, shippingCost, totalCost) {
-    document.getElementById('subtotal').textContent = `TK ${subtotal}`;
-    document.getElementById('shipping-cost').textContent = `TK ${shippingCost}`;
-    document.getElementById('total-cost').textContent = `TK ${totalCost}`;
-}
+        attachEventListeners();
+    }
 
-// Remove Item from Cart
-function removeItem(cartItemId) {
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/Web_project/Customer/controllers/CartController.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            const response = JSON.parse(xhr.responseText);
-            if (response.success) {
-                fetchCart(); // Refresh cart
+    function attachEventListeners() {
+        document.querySelectorAll(".increase-qty").forEach(button => {
+            button.addEventListener("click", function () {
+                let cartItemId = this.getAttribute("data-id");
+                updateCartItem(cartItemId, 1);
+            });
+        });
+
+        document.querySelectorAll(".decrease-qty").forEach(button => {
+            button.addEventListener("click", function () {
+                let cartItemId = this.getAttribute("data-id");
+                updateCartItem(cartItemId, -1);
+            });
+        });
+
+        document.querySelectorAll(".delete-item").forEach(button => {
+            button.addEventListener("click", function () {
+                let cartItemId = this.getAttribute("data-id");
+                removeCartItem(cartItemId);
+            });
+        });
+    }
+
+    // Update Quantity
+    function updateCartItem(cartItemId, change) {
+        const itemElement = document.querySelector(`.increase-qty[data-id="${cartItemId}"]`);
+        if (!itemElement) return;
+
+        const quantitySpan = itemElement.parentElement.querySelector(".quantity");
+        let currentQuantity = parseInt(quantitySpan.textContent);
+        let newQuantity = currentQuantity + change;
+
+        if (newQuantity < 1) return;
+
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', `/ezycommerce/Customer/controllers/CartController.php?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${newQuantity}`, true);
+        xhr.onload = function() {
+            if (xhr.status === 200) {
+                fetchCartItems();
             } else {
-                alert('Failed to remove item');
+                console.log('Error updating quantity');
             }
-        }
-    };
-    xhr.send(`action=removeFromCart&cart_item_id=${cartItemId}`);
-}
+        };
+        xhr.send();
+    }
 
-// Update Quantity
-function updateQuantity(cartItemId, change) {
-    const itemElement = document.querySelector(`[data-id="${cartItemId}"]`);
-    let currentQuantity = parseInt(itemElement.querySelector("span").textContent);
-    let newQuantity = currentQuantity + change;
-    if (newQuantity < 1) return;
-
-    const xhr = new XMLHttpRequest();
-    xhr.open('POST', '/Web_project/Customer/controllers/CartController.php', true);
-    xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-    xhr.onload = function() {
-        if (xhr.status === 200) {
-            fetchCart();
-        }
-    };
-    xhr.send(`action=updateQuantity&cart_item_id=${cartItemId}&quantity=${newQuantity}`);
-}
+    // Remove Cart Item
+    function removeCartItem(cartItemId) {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `/ezycommerce/Customer/controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}`, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                fetchCartItems();
+            }
+        };
+        xhr.send();
+    }
+});

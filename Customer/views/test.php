@@ -1,24 +1,122 @@
-<?php
-require_once '../models/ProductModel.php'; // Ensure the path is correct
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="this is an ecommerce project for making anis express"
+    />
+    <title>Ecommerce project</title>
 
-try {
-    // Initialize the ProductModel
-    $productModel = new ProductModel();
+    <!-- font awesome cdn  -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.1/css/all.min.css"
+      integrity="sha512-MV7K8+y+gLIBoVD59lQIYicR65iaqukzvf/nwasF0nqhPay5w/9lJmVM2hMDcnK1OnMGCdVK+iQrJ7lzPJQd1w=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- navbar starts here  -->
+     <?php include 'navbar.php'; ?>
+    <!-- navbar ends here  -->
+    <main>
+      <div class="cart flex-center">
+        <div class="cart__items">
+          <div class="cart__items-heading card">
+            <h2>Shopping Cart [2 items]</h2>
+            <div class="cart__items-action">
+              <label for="select">
+                <input type="checkbox" name="select" id="select" />
+                Select all items
+              </label>
+              <button class="btn">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+              <button class="btn">Shop More</button>
+            </div>
+          </div>
 
-    // Fetch products (adjust limit and offset if needed)
-    $products = $productModel->getPaginatedProducts(10, 0);
-
-    // Check if products are fetched successfully
-    if (!empty($products)) {
-        echo "<h3>Products fetched successfully:</h3>";
-        echo "<pre>";
-        print_r($products); // Display the fetched products
-        echo "</pre>";
-    } else {
-        echo "<p>No products found in the database.</p>";
-    }
-} catch (Exception $e) {
-    // Catch any errors and display the message
-    echo "<p>Error: " . $e->getMessage() . "</p>";
-}
-?>
+          <div class="cart__item card flex-space-around">
+            <input type="checkbox" name="" id="" />
+            <img
+              src="./images/product1.jpg"
+              alt="product 1"
+              class="cart__item-img"
+            />
+            <div class="cart__item-description">
+              <h3 class="product__name">Sony v-4 Headphone</h3>
+              <h4 class="product__price">Price: $225.99</h4>
+              <p class="cart__item-shipping">Free Shipping</p>
+            </div>
+            <div class="cart__item-actions">
+              <button class="btn"><i class="fas fa-trash-alt"></i></button>
+              <div>
+                <button class="btn"><i class="fas fa-add"></i></button>
+                <span>3</span>
+                <button class="btn"><i class="fas fa-minus"></i></button>
+              </div>
+            </div>
+          </div>
+          <div class="cart__item card flex-space-around">
+            <input type="checkbox" name="" id="" />
+            <img
+              src="./images/product4.jpg"
+              alt="product 4"
+              class="cart__item-img"
+            />
+            <div class="cart__item-description">
+              <h3 class="product__name">Nike Shoes</h3>
+              <h4 class="product__price">Price: $115.99</h4>
+              <p class="cart__item-shipping">Shipping cost $2.50</p>
+            </div>
+            <div class="cart__item-actions">
+              <button class="btn"><i class="fas fa-trash-alt"></i></button>
+              <div>
+                <button class="btn"><i class="fas fa-add"></i></button>
+                <span>1</span>
+                <button class="btn"><i class="fas fa-minus"></i></button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="cart__payment">
+          <div class="cart__payment-summary card">
+            <h2>Payment Summary</h2>
+            <div>
+              <p>subtotal:</p>
+              <p>$341.44</p>
+            </div>
+            <div>
+              <p>Shipping Cost:</p>
+              <p>$2.50</p>
+            </div>
+            <div>
+              <p>Total Cost:</p>
+              <p>$344.38</p>
+            </div>
+            <button class="btn cart__payment-btn">Pay Now</button>
+          </div>
+          <div class="cart__payment-methods card">
+            <h2>Payment Methods</h2>
+            <div>
+              <i class="fa-brands fa-cc-visa fa-3x"></i>
+              <i class="fa-brands fa-cc-apple-pay fa-3x"></i>
+              <i class="fa-brands fa-cc-amex fa-3x"></i>
+              <i class="fa-brands fa-cc-amazon-pay fa-3x"></i>
+              <i class="fa-brands fa-cc-paypal fa-3x"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+    <!-- footer starts here  -->
+     <?php include 'footer.php'; ?>
+    <!-- footer ends here  -->
+    <script src="./scripts/index.js"></script>
+  </body>
+</html>
