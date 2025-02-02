@@ -1,7 +1,7 @@
 <?php
 require_once '../models/db.php';
 require_once '../models/UserModel.php';
-//session_start();
+session_start();
 
 class UserController {
 
