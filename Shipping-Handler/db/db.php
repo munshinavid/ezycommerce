@@ -23,9 +23,10 @@ class mydb {
                         (name, gender, email, password, phone, vehicle_type, nid_number, address, photo, nid) 
                         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         
+        
         $stmt = $conObj->prepare($querystring);
 
-        if (!$stmt) {
+        if (!$stmt ) {
             die("Error preparing query: " . $conObj->error);
         }
 
@@ -43,13 +44,17 @@ class mydb {
             $photo, 
             $nid
         );
+       
 
         // Execute the statement
         $result = $stmt->execute();
 
         // Close the statement
         $stmt->close();
+      
 
+        // Close the statement
+       
         return $result;
     }
 

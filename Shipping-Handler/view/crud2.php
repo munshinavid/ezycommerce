@@ -1,6 +1,6 @@
 <?php
 // Include the model to access database functions
-include '../db/db2.php';
+include '../db/model.php';
 
 // Create an instance of the Database class
 $db = new mydb();

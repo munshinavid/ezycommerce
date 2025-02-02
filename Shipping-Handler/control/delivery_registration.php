@@ -10,6 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'];
     $phone = trim(htmlspecialchars($_POST['phone']));
     $vehicle_type = $_POST['vehicle_type'];
+    
     $nid_number = trim(htmlspecialchars($_POST['nid_number']));
     $address = trim(htmlspecialchars($_POST['address']));
 
