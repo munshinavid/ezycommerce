@@ -89,7 +89,7 @@ document.addEventListener("DOMContentLoaded", function () {
         if (newQuantity < 1) return;
 
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', `/ezycommerce/Customer/controllers/CartController.php?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${newQuantity}`, true);
+        xhr.open('GET', `/navid/Customer/controllers/CartController.php?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${newQuantity}`, true);
         xhr.onload = function() {
             if (xhr.status === 200) {
                 fetchCartItems();
@@ -103,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Remove Cart Item
     function removeCartItem(cartItemId) {
         const xhr = new XMLHttpRequest();
-        xhr.open("GET", `/ezycommerce/Customer/controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}`, true);
+        xhr.open("GET", `/navid/Customer/controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}`, true);
         xhr.onload = function () {
             if (xhr.status === 200) {
                 fetchCartItems();
