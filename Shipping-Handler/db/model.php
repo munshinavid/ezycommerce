@@ -20,7 +20,7 @@ class mydb {
     }
 
     // User-related methods
-    public function getUserByEmail($email) {
+    public function getUserByEmail1($email) {
         $stmt = $this->conn->prepare("SELECT id, name, email, password FROM delivery_man WHERE email = ?");
         $stmt->bind_param("s", $email);
         $stmt->execute();

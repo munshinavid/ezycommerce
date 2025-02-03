@@ -1,7 +1,8 @@
 <?php
 session_start();
-if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header("Location: delivery_dashboard.php");
-    exit;
-}
+session_unset();
+session_destroy();
+setcookie(session_name(), '', time() - 3600, '/'); // Delete session cookie
+header("Location: login.php");
+exit();
 ?>

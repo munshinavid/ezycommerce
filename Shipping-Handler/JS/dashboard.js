@@ -1,43 +1,24 @@
-// Update the event listener attachment
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize with correct class names
-    document.querySelectorAll('.update-btn').forEach(button => {
-        button.addEventListener('click', handleStatusUpdate);
-    });
-
     // Store original status values
     document.querySelectorAll('tr[data-order-id]').forEach(row => {
         const statusSelect = row.querySelector('.status-select');
         row.dataset.originalStatus = statusSelect.value;
     });
-});
 
-
-
-// JS/order-updates.js
-document.addEventListener('DOMContentLoaded', initOrderUpdates);
-
-function initOrderUpdates() {
-    // Store original status values
-    document.querySelectorAll('tr[data-order-id]').forEach(row => {
-        const statusSelect = row.querySelector('.statusSelect');
-        row.dataset.originalStatus = statusSelect.value;
-    });
-
-    // Add event listeners
-    document.querySelectorAll('.updateBtn').forEach(button => {
+    // Add event listeners to update buttons
+    document.querySelectorAll('.update-btn').forEach(button => {
         button.addEventListener('click', handleStatusUpdate);
     });
-}
+});
 
 async function handleStatusUpdate(e) {
     const row = e.target.closest('tr');
     const orderId = row.dataset.orderId;
-    const statusSelect = row.querySelector('.statusSelect');
+    const statusSelect = row.querySelector('.status-select');
     const status = statusSelect.value;
 
     try {
-        const response = await fetch('../control/update_order_status.php', {
+        const response = await fetch('../control/status.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -65,8 +46,6 @@ async function handleStatusUpdate(e) {
 }
 
 function updateUIStatus(row, status) {
-    const statusCell = row.querySelector('td:nth-child(5)');
-    statusCell.textContent = status.charAt(0).toUpperCase() + status.slice(1);
     row.dataset.originalStatus = status;
 }
 

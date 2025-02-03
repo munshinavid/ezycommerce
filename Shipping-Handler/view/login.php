@@ -1,19 +1,26 @@
 <?php
-// Start session at the VERY TOP
+// Start session
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Redirect logged-in users
+// Destroy session if user navigates back after logout
 if (isset($_SESSION['loggedin']) && $_SESSION['loggedin'] === true) {
-    header('Location: delivery_dashboard.php');
+    header('Location: dashboard.php');
     exit();
 }
+
+// Ensure session is completely cleared
+session_unset();
+session_destroy();
+session_start(); // Restart a new session
 
 // Handle error messages
 $error_message = $_SESSION['error_message'] ?? '';
 unset($_SESSION['error_message']);
 ?>
+
+
 <!DOCTYPE html>
 <html>
 <head>

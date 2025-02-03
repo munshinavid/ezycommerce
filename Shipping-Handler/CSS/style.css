@@ -1,5 +1,77 @@
 /* CSS/dashboard.css */
 /* Table Styles */
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    color: #44e166;
+}
+
+.logout-button {
+    display: inline-block;
+    padding: 10px 15px;
+    margin-bottom: 20px;
+    background-color: #ff4d4d;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.logout-button:hover {
+    background-color: #cc0000;
+}
+
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+}
+
+.orders-table th, .orders-table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+.orders-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+.status-select {
+    padding: 5px;
+    border-radius: 5px;
+}
+
+.update-btn {
+    background-color: #28a745;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.update-btn:hover {
+    background-color: #218838;
+}
+
+.error {
+    color: red;
+    font-weight: bold;
+}
+
+.empty-state {
+    font-style: italic;
+    color: #777;
+}
+
+
+
 .orders-table {
     border-collapse: collapse;
     width: 100%;

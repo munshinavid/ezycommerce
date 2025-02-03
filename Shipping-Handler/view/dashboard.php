@@ -84,7 +84,7 @@ try {
         <p>No orders assigned yet.</p>
     </div>
 <?php endif; ?>
-
+<a href="logout.php" class="logout-button">Logout</a>
     <script src="../JS/dashboard.js"></script>
 </body>
 </html>
