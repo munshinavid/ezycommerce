@@ -29,20 +29,16 @@ var_dump($customerDetails);
     <header class="header">
       <h1>Welcome, <span id="customer-name"><?= htmlspecialchars($user['username']) ?></span>!</h1>
       <nav>
-        <a href="#">Home</a>
-        <a href="#">Shop</a>
-        <a href="#">Logout</a>
+        <a href="index.php">Home</a>
+        <a href="index.php">Shop</a>
+        <a href="logout.php">Logout</a>
       </nav>
     </header>
 
     <aside class="sidebar">
       <ul>
         <li><a href="#" class="active">Dashboard</a></li>
-        <li><a href="#">Orders</a></li>
-        <li><a href="#">Wishlist</a></li>
-        <li><a href="#">Addresses</a></li>
-        <li><a href="#">Settings</a></li>
-        <li><a href="#">Support</a></li>
+        
       </ul>
     </aside>
 
