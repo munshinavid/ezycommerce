@@ -172,3 +172,79 @@ h1 {
         width: 100%;
     }
 }
+body {
+    font-family: Arial, sans-serif;
+    background: linear-gradient(135deg, #0077b6, #90e0ef);
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+  }
+  
+  h2 {
+    text-align: center;
+    color: #fff;
+    background: #005f73;
+    padding: 10px;
+    border-radius: 5px;
+  }
+  
+  form {
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+    max-width: 400px;
+    width: 100%;
+  }
+  
+  table {
+    width: 100%;
+  }
+  
+  td {
+    padding: 10px;
+  }
+  
+  label {
+    font-weight: bold;
+    color: #005f73;
+  }
+  
+  input, select, textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #0077b6;
+    border-radius: 5px;
+    font-size: 14px;
+    background: #e0f7fa;
+    color: #333;
+  }
+  
+  textarea {
+    resize: none;
+  }
+  
+  button {
+    background: linear-gradient(135deg, #0077b6, #00b4d8);
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    width: 100%;
+    transition: background 0.3s;
+  }
+  
+  button:hover {
+    background: linear-gradient(135deg, #023e8a, #0096c7);
+  }
+  
+  input[type="radio"] {
+    width: auto;
+    margin-right: 5px;
+  }

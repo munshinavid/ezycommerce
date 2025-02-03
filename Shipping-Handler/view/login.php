@@ -25,7 +25,7 @@ unset($_SESSION['error_message']);
 <html>
 <head>
     <title>Login</title>
-    <link rel="stylesheet" href="../CSS/style2.css">
+  
 </head>
 <body>
     <h1>Login</h1>
