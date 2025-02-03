@@ -1,0 +1,100 @@
+/* General reset for the page */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+}
+
+.registration-container {
+    background-color: #fff;
+    border-radius: 8px;
+    padding: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 500px;
+}
+
+h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #444;
+}
+
+label {
+    font-size: 14px;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+input, textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    color: #333;
+}
+
+input[type="password"], input[type="text"], input[type="email"], textarea {
+    background-color: #f9f9f9;
+}
+
+textarea {
+    height: 80px;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 12px;
+    background-color: #4CAF50;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #45a049;
+}
+
+a {
+    text-decoration: none;
+    color: #4CAF50;
+    font-size: 14px;
+    display: block;
+    text-align: center;
+    margin-top: 15px;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+/* Error and success messages */
+.error {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+}
+
+/* JS Error Display */
+#js-error-message {
+    color: red;
+    font-size: 14px;
+    margin-bottom: 15px;
+}

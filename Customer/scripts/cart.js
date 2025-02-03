@@ -75,6 +75,14 @@ document.addEventListener("DOMContentLoaded", function () {
                 removeCartItem(cartItemId);
             });
         });
+
+         // Handle the "Pay Now" button click
+         document.querySelector(".cart__payment-btn").addEventListener("click", function () {
+           // alert("Payment successful!");
+            //let totalAmount = document.querySelector(".cart__payment-summary div:last-child p:last-child").textContent.replace('$', '');
+            //placeOrder(totalAmount);
+            placeOrder();
+        });
     }
 
     // Update Quantity
@@ -106,6 +114,48 @@ document.addEventListener("DOMContentLoaded", function () {
         xhr.open("GET", `/ezycommerce/Customer/controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}`, true);
         xhr.onload = function () {
             if (xhr.status === 200) {
+                fetchCartItems();
+            }
+        };
+        xhr.send();
+    }
+
+    // Place Order and Simulate Order Completion (Frontend Only)
+    function placeOrder() {
+        // Select cart container and payment summary
+        let cartContainer = document.querySelector(".cart__items");
+        let paymentSummary = document.querySelector(".cart__payment-summary");
+        let payNowButton = document.querySelector(".cart__payment-btn");
+
+        // Clear cart items from the DOM
+        if (cartContainer) {
+            cartContainer.innerHTML = "";
+        }
+
+        // Show order placed message in payment summary
+        if (paymentSummary) {
+            paymentSummary.innerHTML = `
+                <h2>Order Placed Successfully!</h2>
+                <p>Thank you for your purchase. Your order is being processed.</p>
+            `;
+        }
+
+        // Disable Pay Now button (optional)
+        if (payNowButton) {
+            payNowButton.disabled = true;
+            payNowButton.style.opacity = "0.5"; // Reduce opacity to indicate it's disabled
+        }
+    }
+
+
+
+    // Clear Cart after Order
+    function clearCart() {
+        const xhr = new XMLHttpRequest();
+        xhr.open("GET", `/ezycommerce/Customer/controllers/OrderController.php?action=clearCart`, true);
+        xhr.onload = function () {
+            if (xhr.status === 200) {
+                // Refresh the UI to reflect the empty cart
                 fetchCartItems();
             }
         };

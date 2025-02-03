@@ -37,7 +37,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <?php if (!$isLoggedIn): ?>
       <!-- Show Register and Login links if not logged in -->
       <li class="nav__list">
-        <a href="../views/register.php" class="nav__link">Register</a>
+        <a href="../views/customer_registration.php" class="nav__link">Register</a>
       </li>
       <li class="nav__list">
         <a href="../views/login.php" class="nav__link">Login</a>

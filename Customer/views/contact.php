@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="this is an ecommerce project for making anis express"
+      content=""
     />
     <title>Ecommerce project</title>
 
@@ -51,20 +51,13 @@
             <address>
               <h4>Address:</h4>
               <p>123 high street</p>
-              <p>Tampere, Finland</p>
+              <p>Kuril, Dhaka</p>
               <br />
 
               <span>Call: </span>
               <a href="tel:+123456789">+123456789</a>
             </address>
-            <iframe
-              class="contact__map"
-              src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3746986.7197085414!2d88.0947312566068!3d23.490503750845157!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30adaaed80e18ba7%3A0xf2d28e0c4e1fc6b!2sBangladesh!5e0!3m2!1sen!2sfi!4v1673895684382!5m2!1sen!2sfi"
-              style="border: 0"
-              allowfullscreen=""
-              loading="lazy"
-              referrerpolicy="no-referrer-when-downgrade"
-            ></iframe>
+            
           </div>
         </div>
       </section>

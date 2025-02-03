@@ -8,12 +8,15 @@ if (!isset($_SESSION['user_id'])) {
     exit();
 }
 
-$userController = new UserModel();
-$user = $userController->getUserById($_SESSION['user_id']);
+$userModel = new UserModel();
+$user = $userModel->getUserById($_SESSION['user_id']);
 
 if (!$user) {
     die("User not found.");
 }
+
+$customerDetails = $userModel->getCustomerDetails($_SESSION['user_id']); // Fetch details
+
 ?>
 
 <!DOCTYPE html>
@@ -36,17 +39,27 @@ if (!$user) {
             <p class="error"><?php echo $_SESSION['error_message']; unset($_SESSION['error_message']); ?></p>
         <?php endif; ?>
 
-        <form action="../controllers/UserController.php" method="POST">
+        <form action="../controllers/UserUpdate.php" method="POST">
             <label>Name:</label>
-            <input type="text" name="name" value="<?= htmlspecialchars($user['username']) ?>" >
+            <input type="text" name="name" value="<?= $user['username'] ?>" required>
 
             <label>Email:</label>
-            <input type="email" name="email" value="<?= htmlspecialchars($user['email']) ?>" >
+            <input type="email" name="email" value="<?= $user['email'] ?>" required>
+
+            <label>Full Name:</label>
+            <input type="text" name="full_name" value="<?= $customerDetails['full_name'] ?>" required>
 
             <label>Phone:</label>
-            <input type="text" name="password" value="<?= htmlspecialchars($user['password']) ?>" >
+            <input type="text" name="phone" value="<?= $customerDetails['phone'] ?>" required>
 
-            
+            <label>Billing Address:</label>
+            <textarea name="billing_address" required><?= $customerDetails['billing_address'] ?></textarea>
+
+            <label>Shipping Address:</label>
+            <textarea name="shipping_address" required><?= $customerDetails['shipping_address'] ?></textarea>
+
+            <label>Change Password:</label>
+            <input type="password" name="new_password" placeholder="Leave blank to keep current password">
 
             <button type="submit" name="update">Save Changes</button>
         </form>
