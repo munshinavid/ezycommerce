@@ -418,6 +418,52 @@ textarea {
 /* footer starts here  */
 
 /* footer ends here  */
+/* searche  */
+/* Search Container */
+.actions__search {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px auto;
+  max-width: 400px;
+  position: relative;
+}
+
+/* Search Input */
+.actions__search input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #007bff;
+  border-radius: 25px;
+  font-size: 16px;
+  outline: none;
+  transition: 0.3s ease-in-out;
+}
+
+/* Focus Effect */
+.actions__search input:focus {
+  border-color: #0056b3;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.5);
+}
+
+/* Search Button */
+.actions__search .btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #007bff;
+  font-size: 18px;
+  transition: 0.3s;
+}
+
+.actions__search .btn:hover {
+  color: #0056b3;
+}
+
 
 @media (max-width: 992px) {
   .flex-space-around {

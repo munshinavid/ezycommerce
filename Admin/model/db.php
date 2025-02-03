@@ -12,6 +12,26 @@ class Database {
         }
     }
 
+    // Check if an email is already registered
+    public function isEmailTaken($email) {
+        $stmt = $this->conn->prepare("SELECT COUNT(*) AS count FROM Users WHERE email = ?");
+        $stmt->bind_param('s', $email);
+        $stmt->execute();
+        $result = $stmt->get_result()->fetch_assoc();
+        $stmt->close();
+        return $result['count'] > 0;
+    }
+
+    // Register an admin
+    public function registerAdmin($username, $email, $password) {
+        $stmt = $this->conn->prepare("INSERT INTO Users (username, email, password, role) VALUES (?, ?, ?, 'Admin')");
+        $stmt->bind_param('sss', $username, $email, $password);
+        $result = $stmt->execute();
+        $stmt->close();
+        return $result;
+    }
+
+
     // Function to add a product
     public function addProduct($name, $category, $description, $price, $stock, $image_url, $discount_id = NULL) {
         $stmt = $this->conn->prepare("INSERT INTO Products (name, category, description, price, stock, image_url, discount_id) VALUES (?, ?, ?, ?, ?, ?, ?)");
