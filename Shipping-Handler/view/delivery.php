@@ -14,6 +14,7 @@
         <td><label for="name">Full Name</label></td>
         <td><input type="text" id="name" name="name" ></td>
       </tr>
+      
       <tr>
         <td><label for="gender">Gender</label></td>
         <td><input type="radio" id="gender" name="gender" value="male" >Male
