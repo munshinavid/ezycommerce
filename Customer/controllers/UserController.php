@@ -7,6 +7,7 @@ class UserController {
 
     // Method to handle user login
     public function login($email, $password) {
+        session_start();
         $db = new Database();
 
         // Prepare and execute the query to check if the user exists
