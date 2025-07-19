@@ -1,6 +1,6 @@
 <?php
 // Include the Database class
-require_once 'Database.php';
+require_once '../models/db.php';
 
 session_start();
 
@@ -16,20 +16,20 @@ if ($_GET['action'] == 'placeOrder') {
 // Place Order Function (No order details insertion)
 function placeOrder($db) {
     $userId = $_SESSION['user_id'];
-    $totalAmount = isset($_GET['total_amount']) ? floatval($_GET['total_amount']) : 0;
+    $totalAmount = isset($_GET['total_amount']) ? floatval(str_replace(',', '', $_GET['total_amount'])) : 0;
 
     if ($totalAmount <= 0) {
         echo json_encode(['success' => false, 'message' => 'Invalid total amount']);
         return;
     }
 
-    // Insert order into orders table
-    $query = "INSERT INTO orders (customer_id, total_amount, status) VALUES (?, ?, ?)";
+    // Insert order
+    $query = "INSERT INTO orders (customer_id, total_amount, order_status) VALUES (?, ?, ?)";
     $orderInserted = $db->execute($query, [$userId, $totalAmount, 'Pending']);
 
     if ($orderInserted) {
-        // Clear the cart
-        clearCart($db);
+        // Clear cart silently (without extra output)
+        clearCart($db, false);
 
         echo json_encode(['success' => true, 'message' => 'Order placed successfully']);
     } else {
@@ -37,12 +37,20 @@ function placeOrder($db) {
     }
 }
 
+
 // Clear Cart Function
-function clearCart($db) {
+function clearCart($db, $outputJson = true) {
     $userId = $_SESSION['user_id'];
-    $query = "DELETE FROM cart WHERE user_id = ?";
+    $query = "DELETE FROM cart WHERE customer_id = ?";
     $db->execute($query, [$userId]);
 
-    echo json_encode(['success' => true, 'message' => 'Cart cleared']);
+    // Clear home page cart data
+    $_SESSION['cart_count'] = 0;
+    $_SESSION['cart_total'] = 0.00;
+
+    if ($outputJson) {
+        echo json_encode(['success' => true, 'message' => 'Cart cleared']);
+    }
 }
+
 ?>

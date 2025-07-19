@@ -137,28 +137,59 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // Simulate placing the order, clear cart UI, disable pay button
-  function placeOrder() {
-    const cartContainer = document.querySelector(".cart__items");
-    const paymentSummary = document.querySelector(".cart__payment-summary");
-    const payNowButton = document.querySelector(".cart__payment-btn");
+  async function placeOrder() {
+  try {
+    // First, fetch cart data again to get the total amount
+    const response = await fetch('/ezycommerce/Customer/controllers/CartController.php?action=fetchCart');
+    if (!response.ok) throw new Error(`Failed to fetch cart data`);
+    const cartData = await response.json();
 
-    if (cartContainer) cartContainer.innerHTML = "";
-
-    if (paymentSummary) {
-      paymentSummary.innerHTML = `
-        <h2>Order Placed Successfully!</h2>
-        <p>Thank you for your purchase. Your order is being processed.</p>
-      `;
+    if (!cartData.success || cartData.totalCost <= 0) {
+      alert("Cannot place order: empty cart or invalid amount.");
+      return;
     }
 
-    if (payNowButton) {
-      payNowButton.disabled = true;
-      payNowButton.style.opacity = "0.5";
-    }
+    // Call backend to place order
+    const placeOrderResponse = await fetch(`/ezycommerce/Customer/controllers/OrderController.php?action=placeOrder&total_amount=${cartData.totalCost}`);
+    alert(cartData.totalCost);
+    if (!placeOrderResponse.ok) throw new Error("Failed to place order");
 
-    // Optionally: call backend API to clear cart after order here
-    // clearCart();
+    const result = await placeOrderResponse.json();
+
+    if (result.success) {
+      // Show order placed message
+      const cartContainer = document.querySelector(".cart__items");
+      const paymentSummary = document.querySelector(".cart__payment-summary");
+      if (cartContainer) cartContainer.innerHTML = "";
+
+        if (paymentSummary) {
+    paymentSummary.innerHTML = `
+      <h2>Order Placed Successfully!</h2>
+      <p>Thank you for your purchase. Your order is being processed.</p>
+      <a href="/ezycommerce/Customer/views/index.php" class="btn-home" style="
+        display: inline-block;
+        margin-top: 15px;
+        padding: 10px 20px;
+        background-color: #28a745;
+        color: white; 
+        text-decoration: none;
+        border-radius: 5px;
+      ">
+        Return to Home
+      </a>
+    `;
+      }
+      // Optionally clear cart on backend
+      //await clearCart();
+    } else {
+      alert(result.message || "Order failed.");
+    }
+  } catch (error) {
+    console.error("Error placing order:", error);
+    alert("Something went wrong while placing the order.");
   }
+}
+
 
   // (Optional) Clear cart on backend and refresh UI
   async function clearCart() {

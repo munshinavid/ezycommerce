@@ -27,62 +27,7 @@
     <main>
       <div class="cart flex-center">
         <div class="cart__items">
-          <div class="cart__items-heading card">
-            <h2>Shopping Cart [2 items]</h2>
-            <div class="cart__items-action">
-              <label for="select">
-                <input type="checkbox" name="select" id="select" />
-                Select all items
-              </label>
-              <button class="btn">
-                <i class="fas fa-trash-alt"></i>
-              </button>
-              <button class="btn">Shop More</button>
-            </div>
-          </div>
-
-          <div class="cart__item card flex-space-around">
-            <input type="checkbox" name="" id="" />
-            <img
-              src="./images/product1.jpg"
-              alt="product 1"
-              class="cart__item-img"
-            />
-            <div class="cart__item-description">
-              <h3 class="product__name">Sony v-4 Headphone</h3>
-              <h4 class="product__price">Price: $225.99</h4>
-              <p class="cart__item-shipping">Free Shipping</p>
-            </div>
-            <div class="cart__item-actions">
-              <button class="btn"><i class="fas fa-trash-alt"></i></button>
-              <div>
-                <button class="btn"><i class="fas fa-add"></i></button>
-                <span>3</span>
-                <button class="btn"><i class="fas fa-minus"></i></button>
-              </div>
-            </div>
-          </div>
-          <div class="cart__item card flex-space-around">
-            <input type="checkbox" name="" id="" />
-            <img
-              src="./images/product4.jpg"
-              alt="product 4"
-              class="cart__item-img"
-            />
-            <div class="cart__item-description">
-              <h3 class="product__name">Nike Shoes</h3>
-              <h4 class="product__price">Price: $115.99</h4>
-              <p class="cart__item-shipping">Shipping cost $2.50</p>
-            </div>
-            <div class="cart__item-actions">
-              <button class="btn"><i class="fas fa-trash-alt"></i></button>
-              <div>
-                <button class="btn"><i class="fas fa-add"></i></button>
-                <span>1</span>
-                <button class="btn"><i class="fas fa-minus"></i></button>
-              </div>
-            </div>
-          </div>
+          <!-- cart item will dynamically load here -->
         </div>
         <div class="cart__payment">
           <div class="cart__payment-summary card">
