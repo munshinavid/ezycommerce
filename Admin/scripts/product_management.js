@@ -30,9 +30,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
     }
 
-    populateSelect('categories', productCategorySelect, 'category_name', 'category_id');
-    populateSelect('vendors', productVendorSelect, 'vendor_name', 'vendor_id');
-    populateSelect('discounts', productDiscountSelect, 'discount_name', 'discount_id');
+    const selectPromises = [
+        populateSelect('categories', productCategorySelect, 'category_name', 'category_id'),
+        populateSelect('vendors', productVendorSelect, 'vendor_name', 'vendor_id'),
+        populateSelect('discounts', productDiscountSelect, 'discount_name', 'discount_id')
+                ];
+
 
     // --- Open modal ---
     function openModal(mode, product = {}) {
@@ -52,12 +55,12 @@ document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('productPrice').value = product.price;
             document.getElementById('productStock').value = product.stock;
 
-            // Wait for select options to populate before setting value
-            setTimeout(() => {
+            // ✅ Wait until selects are ready, then set values
+            Promise.all(selectPromises).then(() => {
                 productCategorySelect.value = product.category_id || '';
                 productVendorSelect.value = product.vendor_id || '';
                 productDiscountSelect.value = product.discount_id || '';
-            }, 100);
+            });
         }
     }
 

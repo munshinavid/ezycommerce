@@ -44,7 +44,13 @@ class ProductManagementController {
 
     // Get all discounts
     public function getAllDiscounts() {
-        return $this->db->select("SELECT * FROM Discounts ORDER BY discount_value DESC");
+        return $this->db->select("SELECT discount_id,
+                   CASE 
+                       WHEN discount_type = 'percentage' THEN CONCAT(discount_value, '% Off')
+                       WHEN discount_type = 'fixed' THEN CONCAT(discount_value, ' Tk Off')
+                       ELSE 'Discount'
+                   END AS discount_name
+            FROM discounts");
     }
 
     // Add product
