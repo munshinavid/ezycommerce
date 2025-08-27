@@ -12,8 +12,10 @@
                 <span>Users Management</span>
             </div>
             <div class="menu-item">
+                <a href="../views/product_management.php">
                 <i class="fas fa-box"></i>
                 <span>Products Management</span>
+                </a>
             </div>
             <div class="menu-item">
                 <i class="fas fa-shopping-cart"></i>
