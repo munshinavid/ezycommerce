@@ -41,13 +41,21 @@ class DashboardController {
     }
 
     public function getTopProducts($limit = 5) {
-        return $this->db->select("
-            SELECT p.product_id, p.name, p.category, p.price, SUM(oi.quantity) as sold, p.stock
-            FROM Order_Items oi
-            JOIN Products p ON oi.product_id = p.product_id
-            GROUP BY p.product_id, p.name, p.category, p.price, p.stock
-            ORDER BY sold DESC
-            LIMIT ?
-        ", [$limit]);
-    }
+    return $this->db->select("
+        SELECT 
+            p.product_id, 
+            p.name, 
+            c.category_name AS category, 
+            p.price, 
+            SUM(oi.quantity) AS sold, 
+            p.stock
+        FROM Order_Items oi
+        JOIN Products p ON oi.product_id = p.product_id
+        LEFT JOIN Categories c ON p.category_id = c.category_id
+        GROUP BY p.product_id, p.name, c.category_name, p.price, p.stock
+        ORDER BY sold DESC
+        LIMIT ?
+    ", [$limit]);
+}
+
 }

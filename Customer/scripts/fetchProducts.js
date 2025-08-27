@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
               <hr class="hr-design" />
               <span>${product.sold || 0} sold</span>
             </div>
-            <img class="product__img" src="../${product.image_url}" alt="${product.name}" />
+            <img class="product__img" src="${product.image_url}" alt="${product.name}" />
             <div class="product__body">
               <h3 class="product__name">
                 <a href="../views/product.php?id=${product.name}">${product.name}</a>
