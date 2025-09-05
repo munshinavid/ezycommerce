@@ -19,6 +19,7 @@ $topProducts = $dashboard->getTopProducts();
     <title>E-Commerce Super Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/index.css">
+    <link rel="stylesheet" href="../css/sidebar.css">
 </head>
 <body>
     <!-- Sidebar -->
