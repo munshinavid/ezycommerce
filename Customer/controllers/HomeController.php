@@ -36,57 +36,28 @@ class APIController {
     
     public function handleRequest() {
         try {
-            $path = $_GET['path'] ?? '';
+            $uri = $_SERVER['REQUEST_URI']; // e.g., /api.php/cart
+            $script = $_SERVER['SCRIPT_NAME']; // e.g., /api.php
+            $path = trim(str_replace($script, '', $uri), '/'); // -> cart
             $method = $_SERVER['REQUEST_METHOD'];
-            
-            // Parse path and parameters
-            $pathParts = explode('&', $path);
-            $endpoint = $pathParts[0];
-            
-            // Route to appropriate method
-            switch ($endpoint) {
-                case 'categories':
-                    $this->getCategories();
-                    break;
-                    
-                case 'products':
-                    $this->getProducts();
-                    break;
-                    
-                case 'product':
-                    $this->getProduct();
-                    break;
-                    
-                case 'cart':
-                    $this->handleCart($method);
-                    break;
-                    
-                case 'cart-count':
-                    $this->getCartCount();
-                    break;
-                    
-                case 'wishlist':
-                    $this->handleWishlist($method);
-                    break;
-                    
-                case 'wishlist-count':
-                    $this->getWishlistCount();
-                    break;
-                    
-                case 'newsletter':
-                    $this->handleNewsletter($method);
-                    break;
-                    
-                default:
-                    $this->sendError("Invalid endpoint: $endpoint", 404);
-                    break;
+
+            switch ($path) {
+                case 'categories': $this->getCategories(); break;
+                case 'products': $this->getProducts(); break;
+                case 'product': $this->getProduct(); break;
+                case 'cart': $this->handleCart($method); break;
+                case 'cart-count': $this->getCartCount(); break;
+                case 'wishlist': $this->handleWishlist($method); break;
+                case 'wishlist-count': $this->getWishlistCount(); break;
+                case 'newsletter': $this->handleNewsletter($method); break;
+                default: $this->sendError("Invalid endpoint: $path", 404); break;
             }
-            
         } catch (Exception $e) {
             logError("HandleRequest Exception: " . $e->getMessage());
             $this->sendError('Internal server error: ' . $e->getMessage(), 500);
         }
-    }
+   }
+
     
     // Get all categories
     private function getCategories() {
