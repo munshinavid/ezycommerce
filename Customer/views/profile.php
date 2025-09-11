@@ -342,7 +342,6 @@
     <div class="toast-container" id="toast-container">
         <!-- Toasts will be added here dynamically -->
     </div>
-
     <!-- JavaScript Files -->
     <script src="../scripts/profile.js"></script>
 </body>

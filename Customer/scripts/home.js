@@ -1,8 +1,11 @@
 // main.js - Fixed Homepage Frontend JavaScript
 
 // Configuration
+const userData = JSON.parse(localStorage.getItem("userData"));
 const API_BASE_URL = '../controllers/HomeController.php'; // Fixed: should be controller.php not MainController.php
-const CURRENT_USER_ID = 3; // In a real app, this would come from session/authentication
+const CURRENT_USER_ID = userData ? userData.id : null;
+
+initializeEcommerce();
 
 // State management
 let currentPage = 1;
