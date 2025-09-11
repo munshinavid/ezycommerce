@@ -756,6 +756,7 @@ async function loadWishlist() {
         }
         
         const data = await response.json();
+        console.log(data);
         updateWishlistUI(data.items || []);
         
     } catch (error) {
@@ -770,7 +771,9 @@ async function loadWishlist() {
 
 // Update wishlist UI
 function updateWishlistUI(items) {
+    console.log(items);
     const wishlistContainer = document.getElementById('wishlist-items-container');
+    const wishlistRefreshBtn = document.getElementById('refresh-wishlist-btn');
     if (!wishlistContainer) return;
     
     if (!items || items.length === 0) {
@@ -810,6 +813,20 @@ function updateWishlistUI(items) {
             removeFromWishlist(productId);
         });
     });
+
+    const addToCartButtons = document.querySelectorAll('.add-to-cart-btn');
+    addToCartButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const productId = this.dataset.productId;
+            addToCart(productId);
+        });
+    });
+    //refresh wishlist button
+    if (wishlistRefreshBtn) {
+        wishlistRefreshBtn.addEventListener('click', function() {
+            loadWishlist();
+        });
+    }
 }
 
 // Remove from wishlist
@@ -831,6 +848,41 @@ async function removeFromWishlist(productId) {
         showToast('Failed to remove from wishlist', 'error');
     }
 }
+//add to cart function
+async function addToCart(productId) {
+    try {
+        const customer = getCurrentUser();
+        const customerId = customer ? customer.id : null;
+        if (!customerId) throw new Error('User not logged in');
+
+        const quantity = 1; // Default quantity to add
+        const API_URL = '../controllers/HomeController.php/cart'; // RESTful path
+
+        const response = await makeApiRequest(API_URL, {
+            method: 'POST',
+            body: JSON.stringify({ product_id: productId, customer_id: customerId, quantity })
+        });
+        // const text=await response.text();
+        // console.log(text);
+
+        if (!response.ok) throw new Error(`Server responded with status ${response.status}`);
+
+        const data = await response.json();
+
+        if (data.success) {
+            alert('Item added to cart successfully!');
+            const cartCountEl = document.getElementById('cart-count');
+            if (cartCountEl) cartCountEl.innerText = data.cart_count;
+        } else {
+            alert(data.message || 'Failed to add item to cart');
+        }
+
+    } catch (error) {
+        console.error('Error adding item to cart:', error);
+        alert('An error occurred while adding the item to cart. Please try again.');
+    }
+}
+
 
 // View order details
 function viewOrderDetails(orderId) {

@@ -221,6 +221,19 @@
                 </div>
             </div>
 
+            <!-- Wishlist Section -->
+            <div class="content-section" id="wishlist-section" style="display: none;">
+                <div class="content-header">
+                    <h2 class="content-title">My Wishlist</h2>
+                    <button class="btn btn-primary" id="refresh-wishlist-btn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+
+                <div class="products-container" id="wishlist-items-container">
+                    <!-- Wishlist items will be loaded dynamically -->
+                </div>
+
             <!-- Account Settings Section -->
             <div class="content-section" id="settings-section" style="display: none;">
                 <div class="content-header">
