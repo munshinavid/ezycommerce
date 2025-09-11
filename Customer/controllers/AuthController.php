@@ -79,7 +79,8 @@ class AuthController {
             );
             
             if (empty($user) || $password !== $user[0]['password']) {
-            $this->sendResponse(['error' => 'Invalid credentials'], 401);
+                $this->sendResponse(['error' => 'Invalid credentials'], 401);
+                return;
             }
             
             $user = $user[0];
