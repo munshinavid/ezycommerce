@@ -67,6 +67,22 @@ class Database {
         return $success;
     }
 
+    // Insert wrapper
+    public function insert($query, $params = []) {
+        $this->execute($query, $params);
+        return $this->getLastInsertId();
+    }
+
+    // Update wrapper
+    public function update($query, $params = []) {
+        return $this->execute($query, $params);
+    }
+
+    // Delete wrapper
+    public function delete($query, $params = []) {
+        return $this->execute($query, $params);
+    }
+
     // Bind parameters to the prepared statement
     private function bindParams($stmt, $params) {
         $types = '';
