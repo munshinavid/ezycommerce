@@ -1,5 +1,5 @@
 <?php
-// controller.php - API Controller matching your exact database schema
+// HomeController.php - RESTful API Controller for ezyCommerce
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -22,42 +22,216 @@ function logError($message) {
 // Include database class
 require_once '../models/db.php';
 
-class APIController {
+class RESTfulAPIController {
     private $db;
+    private $method;
+    private $path;
+    private $pathSegments;
     
     public function __construct() {
         try {
             $this->db = new Database();
+            $this->method = $_SERVER['REQUEST_METHOD'];
+            $this->parsePath();
         } catch (Exception $e) {
             logError("Database connection failed: " . $e->getMessage());
             $this->sendError('Database connection failed: ' . $e->getMessage(), 500);
         }
     }
     
+    private function parsePath() {
+        $uri = $_SERVER['REQUEST_URI'];
+        $script = $_SERVER['SCRIPT_NAME'];
+        $this->path = trim(str_replace($script, '', $uri), '/');
+        
+        // Remove query string
+        if (($pos = strpos($this->path, '?')) !== false) {
+            $this->path = substr($this->path, 0, $pos);
+        }
+        
+        $this->pathSegments = array_filter(explode('/', $this->path));
+        $this->pathSegments = array_values($this->pathSegments); // Reindex
+    }
+    
     public function handleRequest() {
         try {
-            $uri = $_SERVER['REQUEST_URI']; // e.g., /api.php/cart
-            $script = $_SERVER['SCRIPT_NAME']; // e.g., /api.php
-            $path = trim(str_replace($script, '', $uri), '/'); // -> cart
-            $method = $_SERVER['REQUEST_METHOD'];
-
-            switch ($path) {
-                case 'categories': $this->getCategories(); break;
-                case 'products': $this->getProducts(); break;
-                case 'product': $this->getProduct(); break;
-                case 'cart': $this->handleCart($method); break;
-                case 'cart-count': $this->getCartCount(); break;
-                case 'wishlist': $this->handleWishlist($method); break;
-                case 'wishlist-count': $this->getWishlistCount(); break;
-                case 'newsletter': $this->handleNewsletter($method); break;
-                default: $this->sendError("Invalid endpoint: $path", 404); break;
+            if (empty($this->pathSegments)) {
+                $this->sendError("Invalid endpoint", 404);
+                return;
+            }
+            
+            $resource = $this->pathSegments[0];
+            
+            switch ($resource) {
+                case 'categories':
+                    $this->handleCategories();
+                    break;
+                case 'products':
+                    $this->handleProducts();
+                    break;
+                case 'customers':
+                    $this->handleCustomers();
+                    break;
+                case 'users':
+                    $this->handleUsers();
+                    break;
+                case 'newsletter':
+                    $this->handleNewsletter();
+                    break;
+                default:
+                    $this->sendError("Invalid endpoint: $resource", 404);
+                    break;
             }
         } catch (Exception $e) {
             logError("HandleRequest Exception: " . $e->getMessage());
             $this->sendError('Internal server error: ' . $e->getMessage(), 500);
         }
-   }
-
+    }
+    
+    // Handle /categories
+    private function handleCategories() {
+        if ($this->method !== 'GET') {
+            $this->sendError('Method not allowed', 405);
+            return;
+        }
+        
+        $this->getCategories();
+    }
+    
+    // Handle /products and /products/{id}
+    private function handleProducts() {
+        if ($this->method !== 'GET') {
+            $this->sendError('Method not allowed', 405);
+            return;
+        }
+        
+        if (count($this->pathSegments) === 1) {
+            // GET /products
+            $this->getProducts();
+        } elseif (count($this->pathSegments) === 2) {
+            // GET /products/{id}
+            $productId = $this->pathSegments[1];
+            $this->getProduct($productId);
+        } else {
+            $this->sendError('Invalid products endpoint', 404);
+        }
+    }
+    
+    // Handle /customers/{customerId}/cart/*
+    private function handleCustomers() {
+        if (count($this->pathSegments) < 3) {
+            $this->sendError('Invalid customers endpoint', 404);
+            return;
+        }
+        
+        $customerId = $this->pathSegments[1];
+        $resource = $this->pathSegments[2];
+        
+        if ($resource === 'cart') {
+            $this->handleCustomerCart($customerId);
+        } else {
+            $this->sendError('Invalid customers resource', 404);
+        }
+    }
+    
+    // Handle /users/{userId}/wishlist/*
+    private function handleUsers() {
+        if (count($this->pathSegments) < 3) {
+            $this->sendError('Invalid users endpoint', 404);
+            return;
+        }
+        
+        $userId = $this->pathSegments[1];
+        $resource = $this->pathSegments[2];
+        
+        if ($resource === 'wishlist') {
+            $this->handleUserWishlist($userId);
+        } else {
+            $this->sendError('Invalid users resource', 404);
+        }
+    }
+    
+    // Handle customer cart operations
+    private function handleCustomerCart($customerId) {
+        switch ($this->method) {
+            case 'GET':
+                if (count($this->pathSegments) === 4 && $this->pathSegments[3] === 'count') {
+                    // GET /customers/{customerId}/cart/count
+                    $this->getCartCount($customerId);
+                } else {
+                    // GET /customers/{customerId}/cart
+                    $this->getCart($customerId);
+                }
+                break;
+            case 'POST':
+                // POST /customers/{customerId}/cart
+                $this->addToCart($customerId);
+                break;
+            case 'PUT':
+                if (count($this->pathSegments) === 4) {
+                    // PUT /customers/{customerId}/cart/{itemId}
+                    $cartItemId = $this->pathSegments[3];
+                    $this->updateCartItem($cartItemId);
+                } else {
+                    $this->sendError('Cart item ID required for update', 400);
+                }
+                break;
+            case 'DELETE':
+                if (count($this->pathSegments) === 4) {
+                    // DELETE /customers/{customerId}/cart/{itemId}
+                    $cartItemId = $this->pathSegments[3];
+                    $this->removeFromCart($cartItemId);
+                } else {
+                    $this->sendError('Cart item ID required for deletion', 400);
+                }
+                break;
+            default:
+                $this->sendError('Method not allowed', 405);
+        }
+    }
+    
+    // Handle user wishlist operations
+    private function handleUserWishlist($userId) {
+        switch ($this->method) {
+            case 'GET':
+                if (count($this->pathSegments) === 4 && $this->pathSegments[3] === 'count') {
+                    // GET /users/{userId}/wishlist/count
+                    $this->getWishlistCount($userId);
+                } else {
+                    // GET /users/{userId}/wishlist
+                    $this->getWishlist($userId);
+                }
+                break;
+            case 'POST':
+                // POST /users/{userId}/wishlist
+                $this->addToWishlist($userId);
+                break;
+            case 'DELETE':
+                if (count($this->pathSegments) === 4) {
+                    // DELETE /users/{userId}/wishlist/{productId}
+                    $productId = $this->pathSegments[3];
+                    $this->removeFromWishlist($userId, $productId);
+                } else {
+                    $this->sendError('Product ID required for wishlist removal', 400);
+                }
+                break;
+            default:
+                $this->sendError('Method not allowed', 405);
+        }
+    }
+    
+    // Handle newsletter
+    private function handleNewsletter() {
+        if (count($this->pathSegments) === 2 && $this->pathSegments[1] === 'subscriptions') {
+            if ($this->method === 'POST') {
+                $this->subscribeNewsletter();
+            } else {
+                $this->sendError('Method not allowed', 405);
+            }
+        } else {
+            $this->sendError('Invalid newsletter endpoint', 404);
+        }
+    }
     
     // Get all categories
     private function getCategories() {
@@ -109,10 +283,9 @@ class APIController {
                 $params[] = $searchTerm;
             }
             
-            // Product filter - since we don't have featured/created_at columns, we'll work with what's available
+            // Product filter
             switch ($filter) {
                 case 'sale':
-                    // Products with discounts
                     $whereClauses[] = "p.discount_id IS NOT NULL";
                     break;
                 case 'in-stock':
@@ -139,7 +312,7 @@ class APIController {
                     break;
                 case 'newest':
                 default:
-                    $orderBy .= 'p.product_id DESC'; // Use product_id as proxy for newest
+                    $orderBy .= 'p.product_id DESC';
                     break;
             }
             
@@ -155,7 +328,7 @@ class APIController {
             $totalProducts = $countResult[0]['total'];
             $totalPages = ceil($totalProducts / $limit);
             
-            // Get products with category names and discount info
+            // Get products
             $productsQuery = "
                 SELECT 
                     p.product_id,
@@ -195,12 +368,11 @@ class APIController {
             foreach ($products as &$product) {
                 $product['price'] = floatval($product['price']);
                 $product['original_price'] = floatval($product['original_price']);
-                $product['rating'] = 4.5; // Default rating since we don't have reviews
-                $product['review_count'] = rand(10, 200); // Random review count for demo
+                $product['rating'] = 4.5;
+                $product['review_count'] = rand(10, 200);
                 $product['stock'] = intval($product['stock']);
                 $product['in_stock'] = $product['stock'] > 0;
                 
-                // Set default image if none provided
                 if (empty($product['image_url'])) {
                     $product['image_url'] = 'https://via.placeholder.com/300x200?text=No+Image';
                 }
@@ -224,15 +396,8 @@ class APIController {
     }
     
     // Get single product
-    private function getProduct() {
+    private function getProduct($productId) {
         try {
-            $productId = $_GET['id'] ?? null;
-            
-            if (!$productId) {
-                $this->sendError('Product ID required');
-                return;
-            }
-            
             $products = $this->db->select("
                 SELECT 
                     p.product_id,
@@ -265,8 +430,8 @@ class APIController {
             $product = $products[0];
             $product['price'] = floatval($product['price']);
             $product['original_price'] = floatval($product['original_price']);
-            $product['rating'] = 4.5; // Default rating
-            $product['review_count'] = rand(10, 200); // Random for demo
+            $product['rating'] = 4.5;
+            $product['review_count'] = rand(10, 200);
             $product['stock'] = intval($product['stock']);
             $product['in_stock'] = $product['stock'] > 0;
             
@@ -284,39 +449,8 @@ class APIController {
         }
     }
     
-    // Handle cart operations
-    private function handleCart($method) {
-        try {
-            switch ($method) {
-                case 'GET':
-                    $this->getCart();
-                    break;
-                case 'POST':
-                    $this->addToCart();
-                    break;
-                case 'PUT':
-                    $this->updateCartItem();
-                    break;
-                case 'DELETE':
-                    $this->removeFromCart();
-                    break;
-                default:
-                    $this->sendError('Method not allowed', 405);
-            }
-        } catch (Exception $e) {
-            $this->sendError('Cart operation failed: ' . $e->getMessage());
-        }
-    }
-    
     // Get cart items
-    private function getCart() {
-        $customerId = $_GET['customer_id'] ?? null;
-        
-        if (!$customerId) {
-            $this->sendError('Customer ID required');
-            return;
-        }
-        
+    private function getCart($customerId) {
         // Get or create cart
         $carts = $this->db->select("SELECT cart_id FROM cart WHERE customer_id = ?", [$customerId]);
         
@@ -351,15 +485,14 @@ class APIController {
     }
     
     // Add item to cart
-    private function addToCart() {
+    private function addToCart($customerId) {
         $input = json_decode(file_get_contents('php://input'), true);
         
         $productId = $input['product_id'] ?? null;
-        $customerId = $input['customer_id'] ?? null;
         $quantity = $input['quantity'] ?? 1;
         
-        if (!$productId || !$customerId) {
-            $this->sendError('Product ID and Customer ID required');
+        if (!$productId) {
+            $this->sendError('Product ID required');
             return;
         }
         
@@ -420,14 +553,12 @@ class APIController {
     }
     
     // Update cart item quantity
-    private function updateCartItem() {
+    private function updateCartItem($cartItemId) {
         $input = json_decode(file_get_contents('php://input'), true);
-        
-        $cartItemId = $input['cart_item_id'] ?? null;
         $quantity = $input['quantity'] ?? null;
         
-        if (!$cartItemId || !$quantity) {
-            $this->sendError('Cart item ID and quantity required');
+        if (!$quantity || $quantity < 1) {
+            $this->sendError('Valid quantity required');
             return;
         }
         
@@ -440,14 +571,7 @@ class APIController {
     }
     
     // Remove item from cart
-    private function removeFromCart() {
-        $cartItemId = $_GET['cart_item_id'] ?? null;
-        
-        if (!$cartItemId) {
-            $this->sendError('Cart item ID required');
-            return;
-        }
-        
+    private function removeFromCart($cartItemId) {
         $this->db->delete("DELETE FROM cart_items WHERE cart_item_id = ?", [$cartItemId]);
         
         $this->sendResponse([
@@ -457,14 +581,7 @@ class APIController {
     }
     
     // Get cart count
-    private function getCartCount() {
-        $customerId = $_GET['customer_id'] ?? null;
-        
-        if (!$customerId) {
-            $this->sendError('Customer ID required');
-            return;
-        }
-        
+    private function getCartCount($customerId) {
         $cartCount = $this->getCartCountForCustomer($customerId);
         
         $this->sendResponse([
@@ -485,36 +602,8 @@ class APIController {
         return intval($result[0]['cart_count']);
     }
     
-    // Handle wishlist operations
-    private function handleWishlist($method) {
-        try {
-            switch ($method) {
-                case 'GET':
-                    $this->getWishlist();
-                    break;
-                case 'POST':
-                    $this->addToWishlist();
-                    break;
-                case 'DELETE':
-                    $this->removeFromWishlist();
-                    break;
-                default:
-                    $this->sendError('Method not allowed', 405);
-            }
-        } catch (Exception $e) {
-            $this->sendError('Wishlist operation failed: ' . $e->getMessage());
-        }
-    }
-    
     // Get wishlist items
-    private function getWishlist() {
-        $userId = $_GET['user_id'] ?? null;
-        
-        if (!$userId) {
-            $this->sendError('User ID required');
-            return;
-        }
-        
+    private function getWishlist($userId) {
         $wishlistItems = $this->db->select("
             SELECT 
                 w.wishlist_id,
@@ -536,14 +625,12 @@ class APIController {
     }
     
     // Add to wishlist
-    private function addToWishlist() {
+    private function addToWishlist($userId) {
         $input = json_decode(file_get_contents('php://input'), true);
-        
         $productId = $input['product_id'] ?? null;
-        $userId = $input['user_id'] ?? null;
         
-        if (!$productId || !$userId) {
-            $this->sendError('Product ID and User ID required');
+        if (!$productId) {
+            $this->sendError('Product ID required');
             return;
         }
         
@@ -574,17 +661,7 @@ class APIController {
     }
     
     // Remove from wishlist
-    private function removeFromWishlist() {
-        $input = json_decode(file_get_contents('php://input'), true);
-        
-        $productId = $input['product_id'] ?? null;
-        $userId = $input['user_id'] ?? null;
-        
-        if (!$productId || !$userId) {
-            $this->sendError('Product ID and User ID required');
-            return;
-        }
-        
+    private function removeFromWishlist($userId, $productId) {
         $this->db->delete("
             DELETE FROM wishlist 
             WHERE user_id = ? AND product_id = ?
@@ -600,14 +677,7 @@ class APIController {
     }
     
     // Get wishlist count
-    private function getWishlistCount() {
-        $userId = $_GET['user_id'] ?? null;
-        
-        if (!$userId) {
-            $this->sendError('User ID required');
-            return;
-        }
-        
+    private function getWishlistCount($userId) {
         $wishlistCount = $this->getWishlistCountForUser($userId);
         
         $this->sendResponse([
@@ -628,12 +698,7 @@ class APIController {
     }
     
     // Handle newsletter subscription
-    private function handleNewsletter($method) {
-        if ($method !== 'POST') {
-            $this->sendError('Method not allowed', 405);
-            return;
-        }
-        
+    private function subscribeNewsletter() {
         $input = json_decode(file_get_contents('php://input'), true);
         $email = $input['email'] ?? null;
         
@@ -643,7 +708,6 @@ class APIController {
         }
         
         try {
-            // For now, just return success (you can add newsletter table later)
             $this->sendResponse([
                 'success' => true,
                 'message' => 'Successfully subscribed to newsletter'
@@ -672,6 +736,6 @@ class APIController {
 }
 
 // Initialize and handle request
-$controller = new APIController();
+$controller = new RESTfulAPIController();
 $controller->handleRequest();
 ?>

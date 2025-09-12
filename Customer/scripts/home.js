@@ -1,8 +1,8 @@
-// main.js - Fixed Homepage Frontend JavaScript
+// home.js - Fixed Homepage Frontend JavaScript with RESTful API calls
 
 // Configuration
 const userData = JSON.parse(localStorage.getItem("userData"));
-const API_BASE_URL = '../controllers/HomeController.php'; // Fixed: should be controller.php not MainController.php
+const API_BASE_URL = '../controllers/HomeController.php'; // Base API endpoint
 const CURRENT_USER_ID = userData ? userData.id : null;
 
 initializeEcommerce();
@@ -20,9 +20,17 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeApp();
 });
 
-// API call helper function - Fixed to match controller endpoints
+// RESTful API call helper function
 async function apiCall(endpoint, options = {}) {
-    const url = `${API_BASE_URL}?path=${endpoint}`;
+    // Construct proper URL based on endpoint
+    let url;
+    if (endpoint.startsWith('http')) {
+        url = endpoint;
+    } else {
+        url = `${API_BASE_URL}/${endpoint}`;
+    }
+    
+    console.log('API Call to:', url);
     
     const config = {
         method: 'GET',
@@ -162,12 +170,14 @@ function showToast(message, type = 'success') {
     }, 4000);
 }
 
-// Update cart count (load from server) - Fixed endpoint
+// Update cart count (RESTful)
 async function updateCartCount() {
+    if (!CURRENT_USER_ID) return;
+    
     try {
-        const response = await apiCall(`cart-count&customer_id=${CURRENT_USER_ID}`);
+        const response = await apiCall(`customers/${CURRENT_USER_ID}/cart/count`);
         const cartCount = document.getElementById('cart-count');
-        if (cartCount) {
+        if (cartCount && response.success) {
             cartCount.textContent = response.cart_count > 0 ? response.cart_count : '';
             cartCount.style.display = response.cart_count > 0 ? 'flex' : 'none';
         }
@@ -176,12 +186,14 @@ async function updateCartCount() {
     }
 }
 
-// Update wishlist count (load from server) - Fixed endpoint
+// Update wishlist count (RESTful)
 async function updateWishlistCount() {
+    if (!CURRENT_USER_ID) return;
+    
     try {
-        const response = await apiCall(`wishlist-count&user_id=${CURRENT_USER_ID}`);
+        const response = await apiCall(`users/${CURRENT_USER_ID}/wishlist/count`);
         const wishlistCount = document.getElementById('wishlist-count');
-        if (wishlistCount) {
+        if (wishlistCount && response.success) {
             wishlistCount.textContent = response.wishlist_count > 0 ? response.wishlist_count : '';
             wishlistCount.style.display = response.wishlist_count > 0 ? 'flex' : 'none';
         }
@@ -208,11 +220,13 @@ function updateWishlistCountFromResponse(count) {
     }
 }
 
-// Load categories from backend
+// Load categories from backend (RESTful)
 async function loadCategories() {
     try {
         const data = await apiCall('categories');
-        renderCategories(data.categories);
+        if (data.success) {
+            renderCategories(data.categories);
+        }
     } catch (error) {
         console.error('Failed to load categories:', error);
     }
@@ -243,7 +257,7 @@ function renderCategories(categories) {
     });
 }
 
-// Load products from backend
+// Load products from backend (RESTful with query parameters)
 async function loadProducts(page = 1, filter = 'all', sort = 'newest', category = '', search = '') {
     if (isLoading) return;
     
@@ -256,26 +270,30 @@ async function loadProducts(page = 1, filter = 'all', sort = 'newest', category 
     }
     
     try {
+        // Build query parameters for RESTful endpoint
         const params = new URLSearchParams({
             page: page,
             limit: 8,
             filter: filter,
-            sort: sort,
-            category: category,
-            search: search
+            sort: sort
         });
         
-        const data = await apiCall(`products&${params.toString()}`);
+        if (category) params.append('category', category);
+        if (search) params.append('search', search);
         
-        // Update state
-        currentPage = page;
-        currentFilter = filter;
-        currentSort = sort;
-        currentCategory = category;
-        currentSearch = search;
+        const data = await apiCall(`products?${params.toString()}`);
         
-        renderProducts(data.products);
-        updatePagination(data.pagination.current_page, data.pagination.total_pages);
+        if (data.success) {
+            // Update state
+            currentPage = page;
+            currentFilter = filter;
+            currentSort = sort;
+            currentCategory = category;
+            currentSearch = search;
+            
+            renderProducts(data.products);
+            updatePagination(data.pagination.current_page, data.pagination.total_pages);
+        }
         
     } catch (error) {
         console.error('Failed to load products:', error);
@@ -370,10 +388,14 @@ function renderProducts(products) {
     loadWishlistStatus();
 }
 
-// Load and update wishlist status for displayed products
+// Load and update wishlist status for displayed products (RESTful)
 async function loadWishlistStatus() {
+    if (!CURRENT_USER_ID) return;
+    
     try {
-        const response = await apiCall(`wishlist&user_id=${CURRENT_USER_ID}`);
+        const response = await apiCall(`users/${CURRENT_USER_ID}/wishlist`);
+        if (!response.success) return;
+        
         const wishlistItems = response.wishlist_items || [];
         
         // Create a set of wishlist product IDs for quick lookup
@@ -424,14 +446,18 @@ function updatePagination(currentPage, totalPages) {
     paginationContainer.innerHTML = paginationHTML;
 }
 
-// Add to cart
+// Add to cart (RESTful)
 async function addToCart(productId) {
+    if (!CURRENT_USER_ID) {
+        showToast('Please login to add items to cart', 'error');
+        return;
+    }
+    
     try {
-        const response = await apiCall('cart', {
+        const response = await apiCall(`customers/${CURRENT_USER_ID}/cart`, {
             method: 'POST',
             body: JSON.stringify({
                 product_id: productId,
-                customer_id: CURRENT_USER_ID,
                 quantity: 1
             })
         });
@@ -448,20 +474,21 @@ async function addToCart(productId) {
     }
 }
 
-// Add to wishlist - Enhanced with UI update
+// Add to wishlist (RESTful)
 async function addToWishlist(productId) {
+    if (!CURRENT_USER_ID) {
+        showToast('Please login to add items to wishlist', 'error');
+        return;
+    }
+    
     try {
         const btn = document.querySelector(`.btn-wishlist[data-product-id="${productId}"]`);
         const isInWishlist = btn && btn.classList.contains('in-wishlist');
         
         if (isInWishlist) {
-            // Remove from wishlist
-            const response = await apiCall('wishlist', {
-                method: 'DELETE',
-                body: JSON.stringify({
-                    product_id: productId,
-                    user_id: CURRENT_USER_ID
-                })
+            // Remove from wishlist - DELETE /users/{userId}/wishlist/{productId}
+            const response = await apiCall(`users/${CURRENT_USER_ID}/wishlist/${productId}`, {
+                method: 'DELETE'
             });
             
             if (response.success) {
@@ -475,12 +502,11 @@ async function addToWishlist(productId) {
                 showToast(response.error || 'Failed to remove from wishlist', 'error');
             }
         } else {
-            // Add to wishlist
-            const response = await apiCall('wishlist', {
+            // Add to wishlist - POST /users/{userId}/wishlist
+            const response = await apiCall(`users/${CURRENT_USER_ID}/wishlist`, {
                 method: 'POST',
                 body: JSON.stringify({
-                    product_id: productId,
-                    user_id: CURRENT_USER_ID
+                    product_id: productId
                 })
             });
             
@@ -501,10 +527,10 @@ async function addToWishlist(productId) {
     }
 }
 
-// Remove item from cart
+// Remove item from cart (RESTful)
 async function removeFromCart(cartItemId) {
     try {
-        const response = await apiCall(`cart&cart_item_id=${cartItemId}`, {
+        const response = await apiCall(`customers/${CURRENT_USER_ID}/cart/${cartItemId}`, {
             method: 'DELETE'
         });
         
@@ -523,13 +549,12 @@ async function removeFromCart(cartItemId) {
     }
 }
 
-// Update cart item quantity
+// Update cart item quantity (RESTful)
 async function updateCartQuantity(cartItemId, quantity) {
     try {
-        const response = await apiCall('cart', {
+        const response = await apiCall(`customers/${CURRENT_USER_ID}/cart/${cartItemId}`, {
             method: 'PUT',
             body: JSON.stringify({
-                cart_item_id: cartItemId,
                 quantity: quantity
             })
         });
@@ -548,33 +573,42 @@ async function updateCartQuantity(cartItemId, quantity) {
     }
 }
 
-// Get cart items
+// Get cart items (RESTful)
 async function getCartItems() {
     try {
-        const response = await apiCall(`cart&customer_id=${CURRENT_USER_ID}`);
-        return response.cart_items;
+        const response = await apiCall(`customers/${CURRENT_USER_ID}/cart`);
+        if (response.success) {
+            return response.cart_items;
+        }
+        throw new Error(response.error || 'Failed to get cart items');
     } catch (error) {
         console.error('Failed to get cart items:', error);
         throw error;
     }
 }
 
-// Get wishlist items
+// Get wishlist items (RESTful)
 async function getWishlistItems() {
     try {
-        const response = await apiCall(`wishlist&user_id=${CURRENT_USER_ID}`);
-        return response.wishlist_items;
+        const response = await apiCall(`users/${CURRENT_USER_ID}/wishlist`);
+        if (response.success) {
+            return response.wishlist_items;
+        }
+        throw new Error(response.error || 'Failed to get wishlist items');
     } catch (error) {
         console.error('Failed to get wishlist items:', error);
         throw error;
     }
 }
 
-// Get single product details - Fixed endpoint
+// Get single product details (RESTful)
 async function getProduct(productId) {
     try {
-        const response = await apiCall(`product&id=${productId}`);
-        return response.product;
+        const response = await apiCall(`products/${productId}`);
+        if (response.success) {
+            return response.product;
+        }
+        throw new Error(response.error || 'Failed to get product');
     } catch (error) {
         console.error('Failed to get product:', error);
         throw error;
@@ -630,7 +664,7 @@ function performSearch(query) {
     showToast(`Searching for: ${query}`, 'success');
 }
 
-// Subscribe to newsletter
+// Subscribe to newsletter (RESTful)
 async function subscribeNewsletter(form) {
     const emailInput = form.querySelector('input[type="email"]');
     const email = emailInput.value;
@@ -641,7 +675,7 @@ async function subscribeNewsletter(form) {
     }
     
     try {
-        const response = await apiCall('newsletter', {
+        const response = await apiCall('newsletter/subscriptions', {
             method: 'POST',
             body: JSON.stringify({ email: email })
         });
@@ -782,8 +816,11 @@ function initializeEcommerce() {
     // Load initial data
     loadProducts();
     loadCategories();
-    updateCartCount();
-    updateWishlistCount();
+    
+    if (CURRENT_USER_ID) {
+        updateCartCount();
+        updateWishlistCount();
+    }
     
     // Setup event listeners
     setupEventListeners();
