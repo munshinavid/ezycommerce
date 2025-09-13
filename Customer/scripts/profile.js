@@ -59,6 +59,7 @@ async function makeApiRequest(url, options = {}) {
     if (!token) {
         throw new Error('No authentication token found');
     }
+    console.log('Making API request to:', url);
 
     const defaultHeaders = {
         'Content-Type': 'application/json',
