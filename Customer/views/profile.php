@@ -24,7 +24,7 @@
     <!-- Header -->
     <header>
         <div class="header-content">
-            <a href="index.html" class="logo">
+            <a href="index.php" class="logo">
                 <i class="fas fa-shopping-bag"></i>
                 ShopEasy
             </a>

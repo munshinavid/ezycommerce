@@ -69,8 +69,8 @@
                 </div>
             </div>
             
-            <div class="header-icons" onclick="window.location.href='profile.php'">
-                <button class="icon-btn">
+            <div class="header-icons" >
+                <button class="icon-btn" onclick="window.location.href='profile.php'">
                     <i class="fas fa-user"></i>
                     <span id="user-greeting"></span> <!-- 👈 Added -->
                 </button>

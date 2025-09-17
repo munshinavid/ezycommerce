@@ -435,6 +435,7 @@ async function loadAddresses() {
         }
         
         const addresses = await response.json();
+        console.log(addresses);
         updateAddressesUI(addresses);
         
     } catch (error) {
