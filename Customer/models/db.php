@@ -103,6 +103,19 @@ class Database {
         return $this->conn->insert_id;
     }
 
+    // Transaction controls
+    public function beginTransaction() {
+        $this->conn->begin_transaction();
+    }
+
+    public function commit() {
+        $this->conn->commit();
+    }
+
+    public function rollback() {
+        $this->conn->rollback();
+    }
+
     // Close the connection
     public function close() {
         $this->conn->close();

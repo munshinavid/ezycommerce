@@ -321,6 +321,16 @@ class CartController {
             return;
         }
 
+        // Compose unified address if sent as line1/line2
+        if (!isset($customerDetails['address'])) {
+            $line1 = $customerDetails['address_line1'] ?? '';
+            $line2 = $customerDetails['address_line2'] ?? '';
+            $composed = trim($line1 . (empty($line2) ? '' : ', ' . $line2));
+            if (!empty($composed)) {
+                $customerDetails['address'] = $composed;
+            }
+        }
+
         // Validate customer details
         $requiredFields = ['full_name', 'address', 'phone'];
         foreach ($requiredFields as $field) {
@@ -382,7 +392,7 @@ class CartController {
         $totalAmount = $subtotal + $shippingCost;
 
         // Start transaction
-        $this->db->execute("START TRANSACTION");
+        $this->db->beginTransaction();
         
         try {
             // Save/update customer details
@@ -451,7 +461,7 @@ class CartController {
             $this->db->delete("DELETE FROM Cart_Items WHERE cart_id = ?", [$cartId]);
 
             // Commit transaction
-            $this->db->execute("COMMIT");
+            $this->db->commit();
             
             $response = [
                 'order_id' => $orderId,
@@ -462,7 +472,7 @@ class CartController {
             $this->sendResponse(true, 'Order placed successfully', $response);
             
         } catch (Exception $e) {
-            $this->db->execute("ROLLBACK");
+            $this->db->rollback();
             throw $e;
         }
     }
@@ -479,6 +489,11 @@ class CartController {
         $input = json_decode(file_get_contents("php://input"), true);
         if (isset($input['user_id'])) {
             return $input['user_id'];
+        }
+
+        // after JSON and before return null
+        if (isset($_POST['user_id'])) {
+            return $_POST['user_id'];
         }
         
         // Try from GET data (for API calls)

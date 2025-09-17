@@ -510,6 +510,12 @@ function renderAddressOptions(addresses) {
 		card.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectAddressCard(card); }});
 	});
 
+    // Auto-select default address if present
+    const defaultCard = listEl.querySelector('.address-card .badge-default')?.parentElement;
+    if (defaultCard) {
+        selectAddressCard(defaultCard);
+    }
+
 	const refreshBtn = document.getElementById('refresh-addresses-btn');
 	if (refreshBtn && !refreshBtn._bound) {
 		refreshBtn.addEventListener('click', loadAddresses);
@@ -536,13 +542,15 @@ function renderAddressOptions(addresses) {
 				if (errorEl) { errorEl.textContent = 'Please select an address.'; errorEl.style.display = 'block'; }
 				return;
 			}
+            alert("confirm cliked");
 			if (errorEl) errorEl.style.display = 'none';
 			const selected = addresses.find(a => String(a.id) === String(selectedAddressId));
 			const customerDetails = {
-				full_name: selected.full_name || '',
-				address_line1: selected.address_line1 || selected.address || '',
-				phone: selected.phone || ''
-			};
+                full_name: selected.full_name || '',
+                address: [selected.address_line1 || selected.address || '', selected.address_line2 || '']
+                          .filter(Boolean).join(', '),
+                phone: selected.phone || ''
+              };
 			const methodEl = document.querySelector('input[name="payment_method"]:checked');
 			const paymentMethod = methodEl ? methodEl.value : 'Cash on Delivery';
 			const res = await placeOrder(customerDetails, paymentMethod);
