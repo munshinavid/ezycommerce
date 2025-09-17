@@ -117,6 +117,42 @@
             <a href="index.php" class="continue-shopping">Continue Shopping</a>
         </div>
     </div>
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="checkout-modal hidden">
+        <div class="checkout-modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Complete Your Order</h2>
+                <button type="button" class="close-btn" aria-label="Close">&times;</button>
+            </div>
+
+            <div class="modal-section">
+                <h3 class="section-heading">Select Shipping Address</h3>
+                <div class="address-toolbar">
+                    <button type="button" class="btn btn-secondary" id="refresh-addresses-btn">Refresh</button>
+                    <button type="button" class="btn btn-primary" id="add-address-btn">Add New Address</button>
+                </div>
+                <div id="address-list" class="address-list">
+                    <!-- Address cards will be injected here -->
+                </div>
+                <div id="address-error" class="form-error" style="display:none;"></div>
+            </div>
+
+            <div class="modal-section">
+                <h3 class="section-heading">Payment Method</h3>
+                <div class="payment-options">
+                    <label class="radio-option"><input type="radio" name="payment_method" value="Cash on Delivery" checked> Cash on Delivery</label>
+                    <label class="radio-option"><input type="radio" name="payment_method" value="Credit Card"> Credit Card</label>
+                    <label class="radio-option"><input type="radio" name="payment_method" value="Mobile Banking"> Mobile Banking</label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="cancel-checkout-btn">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-order-btn" disabled>Place Order</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Recently Viewed -->
     <div class="recently-viewed">

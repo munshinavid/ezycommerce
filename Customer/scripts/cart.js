@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', initializeCart);
 
 // Configuration
 const userData = JSON.parse(localStorage.getItem("userData"));
+const authToken= localStorage.getItem("authToken");
 const API_BASE_URL = '../controllers/CartController.php'; // Base API endpoint
 const CURRENT_USER_ID = userData ? userData.id : null;
 
@@ -423,11 +424,154 @@ async function clearCart() {
 
 // --- Checkout Button Handler ---
 const checkoutBtn = document.querySelector('.checkout-btn');
+const checkoutModal = document.getElementById('checkout-modal');
+const closeBtn = document.querySelector('.close-btn');
+
 if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', function() {
-        // You can implement checkout modal or redirect to checkout page
+    checkoutBtn.addEventListener('click', async function () {
         console.log('Checkout button clicked');
-        // Example: redirect to checkout page
-        // window.location.href = '../pages/checkout.php';
+        // Show modal
+        checkoutModal.style.display = 'block';
+        await loadAddresses();
     });
 }
+
+if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+        checkoutModal.style.display = 'none';
+    });
+}
+async function loadAddresses() {
+    // const userData = JSON.parse(localStorage.getItem("userData"));
+    // if (!userData || !userData.token) {
+    //     alert("You are not logged in!");
+    //     return;
+    // }
+    //get authtoken from localstorage
+    console.log(authToken);
+
+    try {
+        const res = await fetch("../controllers/UserController.php?endpoint=addresses", {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${authToken}`
+            },
+            credentials: "include"
+        });
+
+        const data = await res.json();
+        console.log("Addresses:", data);
+
+        if (Array.isArray(data)) {
+            renderAddressOptions(data);
+        } else if (data.error) {
+            alert("Error: " + data.error);
+        }
+    } catch (err) {
+        console.error("Failed to load addresses:", err);
+    }
+}
+
+// --- Checkout Modal: Address rendering & interactions ---
+let selectedAddressId = null;
+
+function renderAddressOptions(addresses) {
+	const listEl = document.getElementById('address-list');
+	const confirmBtn = document.getElementById('confirm-order-btn');
+	const errorEl = document.getElementById('address-error');
+	selectedAddressId = null;
+	if (confirmBtn) confirmBtn.disabled = true;
+	if (!listEl) return;
+
+	if (!addresses || addresses.length === 0) {
+		listEl.innerHTML = '<p>No saved addresses found. Please add a new address.</p>';
+		return;
+	}
+
+	const cardsHtml = addresses.map(addr => {
+		const isDefault = Number(addr.is_default) === 1;
+		const type = addr.type || (isDefault ? 'default' : 'home');
+		return `
+			<div class="address-card" data-id="${addr.id}" role="button" tabindex="0">
+				${isDefault ? '<span class="badge-default">Default</span>' : ''}
+				<div class="address-type">${type}</div>
+				<div class="address-name">${escapeHtml(addr.full_name || '')}</div>
+				<div class="address-lines">${escapeHtml(addr.address_line1 || addr.address || '')}</div>
+				${addr.address_line2 ? `<div class=\"address-lines\">${escapeHtml(addr.address_line2)}</div>` : ''}
+				<div class="address-phone">${escapeHtml(addr.phone || '')}</div>
+			</div>
+		`;
+	}).join('');
+
+	listEl.innerHTML = cardsHtml;
+
+	listEl.querySelectorAll('.address-card').forEach(card => {
+		card.addEventListener('click', () => selectAddressCard(card));
+		card.addEventListener('keypress', (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selectAddressCard(card); }});
+	});
+
+	const refreshBtn = document.getElementById('refresh-addresses-btn');
+	if (refreshBtn && !refreshBtn._bound) {
+		refreshBtn.addEventListener('click', loadAddresses);
+		refreshBtn._bound = true;
+	}
+	const addBtn = document.getElementById('add-address-btn');
+	if (addBtn && !addBtn._bound) {
+		addBtn.addEventListener('click', () => {
+			alert('Address creation UI not implemented yet.');
+		});
+		addBtn._bound = true;
+	}
+
+	const modal = document.getElementById('checkout-modal');
+	const cancelBtn = document.getElementById('cancel-checkout-btn');
+	if (cancelBtn && !cancelBtn._bound) {
+		cancelBtn.addEventListener('click', () => { if (modal) modal.style.display = 'none'; });
+		cancelBtn._bound = true;
+	}
+
+	if (confirmBtn && !confirmBtn._bound) {
+		confirmBtn.addEventListener('click', async () => {
+			if (!selectedAddressId) {
+				if (errorEl) { errorEl.textContent = 'Please select an address.'; errorEl.style.display = 'block'; }
+				return;
+			}
+			if (errorEl) errorEl.style.display = 'none';
+			const selected = addresses.find(a => String(a.id) === String(selectedAddressId));
+			const customerDetails = {
+				full_name: selected.full_name || '',
+				address_line1: selected.address_line1 || selected.address || '',
+				phone: selected.phone || ''
+			};
+			const methodEl = document.querySelector('input[name="payment_method"]:checked');
+			const paymentMethod = methodEl ? methodEl.value : 'Cash on Delivery';
+			const res = await placeOrder(customerDetails, paymentMethod);
+			if (res && res.success) {
+				alert('Order placed successfully!');
+				if (modal) modal.style.display = 'none';
+				loadCartData();
+			} else {
+				alert('Failed to place order: ' + (res && res.message ? res.message : 'Unknown error'));
+			}
+		});
+		confirmBtn._bound = true;
+	}
+}
+
+function selectAddressCard(cardEl) {
+	const confirmBtn = document.getElementById('confirm-order-btn');
+	document.querySelectorAll('.address-card').forEach(el => el.classList.remove('selected'));
+	cardEl.classList.add('selected');
+	selectedAddressId = cardEl.getAttribute('data-id');
+	if (confirmBtn) confirmBtn.disabled = false;
+}
+
+function escapeHtml(value) {
+	return String(value)
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/\"/g, '&quot;')
+		.replace(/'/g, '&#039;');
+}
+
