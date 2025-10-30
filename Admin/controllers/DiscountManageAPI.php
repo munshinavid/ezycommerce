@@ -1,5 +1,5 @@
 <?php
-// api/discounts.php - Complete Discount Management API
+// api/discounts.php - Simplified Automatic Discount API
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
@@ -27,16 +27,13 @@ class DiscountManagementAPI {
 
     public function handleRequest() {
         try {
-            // Determine the endpoint
             $endpoint = $this->uriSegments[count($this->uriSegments) - 1];
             
-            // Check if it's a specific resource request
             if (is_numeric($endpoint)) {
                 $resourceId = $endpoint;
                 $action = isset($this->uriSegments[count($this->uriSegments) - 2]) ? 
                          $this->uriSegments[count($this->uriSegments) - 2] : null;
                 
-                // Check for sub-resources like /discounts/{id}/products
                 if (isset($this->uriSegments[count($this->uriSegments) - 1]) && 
                     !is_numeric($this->uriSegments[count($this->uriSegments) - 1])) {
                     $subResource = $this->uriSegments[count($this->uriSegments) - 1];
@@ -50,7 +47,6 @@ class DiscountManagementAPI {
                 return;
             }
 
-            // Handle collection endpoints
             switch ($endpoint) {
                 case 'discounts':
                     $this->handleDiscountsEndpoint();
@@ -110,13 +106,11 @@ class DiscountManagementAPI {
         $status = isset($_GET['status']) ? $_GET['status'] : 'all';
         $type = isset($_GET['type']) ? $_GET['type'] : 'all';
 
-        // Build WHERE clause
         $where = [];
         $params = [];
         
         if (!empty($search)) {
-            $where[] = "(d.discount_code LIKE ? OR d.discount_name LIKE ?)";
-            $params[] = "%$search%";
+            $where[] = "d.discount_name LIKE ?";
             $params[] = "%$search%";
         }
         
@@ -125,28 +119,25 @@ class DiscountManagementAPI {
             $params[] = $type;
         }
         
-        // Status filter based on dates
         $now = date('Y-m-d H:i:s');
         if ($status === 'active') {
-            $where[] = "(d.start_date <= ? AND d.end_date >= ?)";
+            $where[] = "(d.start_date <= ? AND d.end_date >= ? AND d.is_active = 1)";
             $params[] = $now;
             $params[] = $now;
         } elseif ($status === 'upcoming') {
-            $where[] = "d.start_date > ?";
+            $where[] = "(d.start_date > ? AND d.is_active = 1)";
             $params[] = $now;
         } elseif ($status === 'expired') {
-            $where[] = "d.end_date < ?";
+            $where[] = "(d.end_date < ? OR d.is_active = 0)";
             $params[] = $now;
         }
 
         $whereClause = !empty($where) ? 'WHERE ' . implode(' AND ', $where) : '';
 
-        // Count total records
         $countQuery = "SELECT COUNT(*) as total FROM discounts d $whereClause";
         $countResult = $this->db->select($countQuery, $params);
         $total = $countResult[0]['total'];
 
-        // Get discounts with product count
         $query = "
             SELECT 
                 d.*,
@@ -155,8 +146,9 @@ class DiscountManagementAPI {
                     FROM products p 
                     WHERE p.discount_id = d.discount_id
                 ) + (
-                    SELECT COUNT(DISTINCT c.category_id) 
-                    FROM categories c 
+                    SELECT COUNT(DISTINCT p2.product_id)
+                    FROM products p2
+                    INNER JOIN categories c ON p2.category_id = c.category_id
                     WHERE c.discount_id = d.discount_id
                 ) as products_count
             FROM discounts d
@@ -170,7 +162,6 @@ class DiscountManagementAPI {
         
         $discounts = $this->db->select($query, $params);
 
-        // Format discounts
         $formattedDiscounts = array_map(function($discount) {
             return $this->formatDiscount($discount);
         }, $discounts);
@@ -198,12 +189,10 @@ class DiscountManagementAPI {
 
         $discount = $result[0];
 
-        // Get associated products
         $productsQuery = "SELECT product_id FROM products WHERE discount_id = ?";
         $products = $this->db->select($productsQuery, [$id]);
         $productIds = array_map(function($p) { return (int)$p['product_id']; }, $products);
 
-        // Get associated categories
         $categoriesQuery = "SELECT category_id FROM categories WHERE discount_id = ?";
         $categories = $this->db->select($categoriesQuery, [$id]);
         $categoryIds = array_map(function($c) { return (int)$c['category_id']; }, $categories);
@@ -215,7 +204,7 @@ class DiscountManagementAPI {
         $this->sendResponse(200, $formattedDiscount);
     }
 
-    // GET /api/discounts/{id}/products - Get products with discount (both direct and via categories)
+    // GET /api/discounts/{id}/products - Get products with discount
     private function getDiscountProducts($id) {
         $query = "
             SELECT DISTINCT
@@ -255,8 +244,7 @@ class DiscountManagementAPI {
     private function createDiscount() {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        // Validate required fields
-        $required = ['code', 'name', 'type', 'value', 'start_date', 'end_date', 'apply_to'];
+        $required = ['name', 'type', 'value', 'start_date', 'end_date', 'apply_to'];
         foreach ($required as $field) {
             if (!isset($data[$field])) {
                 $this->sendResponse(400, ['message' => "Field '$field' is required"]);
@@ -264,25 +252,21 @@ class DiscountManagementAPI {
             }
         }
 
-        // Validate discount type
         if (!in_array($data['type'], ['percentage', 'fixed'])) {
-            $this->sendResponse(400, ['message' => 'Invalid discount type. Must be percentage or fixed']);
+            $this->sendResponse(400, ['message' => 'Invalid discount type']);
             return;
         }
 
-        // Validate percentage value
         if ($data['type'] === 'percentage' && ($data['value'] < 0 || $data['value'] > 100)) {
             $this->sendResponse(400, ['message' => 'Percentage must be between 0 and 100']);
             return;
         }
 
-        // Validate apply_to
         if (!in_array($data['apply_to'], ['all', 'selected', 'categories'])) {
             $this->sendResponse(400, ['message' => 'Invalid apply_to value']);
             return;
         }
 
-        // Validate dates
         if (strtotime($data['start_date']) > strtotime($data['end_date'])) {
             $this->sendResponse(400, ['message' => 'Start date must be before end date']);
             return;
@@ -291,35 +275,22 @@ class DiscountManagementAPI {
         $this->db->beginTransaction();
 
         try {
-            // Check if discount code already exists
-            $checkQuery = "SELECT discount_id FROM discounts WHERE discount_code = ?";
-            $existing = $this->db->select($checkQuery, [$data['code']]);
-            if (!empty($existing)) {
-                $this->sendResponse(400, ['message' => 'Discount code already exists']);
-                return;
-            }
-
-            // Insert discount
             $query = "
                 INSERT INTO discounts (
-                    discount_code, discount_name, discount_type, discount_value,
-                    start_date, end_date, max_uses, min_order_amount, apply_to
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    discount_name, discount_type, discount_value,
+                    start_date, end_date, apply_to, is_active
+                ) VALUES (?, ?, ?, ?, ?, ?, 1)
             ";
             
             $discountId = $this->db->insert($query, [
-                $data['code'],
                 $data['name'],
                 $data['type'],
                 $data['value'],
                 $data['start_date'],
                 $data['end_date'],
-                $data['max_uses'] ?? 0,
-                $data['min_order_amount'] ?? 0,
                 $data['apply_to']
             ]);
 
-            // Apply discount based on apply_to setting
             if ($data['apply_to'] === 'selected' && !empty($data['products'])) {
                 $this->applyDiscountToProducts($discountId, $data['products']);
             } elseif ($data['apply_to'] === 'categories' && !empty($data['categories'])) {
@@ -343,8 +314,7 @@ class DiscountManagementAPI {
     private function updateDiscount($id) {
         $data = json_decode(file_get_contents('php://input'), true);
 
-        // Check if discount exists
-        $checkQuery = "SELECT discount_id, discount_code FROM discounts WHERE discount_id = ?";
+        $checkQuery = "SELECT discount_id FROM discounts WHERE discount_id = ?";
         $exists = $this->db->select($checkQuery, [$id]);
         
         if (empty($exists)) {
@@ -352,17 +322,6 @@ class DiscountManagementAPI {
             return;
         }
 
-        // Check if new code conflicts with another discount
-        if ($data['code'] !== $exists[0]['discount_code']) {
-            $codeCheck = "SELECT discount_id FROM discounts WHERE discount_code = ? AND discount_id != ?";
-            $codeExists = $this->db->select($codeCheck, [$data['code'], $id]);
-            if (!empty($codeExists)) {
-                $this->sendResponse(400, ['message' => 'Discount code already exists']);
-                return;
-            }
-        }
-
-        // Validate dates
         if (strtotime($data['start_date']) > strtotime($data['end_date'])) {
             $this->sendResponse(400, ['message' => 'Start date must be before end date']);
             return;
@@ -371,38 +330,29 @@ class DiscountManagementAPI {
         $this->db->beginTransaction();
 
         try {
-            // Update discount
             $query = "
                 UPDATE discounts SET
-                    discount_code = ?,
                     discount_name = ?,
                     discount_type = ?,
                     discount_value = ?,
                     start_date = ?,
                     end_date = ?,
-                    max_uses = ?,
-                    min_order_amount = ?,
                     apply_to = ?
                 WHERE discount_id = ?
             ";
             
             $this->db->update($query, [
-                $data['code'],
                 $data['name'],
                 $data['type'],
                 $data['value'],
                 $data['start_date'],
                 $data['end_date'],
-                $data['max_uses'] ?? 0,
-                $data['min_order_amount'] ?? 0,
                 $data['apply_to'],
                 $id
             ]);
 
-            // Remove existing discount from products and categories
             $this->removeDiscountFromAll($id);
 
-            // Apply discount based on new apply_to setting
             if ($data['apply_to'] === 'selected' && !empty($data['products'])) {
                 $this->applyDiscountToProducts($id, $data['products']);
             } elseif ($data['apply_to'] === 'categories' && !empty($data['categories'])) {
@@ -421,7 +371,6 @@ class DiscountManagementAPI {
 
     // DELETE /api/discounts/{id} - Delete discount
     private function deleteDiscount($id) {
-        // Check if discount exists
         $checkQuery = "SELECT discount_id FROM discounts WHERE discount_id = ?";
         $exists = $this->db->select($checkQuery, [$id]);
         
@@ -433,10 +382,7 @@ class DiscountManagementAPI {
         $this->db->beginTransaction();
 
         try {
-            // Remove discount from products and categories (foreign key SET NULL will handle this, but being explicit)
             $this->removeDiscountFromAll($id);
-
-            // Delete discount
             $deleteQuery = "DELETE FROM discounts WHERE discount_id = ?";
             $this->db->delete($deleteQuery, [$id]);
 
@@ -534,7 +480,6 @@ class DiscountManagementAPI {
 
     // ==================== HELPER METHODS ====================
 
-    // Apply discount to specific products
     private function applyDiscountToProducts($discountId, $productIds) {
         if (empty($productIds)) return;
 
@@ -545,7 +490,6 @@ class DiscountManagementAPI {
         $this->db->update($query, $params);
     }
 
-    // Apply discount to specific categories
     private function applyDiscountToCategories($discountId, $categoryIds) {
         if (empty($categoryIds)) return;
 
@@ -556,36 +500,30 @@ class DiscountManagementAPI {
         $this->db->update($query, $params);
     }
 
-    // Apply discount to all products and categories
     private function applyDiscountToAll($discountId) {
         $this->db->update("UPDATE products SET discount_id = ?", [$discountId]);
         $this->db->update("UPDATE categories SET discount_id = ?", [$discountId]);
     }
 
-    // Remove discount from all products and categories
     private function removeDiscountFromAll($discountId) {
         $this->db->update("UPDATE products SET discount_id = NULL WHERE discount_id = ?", [$discountId]);
         $this->db->update("UPDATE categories SET discount_id = NULL WHERE discount_id = ?", [$discountId]);
     }
 
-    // Format discount for response
     private function formatDiscount($discount) {
         return [
             'id' => (int)$discount['discount_id'],
-            'code' => $discount['discount_code'] ?? '',
             'name' => $discount['discount_name'] ?? '',
             'type' => $discount['discount_type'],
             'value' => (float)$discount['discount_value'],
             'start_date' => $discount['start_date'],
             'end_date' => $discount['end_date'],
-            'max_uses' => (int)($discount['max_uses'] ?? 0),
-            'min_order_amount' => (float)($discount['min_order_amount'] ?? 0),
             'apply_to' => $discount['apply_to'] ?? 'all',
+            'is_active' => (bool)($discount['is_active'] ?? true),
             'products_count' => (int)($discount['products_count'] ?? 0)
         ];
     }
 
-    // Send JSON response
     private function sendResponse($statusCode, $data) {
         http_response_code($statusCode);
         echo json_encode($data, JSON_PRETTY_PRINT);
@@ -593,6 +531,5 @@ class DiscountManagementAPI {
     }
 }
 
-// Initialize and handle the request
 $api = new DiscountManagementAPI();
 $api->handleRequest();

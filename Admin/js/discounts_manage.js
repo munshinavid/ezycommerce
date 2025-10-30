@@ -1,4 +1,4 @@
-// API Configuration
+// discount_manage.js - Simplified for Automatic Discounts
 const API_BASE_URL = '../controllers/DiscountManageAPI.php';
 const DISCOUNTS_ENDPOINT = `${API_BASE_URL}/discounts`;
 const PRODUCTS_ENDPOINT = `${API_BASE_URL}/products`;
@@ -32,7 +32,7 @@ const statusFilter = document.getElementById('statusFilter');
 const typeFilter = document.getElementById('typeFilter');
 const applyFiltersBtn = document.getElementById('applyFilters');
 
-// Initialize the application
+// Initialize
 document.addEventListener('DOMContentLoaded', function() {
     loadDiscounts();
     setupEventListeners();
@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Setup event listeners
 function setupEventListeners() {
-    // Modal functionality
     document.getElementById('addDiscountBtn').addEventListener('click', () => openDiscountModal());
     document.querySelectorAll('.close-btn').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -51,25 +50,19 @@ function setupEventListeners() {
     document.getElementById('cancelBtn').addEventListener('click', () => closeDiscountModal());
     document.getElementById('closeViewProductsBtn').addEventListener('click', () => closeViewProductsModal());
     
-    // Form submission
     discountForm.addEventListener('submit', handleDiscountFormSubmit);
-    
-    // Dynamic form behavior
     document.getElementById('discountType').addEventListener('change', handleDiscountTypeChange);
     document.getElementById('applyTo').addEventListener('change', handleApplyToChange);
     document.getElementById('productSearch').addEventListener('input', handleProductSearch);
     
-    // Filter functionality
     applyFiltersBtn.addEventListener('click', applyFilters);
     searchInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter') applyFilters();
     });
     
-    // Confirmation modal
     document.getElementById('confirmCancel').addEventListener('click', () => closeConfirmationModal());
     document.getElementById('confirmAction').addEventListener('click', handleConfirmedAction);
     
-    // Close modals when clicking outside
     window.addEventListener('click', (e) => {
         if (e.target === discountModal) closeDiscountModal();
         if (e.target === viewProductsModal) closeViewProductsModal();
@@ -77,7 +70,7 @@ function setupEventListeners() {
     });
 }
 
-// Load discounts from API
+// Load discounts
 function loadDiscounts(page = 1) {
     showLoadingState(true);
     
@@ -91,9 +84,7 @@ function loadDiscounts(page = 1) {
     
     fetch(`${DISCOUNTS_ENDPOINT}?${params}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch discounts');
-            }
+            if (!response.ok) throw new Error('Failed to fetch discounts');
             return response.json();
         })
         .then(data => {
@@ -106,24 +97,24 @@ function loadDiscounts(page = 1) {
         .catch(error => {
             console.error('Error loading discounts:', error);
             showNotification('Failed to load discounts', 'error');
-            discountsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center; color: red;">Error loading discounts</td></tr>';
+            discountsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center; color: red;">Error loading discounts</td></tr>';
         })
         .finally(() => {
             showLoadingState(false);
         });
 }
 
-// Display discounts in the table
+// Display discounts
 function displayDiscounts(discounts) {
     if (discounts.length === 0) {
-        discountsTableBody.innerHTML = '<tr><td colspan="9" style="text-align: center;">No discounts found</td></tr>';
+        discountsTableBody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No discounts found</td></tr>';
         return;
     }
     
     discountsTableBody.innerHTML = discounts.map(discount => `
         <tr>
             <td>#${discount.id}</td>
-            <td>${escapeHtml(discount.code)}</td>
+            <td>${escapeHtml(discount.name)}</td>
             <td><span class="discount-type type-${discount.type}">${discount.type.charAt(0).toUpperCase() + discount.type.slice(1)}</span></td>
             <td>${discount.type === 'percentage' ? `${discount.value}%` : `$${discount.value.toFixed(2)}`}</td>
             <td>${formatDate(discount.start_date)}</td>
@@ -144,7 +135,6 @@ function displayDiscounts(discounts) {
         </tr>
     `).join('');
     
-    // Add event listeners to action buttons
     document.querySelectorAll('.view-products-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const discountId = e.target.closest('.view-products-btn').dataset.id;
@@ -167,7 +157,7 @@ function displayDiscounts(discounts) {
     });
 }
 
-// Update pagination controls
+// Update pagination
 function updatePagination(pagination) {
     const { current_page, total_pages } = pagination;
     
@@ -178,14 +168,12 @@ function updatePagination(pagination) {
     
     let paginationHTML = '';
     
-    // Previous button
     if (current_page > 1) {
         paginationHTML += `<button onclick="loadDiscounts(${current_page - 1})">&laquo;</button>`;
     } else {
         paginationHTML += `<button disabled>&laquo;</button>`;
     }
     
-    // Page numbers
     const startPage = Math.max(1, current_page - 2);
     const endPage = Math.min(total_pages, current_page + 2);
     
@@ -211,7 +199,6 @@ function updatePagination(pagination) {
         paginationHTML += `<button onclick="loadDiscounts(${total_pages})">${total_pages}</button>`;
     }
     
-    // Next button
     if (current_page < total_pages) {
         paginationHTML += `<button onclick="loadDiscounts(${current_page + 1})">&raquo;</button>`;
     } else {
@@ -221,36 +208,30 @@ function updatePagination(pagination) {
     paginationDiv.innerHTML = paginationHTML;
 }
 
-// Update discount count display
+// Update discount count
 function updateDiscountCount(count) {
     discountCountSpan.textContent = `Total discounts: ${count}`;
 }
 
-// Open discount modal for adding or editing
+// Open discount modal
 function openDiscountModal(discount = null) {
     if (discount) {
-        // Editing existing discount
         modalTitle.textContent = 'Edit Discount';
         submitBtn.textContent = 'Update Discount';
         currentDiscountId = discount.id;
         document.getElementById('discountId').value = discount.id;
-        document.getElementById('discountCode').value = discount.code;
         document.getElementById('discountName').value = discount.name;
         document.getElementById('discountType').value = discount.type;
         document.getElementById('discountValue').value = discount.value;
         document.getElementById('startDate').value = formatDateTimeForInput(discount.start_date);
         document.getElementById('endDate').value = formatDateTimeForInput(discount.end_date);
-        document.getElementById('maxUses').value = discount.max_uses || 0;
-        document.getElementById('minOrderAmount').value = discount.min_order_amount || 0;
         document.getElementById('applyTo').value = discount.apply_to;
         
-        // Set selected products and categories
         selectedProducts = discount.products || [];
         selectedCategories = discount.categories || [];
         
         handleApplyToChange();
     } else {
-        // Adding new discount
         modalTitle.textContent = 'Add New Discount';
         submitBtn.textContent = 'Add Discount';
         currentDiscountId = null;
@@ -273,26 +254,22 @@ function closeDiscountModal() {
     currentDiscountId = null;
 }
 
-// Handle discount form submission (add/edit)
+// Handle discount form submission
 function handleDiscountFormSubmit(e) {
     e.preventDefault();
     
     const discountId = document.getElementById('discountId').value;
     const discountData = {
-        code: document.getElementById('discountCode').value.trim(),
         name: document.getElementById('discountName').value.trim(),
         type: document.getElementById('discountType').value,
         value: parseFloat(document.getElementById('discountValue').value),
         start_date: document.getElementById('startDate').value,
         end_date: document.getElementById('endDate').value,
-        max_uses: parseInt(document.getElementById('maxUses').value) || 0,
-        min_order_amount: parseFloat(document.getElementById('minOrderAmount').value) || 0,
         apply_to: document.getElementById('applyTo').value
     };
     
-    // Validate
-    if (!discountData.code || !discountData.name) {
-        showNotification('Please fill all required fields', 'error');
+    if (!discountData.name) {
+        showNotification('Please enter discount name', 'error');
         return;
     }
     
@@ -306,7 +283,6 @@ function handleDiscountFormSubmit(e) {
         return;
     }
     
-    // Add selected products or categories based on apply_to
     if (discountData.apply_to === 'selected') {
         if (selectedProducts.length === 0) {
             showNotification('Please select at least one product', 'error');
@@ -322,15 +298,13 @@ function handleDiscountFormSubmit(e) {
     }
     
     if (discountId) {
-        // Update existing discount
         updateDiscount(discountId, discountData);
     } else {
-        // Add new discount
         addDiscount(discountData);
     }
 }
 
-// Add new discount via API
+// Add new discount
 function addDiscount(discountData) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Adding...';
@@ -365,15 +339,13 @@ function addDiscount(discountData) {
     });
 }
 
-// Edit discount - fetch discount data and open modal
+// Edit discount
 function editDiscount(discountId) {
     showLoadingState(true);
     
     fetch(`${DISCOUNTS_ENDPOINT}/${discountId}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch discount data');
-            }
+            if (!response.ok) throw new Error('Failed to fetch discount data');
             return response.json();
         })
         .then(discount => {
@@ -388,7 +360,7 @@ function editDiscount(discountId) {
         });
 }
 
-// Update discount via API
+// Update discount
 function updateDiscount(discountId, discountData) {
     submitBtn.disabled = true;
     submitBtn.textContent = 'Updating...';
@@ -427,9 +399,7 @@ function updateDiscount(discountId, discountData) {
 function viewDiscountProducts(discountId) {
     fetch(`${DISCOUNTS_ENDPOINT}/${discountId}/products`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch discount products');
-            }
+            if (!response.ok) throw new Error('Failed to fetch discount products');
             return response.json();
         })
         .then(data => {
@@ -441,7 +411,7 @@ function viewDiscountProducts(discountId) {
         });
 }
 
-// Display discount products in modal
+// Display discount products
 function displayDiscountProducts(discountId, products) {
     document.getElementById('viewProductsTitle').textContent = `Products with Discount #${discountId}`;
     
@@ -478,7 +448,7 @@ function confirmDeleteDiscount(discountId) {
     confirmationModal.style.display = 'flex';
 }
 
-// Handle confirmed actions (currently only deletion)
+// Handle confirmed actions
 function handleConfirmedAction() {
     if (discountToDelete) {
         deleteDiscount(discountToDelete);
@@ -492,7 +462,7 @@ function closeConfirmationModal() {
     discountToDelete = null;
 }
 
-// Delete discount via API
+// Delete discount
 function deleteDiscount(discountId) {
     fetch(`${DISCOUNTS_ENDPOINT}/${discountId}`, {
         method: 'DELETE'
@@ -554,7 +524,7 @@ function handleApplyToChange() {
     }
 }
 
-// Load products for selection
+// Load products
 function loadProducts(search = '') {
     const params = new URLSearchParams();
     if (search) {
@@ -564,9 +534,7 @@ function loadProducts(search = '') {
     
     fetch(`${PRODUCTS_ENDPOINT}?${params}`)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch products');
-            }
+            if (!response.ok) throw new Error('Failed to fetch products');
             return response.json();
         })
         .then(data => {
@@ -578,7 +546,7 @@ function loadProducts(search = '') {
         });
 }
 
-// Display products for selection
+// Display products
 function displayProducts(products) {
     const productsList = document.getElementById('productsList');
     
@@ -595,7 +563,6 @@ function displayProducts(products) {
         </div>
     `).join('');
     
-    // Add event listeners to checkboxes
     document.querySelectorAll('#productsList input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', (e) => {
             const productId = parseInt(e.target.value);
@@ -610,13 +577,11 @@ function displayProducts(products) {
     });
 }
 
-// Load categories for selection
+// Load categories
 function loadCategories() {
     fetch(CATEGORIES_ENDPOINT)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch categories');
-            }
+            if (!response.ok) throw new Error('Failed to fetch categories');
             return response.json();
         })
         .then(data => {
@@ -628,7 +593,7 @@ function loadCategories() {
         });
 }
 
-// Display categories for selection
+// Display categories
 function displayCategories(categories) {
     const categoriesList = document.getElementById('categoriesList');
     
@@ -645,7 +610,6 @@ function displayCategories(categories) {
         </div>
     `).join('');
     
-    // Add event listeners to checkboxes
     document.querySelectorAll('#categoriesList input[type="checkbox"]').forEach(checkbox => {
         checkbox.addEventListener('change', (e) => {
             const categoryId = parseInt(e.target.value);
@@ -676,7 +640,7 @@ function applyFilters() {
         status: statusFilter.value,
         type: typeFilter.value
     };
-    loadDiscounts(1); // Reset to first page when applying filters
+    loadDiscounts(1);
 }
 
 // Show loading state
@@ -693,7 +657,6 @@ function showLoadingState(loading) {
 
 // Show notification
 function showNotification(message, type) {
-    // Remove existing notifications
     document.querySelectorAll('.notification').forEach(n => n.remove());
     
     const notification = document.createElement('div');
@@ -701,7 +664,6 @@ function showNotification(message, type) {
     notification.textContent = message;
     document.body.appendChild(notification);
     
-    // Trigger animation
     setTimeout(() => notification.classList.add('show'), 10);
     
     setTimeout(() => {
@@ -726,12 +688,12 @@ function getDiscountStatus(discount) {
     const startDate = new Date(discount.start_date);
     const endDate = new Date(discount.end_date);
     
+    if (!discount.is_active) return 'expired';
     if (now < startDate) return 'upcoming';
     if (now > endDate) return 'expired';
     return 'active';
 }
 
-// Escape HTML to prevent XSS
 function escapeHtml(text) {
     const map = {
         '&': '&amp;',
