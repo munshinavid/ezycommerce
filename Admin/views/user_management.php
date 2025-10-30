@@ -1,6 +1,3 @@
-<?php echo "Hello World"; ?>
-<!DOCTYPE html>
-<!-- ...existing code... -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,6 +7,78 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/user_management.css">
     <link rel="stylesheet" href="../css/sidebar.css">
+    <style>
+        /* Additional styles for enhanced functionality */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .notification.success {
+            background-color: #28a745;
+        }
+        
+        .notification.error {
+            background-color: #dc3545;
+        }
+        
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .confirmation-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .confirmation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -55,7 +124,7 @@
                     <option value="logistics">Logistics</option>
                 </select>
             </div>
-            <button class="btn btn-primary" style="align-self: flex-end;">
+            <button class="btn btn-primary" id="applyFilters">
                 <i class="fas fa-filter"></i> Apply Filters
             </button>
         </div>
@@ -65,155 +134,43 @@
             <div class="table-header">
                 <h3>All Users</h3>
                 <div>
-                    <span>Showing 1-10 of 48 users</span>
+                    <span id="userCount">Loading users...</span>
                 </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>User ID</th>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>Role</th>
-                        <th>Created At</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>#1001</td>
-                        <td>john_doe</td>
-                        <td>john.doe@example.com</td>
-                        <td><span class="role-badge role-customer">Customer</span></td>
-                        <td>Jun 12, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1002</td>
-                        <td>emma_williams</td>
-                        <td>emma.w@example.com</td>
-                        <td><span class="role-badge role-vendor">Vendor</span></td>
-                        <td>May 28, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1003</td>
-                        <td>admin_michael</td>
-                        <td>michael@example.com</td>
-                        <td><span class="role-badge role-admin">Admin</span></td>
-                        <td>Apr 15, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1004</td>
-                        <td>logistics_sarah</td>
-                        <td>sarah.l@example.com</td>
-                        <td><span class="role-badge role-logistics">Logistics</span></td>
-                        <td>Jun 5, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1005</td>
-                        <td>david_miller</td>
-                        <td>david.m@example.com</td>
-                        <td><span class="role-badge role-customer">Customer</span></td>
-                        <td>Jun 18, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1006</td>
-                        <td>tech_gadgets</td>
-                        <td>contact@techgadgets.com</td>
-                        <td><span class="role-badge role-vendor">Vendor</span></td>
-                        <td>Mar 22, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1007</td>
-                        <td>fashion_outlet</td>
-                        <td>info@fashionoutlet.com</td>
-                        <td><span class="role-badge role-vendor">Vendor</span></td>
-                        <td>Feb 10, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1008</td>
-                        <td>jennifer_k</td>
-                        <td>jennifer.k@example.com</td>
-                        <td><span class="role-badge role-customer">Customer</span></td>
-                        <td>Jun 22, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1009</td>
-                        <td>logistics_mark</td>
-                        <td>mark.t@example.com</td>
-                        <td><span class="role-badge role-logistics">Logistics</span></td>
-                        <td>May 15, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#1010</td>
-                        <td>admin_sophia</td>
-                        <td>sophia.a@example.com</td>
-                        <td><span class="role-badge role-admin">Admin</span></td>
-                        <td>Jan 5, 2023</td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                            <button class="btn btn-danger btn-sm"><i class="fas fa-trash"></i> Delete</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-wrapper">
+                <table id="usersTable">
+                    <thead>
+                        <tr>
+                            <th>User ID</th>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Created At</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be loaded here via AJAX -->
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
-            <div class="pagination">
-                <button>&laquo;</button>
-                <button class="active">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>&raquo;</button>
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be generated here via AJAX -->
             </div>
         </div>
     </div>
 
-    <!-- Add User Modal -->
-    <div class="modal" id="addUserModal">
+    <!-- Add/Edit User Modal -->
+    <div class="modal" id="userModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h3>Add New User</h3>
+                <h3 id="modalTitle">Add New User</h3>
                 <button class="close-btn">&times;</button>
             </div>
-            <form id="addUserForm">
+            <form id="userForm">
+                <input type="hidden" id="userId">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" id="username" required>
@@ -224,7 +181,8 @@
                 </div>
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" required>
+                    <input type="password" id="password">
+                    <small>Leave blank to keep current password (when editing)</small>
                 </div>
                 <div class="form-group">
                     <label for="role">Role</label>
@@ -237,77 +195,26 @@
                     </select>
                 </div>
                 <div class="form-actions">
-                    <button type="button" class="btn btn-danger">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Add User</button>
+                    <button type="button" class="btn btn-danger" id="cancelBtn">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Add User</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <script>
-        // Modal functionality
-        const addUserBtn = document.getElementById('addUserBtn');
-        const addUserModal = document.getElementById('addUserModal');
-        const closeBtn = document.querySelector('.close-btn');
-        const cancelBtn = document.querySelector('.btn-danger');
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="confirmation-content">
+            <h3 id="confirmationTitle">Confirm Action</h3>
+            <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+            <div class="confirmation-actions">
+                <button class="btn btn-danger" id="confirmCancel">Cancel</button>
+                <button class="btn btn-primary" id="confirmAction">Confirm</button>
+            </div>
+        </div>
+    </div>
 
-        addUserBtn.addEventListener('click', () => {
-            addUserModal.style.display = 'flex';
-        });
-
-        closeBtn.addEventListener('click', () => {
-            addUserModal.style.display = 'none';
-        });
-
-        cancelBtn.addEventListener('click', () => {
-            addUserModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === addUserModal) {
-                addUserModal.style.display = 'none';
-            }
-        });
-
-        // Form submission
-        document.getElementById('addUserForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            // In a real application, you would handle form submission to the server here
-            alert('User added successfully!');
-            addUserModal.style.display = 'none';
-        });
-
-        // Filter functionality
-        document.getElementById('search').addEventListener('input', (e) => {
-            const searchValue = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const username = row.children[1].textContent.toLowerCase();
-                const email = row.children[2].textContent.toLowerCase();
-                
-                if (username.includes(searchValue) || email.includes(searchValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-
-        document.getElementById('roleFilter').addEventListener('change', (e) => {
-            const roleValue = e.target.value;
-            const rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const role = row.children[3].textContent.toLowerCase();
-                
-                if (roleValue === 'all' || role.includes(roleValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    </script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/user_management.js"></script>
 </body>
 </html>
