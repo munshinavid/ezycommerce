@@ -58,76 +58,171 @@ class CartController {
 
     // Fetch cart items for current user
     private function fetchCart() {
-        $customerId = $this->getCustomerId();
-        
-        if (!$customerId) {
-            $this->sendResponse(false, 'User not logged in', null, 401);
-            return;
-        }
+    $customerId = $this->getCustomerId();
+    
+    if (!$customerId) {
+        $this->sendResponse(false, 'User not logged in', null, 401);
+        return;
+    }
 
-        // Get or create cart for user
-        $cartId = $this->getOrCreateCart($customerId);
-        
-        // Fetch cart items with product details
-        $query = "
-            SELECT 
-                ci.cart_item_id,
-                ci.product_id,
-                ci.quantity,
-                p.name,
-                p.price,
-                p.image_url,
-                p.stock,
-                (ci.quantity * p.price) as item_total,
-                COALESCE(d.discount_type, '') as discount_type,
-                COALESCE(d.discount_value, 0) as discount_value
-            FROM Cart_Items ci
-            JOIN Products p ON ci.product_id = p.product_id
-            LEFT JOIN Discounts d ON p.discount_id = d.discount_id 
-                AND CURDATE() BETWEEN d.start_date AND d.end_date
-            WHERE ci.cart_id = ?
-            ORDER BY ci.cart_item_id DESC
-        ";
-        
-        $cartItems = $this->db->select($query, [$cartId]);
-        
-        // Calculate totals
-        $subtotal = 0;
-        $totalDiscount = 0;
-        
-        foreach ($cartItems as &$item) {
-            $itemPrice = $item['price'] * $item['quantity'];
-            $itemDiscount = 0;
+    $cartId = $this->getOrCreateCart($customerId);
+    
+    // Enhanced query to get product and category discounts
+    $query = "
+        SELECT 
+            ci.cart_item_id,
+            ci.product_id,
+            ci.quantity,
+            p.name,
+            p.price,
+            p.image_url,
+            p.stock,
+            p.category_id,
+            c.category_name,
+            p.discount_id as product_discount_id,
+            c.discount_id as category_discount_id,
             
-            // Apply discount if exists
-            if ($item['discount_type'] == 'percentage') {
-                $itemDiscount = ($itemPrice * $item['discount_value']) / 100;
-            } elseif ($item['discount_type'] == 'fixed') {
-                $itemDiscount = min($item['discount_value'], $itemPrice);
-            }
+            -- Product-level discount
+            pd.discount_id as pd_id,
+            pd.discount_type as product_discount_type,
+            pd.discount_value as product_discount_value,
+            pd.discount_name as product_discount_name,
+            pd.is_active as pd_active,
+            pd.start_date as pd_start,
+            pd.end_date as pd_end,
             
-            $item['discount_amount'] = $itemDiscount;
-            $item['final_price'] = $itemPrice - $itemDiscount;
+            -- Category-level discount
+            cd.discount_id as cd_id,
+            cd.discount_type as category_discount_type,
+            cd.discount_value as category_discount_value,
+            cd.discount_name as category_discount_name,
+            cd.is_active as cd_active,
+            cd.start_date as cd_start,
+            cd.end_date as cd_end
             
-            $subtotal += $item['final_price'];
-            $totalDiscount += $itemDiscount;
+        FROM cart_items ci
+        JOIN products p ON ci.product_id = p.product_id
+        LEFT JOIN categories c ON p.category_id = c.category_id
+        
+        -- Get product discount (will check active status in PHP)
+        LEFT JOIN discounts pd ON p.discount_id = pd.discount_id
+        
+        -- Get category discount (will check active status in PHP)
+        LEFT JOIN discounts cd ON c.discount_id = cd.discount_id
+        
+        WHERE ci.cart_id = ?
+        ORDER BY ci.cart_item_id DESC
+    ";
+    
+    $cartItems = $this->db->select($query, [$cartId]);
+    
+    // Calculate totals with proper discount logic
+    $subtotal = 0;
+    $totalDiscount = 0;
+    $currentDate = date('Y-m-d');
+    
+    foreach ($cartItems as &$item) {
+        $itemPrice = floatval($item['price']) * intval($item['quantity']);
+        $itemDiscount = 0;
+        
+        // Determine which discount to apply (product discount takes priority)
+        $discountType = null;
+        $discountValue = 0;
+        $discountName = '';
+        $discountSource = 'none';
+        
+        // Check product-specific discount
+        if (!empty($item['pd_id']) && 
+            $item['pd_active'] == 1 &&
+            $currentDate >= date('Y-m-d', strtotime($item['pd_start'])) &&
+            $currentDate <= date('Y-m-d', strtotime($item['pd_end']))) {
+            
+            $discountType = $item['product_discount_type'];
+            $discountValue = floatval($item['product_discount_value']);
+            $discountName = $item['product_discount_name'];
+            $discountSource = 'product';
+        } 
+        // Check category-level discount (only if no product discount)
+        elseif (!empty($item['cd_id']) && 
+                 $item['cd_active'] == 1 &&
+                 $currentDate >= date('Y-m-d', strtotime($item['cd_start'])) &&
+                 $currentDate <= date('Y-m-d', strtotime($item['cd_end']))) {
+            
+            $discountType = $item['category_discount_type'];
+            $discountValue = floatval($item['category_discount_value']);
+            $discountName = $item['category_discount_name'];
+            $discountSource = 'category';
         }
         
-        // Calculate shipping (free shipping over ৳1000)
-        $shippingCost = $subtotal >= 1000 ? 0 : 50;
-        $totalCost = $subtotal + $shippingCost;
+        // Calculate discount amount
+        if ($discountType == 'percentage') {
+            // Percentage discount: apply to total item price
+            $itemDiscount = ($itemPrice * $discountValue) / 100;
+        } elseif ($discountType == 'fixed') {
+            // Fixed discount: apply per unit, then multiply by quantity
+            // But don't exceed the total item price
+            $discountPerUnit = $discountValue;
+            $totalFixedDiscount = $discountPerUnit * intval($item['quantity']);
+            $itemDiscount = min($totalFixedDiscount, $itemPrice);
+        }
         
-        $response = [
-            'cartItems' => $cartItems,
-            'itemCount' => count($cartItems),
-            'subtotal' => number_format($subtotal, 2),
-            'totalDiscount' => number_format($totalDiscount, 2),
-            'shippingCost' => number_format($shippingCost, 2),
-            'totalCost' => number_format($totalCost, 2)
+        
+        // Calculate final price after discount
+        $finalPrice = $itemPrice - $itemDiscount;
+        
+        // Store discount info in item (keep as numbers for calculations)
+        $item['discount_type'] = $discountType;
+        $item['discount_value'] = $discountValue;
+        $item['discount_name'] = $discountName;
+        $item['discount_source'] = $discountSource;
+        $item['discount_amount'] = $itemDiscount;
+        $item['final_price'] = $finalPrice;
+        $item['item_total'] = $itemPrice; // Original price before discount
+        
+        // Debug info (remove in production)
+        $item['debug'] = [
+            'has_product_discount' => !empty($item['pd_id']),
+            'has_category_discount' => !empty($item['cd_id']),
+            'pd_active' => $item['pd_active'],
+            'cd_active' => $item['cd_active'],
+            'current_date' => $currentDate,
+            'discount_applied' => $discountSource
         ];
         
-        $this->sendResponse(true, 'Cart fetched successfully', $response);
+        // Add to totals
+        $subtotal += $finalPrice;
+        $totalDiscount += $itemDiscount;
+        
+        // Clean up - remove internal fields
+        unset($item['pd_id'], $item['cd_id']);
+        unset($item['pd_active'], $item['cd_active']);
+        unset($item['pd_start'], $item['pd_end']);
+        unset($item['cd_start'], $item['cd_end']);
     }
+    
+    // Calculate shipping (free shipping over ৳1000)
+    $shippingCost = $subtotal >= 1000 ? 0 : 50;
+    $totalCost = $subtotal + $shippingCost;
+    
+    // Format all monetary values for response
+    foreach ($cartItems as &$item) {
+        $item['price'] = number_format($item['price'], 2, '.', '');
+        $item['item_total'] = number_format($item['item_total'], 2, '.', '');
+        $item['discount_amount'] = number_format($item['discount_amount'], 2, '.', '');
+        $item['final_price'] = number_format($item['final_price'], 2, '.', '');
+    }
+    
+    $response = [
+        'cartItems' => $cartItems,
+        'itemCount' => count($cartItems),
+        'subtotal' => number_format($subtotal, 2, '.', ''),
+        'totalDiscounts' => number_format($totalDiscount, 2, '.', ''),
+        'shippingCost' => number_format($shippingCost, 2, '.', ''),
+        'totalCost' => number_format($totalCost, 2, '.', '')
+    ];
+    
+    $this->sendResponse(true, 'Cart fetched successfully', $response);
+}
 
     // Add item to cart
     private function addToCart() {

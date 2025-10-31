@@ -144,6 +144,8 @@ function updateCartSummary(data) {
     document.getElementById('subtotal').textContent = `৳${data.subtotal}`;
     document.getElementById('shipping').textContent = `৳${data.shippingCost}`;
     document.getElementById('total').textContent = `৳${data.totalCost}`;
+    //discount if any
+    document.getElementById('discount').textContent = `৳${data.totalDiscounts || 0}`;
 }
 
 // --- Optimistic UI Updates ---
