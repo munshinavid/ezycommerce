@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +7,101 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="../css/user_management.css">
     <link rel="stylesheet" href="../css/sidebar.css">
+    <style>
+        /* Additional styles for enhanced functionality */
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+        
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 5px;
+            color: white;
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+        
+        .notification.success {
+            background-color: #28a745;
+        }
+        
+        .notification.error {
+            background-color: #dc3545;
+        }
+        
+        .notification.warning {
+            background-color: #ffc107;
+            color: #212529;
+        }
+        
+        .confirmation-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .confirmation-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            max-width: 400px;
+            width: 90%;
+        }
+        
+        .confirmation-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .pagination button {
+            margin: 0 5px;
+            padding: 5px 10px;
+            border: 1px solid #ddd;
+            background-color: white;
+            cursor: pointer;
+        }
+        
+        .pagination button.active {
+            background-color: #007bff;
+            color: white;
+        }
+        
+        .pagination button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .status-select {
+            padding: 5px 10px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            font-size: 14px;
+        }
+        
+        .order-details-section {
+            margin-bottom: 20px;
+        }
+        
+        .order-details-section h4 {
+            margin-bottom: 10px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
@@ -19,7 +113,7 @@
         <div class="header">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search orders...">
+                <input type="text" placeholder="Search orders..." id="searchInput">
             </div>
             <div class="user-profile">
                 <img src="https://ui-avatars.com/api/?name=Super+Admin&background=random" alt="Admin">
@@ -33,7 +127,7 @@
         <div class="page-header">
             <h1 class="page-title">Orders Management</h1>
             <div>
-                <button class="btn btn-primary">
+                <button class="btn btn-primary" id="exportBtn">
                     <i class="fas fa-file-export"></i> Export Orders
                 </button>
             </div>
@@ -66,7 +160,7 @@
                     <option value="quarter">This Quarter</option>
                 </select>
             </div>
-            <button class="btn btn-primary" style="align-self: flex-end;">
+            <button class="btn btn-primary" id="applyFilters" style="align-self: flex-end;">
                 <i class="fas fa-filter"></i> Apply Filters
             </button>
         </div>
@@ -76,293 +170,117 @@
             <div class="table-header">
                 <h3>All Orders</h3>
                 <div>
-                    <span>Showing 1-10 of 84 orders</span>
+                    <span id="orderCount">Loading orders...</span>
                 </div>
             </div>
-            <table>
-                <thead>
-                    <tr>
-                        <th>Order ID</th>
-                        <th>Customer</th>
-                        <th>Date</th>
-                        <th>Amount</th>
-                        <th>Status</th>
-                        <th>Payment</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>#ORD-7842</td>
-                        <td>John Smith</td>
-                        <td>Jun 24, 2023</td>
-                        <td>$128.99</td>
-                        <td><span class="order-status status-delivered">Delivered</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7841</td>
-                        <td>Emma Johnson</td>
-                        <td>Jun 24, 2023</td>
-                        <td>$89.50</td>
-                        <td><span class="order-status status-shipped">Shipped</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7840</td>
-                        <td>Michael Brown</td>
-                        <td>Jun 23, 2023</td>
-                        <td>$245.75</td>
-                        <td><span class="order-status status-processing">Processing</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7839</td>
-                        <td>Sarah Wilson</td>
-                        <td>Jun 23, 2023</td>
-                        <td>$54.25</td>
-                        <td><span class="order-status status-cancelled">Cancelled</span></td>
-                        <td><span class="payment-status payment-failed">Failed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7838</td>
-                        <td>David Miller</td>
-                        <td>Jun 22, 2023</td>
-                        <td>$189.99</td>
-                        <td><span class="order-status status-pending">Pending</span></td>
-                        <td><span class="payment-status payment-pending">Pending</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7837</td>
-                        <td>Jennifer Lopez</td>
-                        <td>Jun 22, 2023</td>
-                        <td>$321.40</td>
-                        <td><span class="order-status status-delivered">Delivered</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7836</td>
-                        <td>Robert Taylor</td>
-                        <td>Jun 21, 2023</td>
-                        <td>$76.80</td>
-                        <td><span class="order-status status-shipped">Shipped</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7835</td>
-                        <td>Amanda Clark</td>
-                        <td>Jun 21, 2023</td>
-                        <td>$145.30</td>
-                        <td><span class="order-status status-processing">Processing</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7834</td>
-                        <td>James Anderson</td>
-                        <td>Jun 20, 2023</td>
-                        <td>$92.45</td>
-                        <td><span class="order-status status-cancelled">Cancelled</span></td>
-                        <td><span class="payment-status payment-failed">Failed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>#ORD-7833</td>
-                        <td>Lisa Garcia</td>
-                        <td>Jun 20, 2023</td>
-                        <td>$210.20</td>
-                        <td><span class="order-status status-delivered">Delivered</span></td>
-                        <td><span class="payment-status payment-completed">Completed</span></td>
-                        <td class="action-buttons">
-                            <button class="btn btn-success btn-sm view-order-btn"><i class="fas fa-eye"></i> View</button>
-                            <button class="btn btn-primary btn-sm"><i class="fas fa-edit"></i> Edit</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-wrapper">
+                <table id="ordersTable">
+                    <thead>
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Status</th>
+                            <th>Payment</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="ordersTableBody">
+                        <!-- Orders will be loaded here via AJAX -->
+                    </tbody>
+                </table>
+            </div>
 
             <!-- Pagination -->
-            <div class="pagination">
-                <button>&laquo;</button>
-                <button class="active">1</button>
-                <button>2</button>
-                <button>3</button>
-                <button>4</button>
-                <button>5</button>
-                <button>&raquo;</button>
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be generated here via AJAX -->
             </div>
         </div>
     </div>
 
     <!-- Order Details Modal -->
     <div class="modal" id="orderDetailsModal">
-        <div class="modal-content">
+        <div class="modal-content" style="max-width: 800px;">
             <div class="modal-header">
-                <h3>Order Details - #ORD-7842</h3>
+                <h3 id="modalOrderTitle">Order Details</h3>
                 <button class="close-btn">&times;</button>
             </div>
             
             <div class="order-details">
-                <div class="detail-row">
-                    <div class="detail-label">Order Date:</div>
-                    <div class="detail-value">June 24, 2023 at 14:32</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Customer:</div>
-                    <div class="detail-value">John Smith (john.smith@example.com)</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Shipping Address:</div>
-                    <div class="detail-value">123 Main St, Apt 4B, New York, NY 10001, United States</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Phone:</div>
-                    <div class="detail-value">+1 (555) 123-4567</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Status:</div>
-                    <div class="detail-value"><span class="order-status status-delivered">Delivered</span></div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Payment Method:</div>
-                    <div class="detail-value">Credit Card (Visa ending in 7654)</div>
-                </div>
-                <div class="detail-row">
-                    <div class="detail-label">Payment Status:</div>
-                    <div class="detail-value"><span class="payment-status payment-completed">Completed</span></div>
-                </div>
-            </div>
-            
-            <div class="order-items">
-                <h4>Order Items</h4>
-                <div class="order-item">
-                    <img src="https://via.placeholder.com/60" class="item-image" alt="Wireless Headphones">
-                    <div class="item-details">
-                        <div class="item-name">Wireless Headphones</div>
-                        <div class="item-price">$129.99 × 1</div>
+                <div class="order-details-section">
+                    <h4>Order Information</h4>
+                    <div class="detail-row">
+                        <div class="detail-label">Order Date:</div>
+                        <div class="detail-value" id="orderDate">Loading...</div>
                     </div>
-                    <div class="item-total">$129.99</div>
+                    <div class="detail-row">
+                        <div class="detail-label">Customer:</div>
+                        <div class="detail-value" id="orderCustomer">Loading...</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Shipping Address:</div>
+                        <div class="detail-value" id="orderAddress">Loading...</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Phone:</div>
+                        <div class="detail-value" id="orderPhone">Loading...</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Status:</div>
+                        <div class="detail-value">
+                            <select id="orderStatusSelect" class="status-select">
+                                <option value="pending">Pending</option>
+                                <option value="processing">Processing</option>
+                                <option value="shipped">Shipped</option>
+                                <option value="delivered">Delivered</option>
+                                <option value="cancelled">Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Payment Method:</div>
+                        <div class="detail-value" id="orderPaymentMethod">Loading...</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Payment Status:</div>
+                        <div class="detail-value" id="orderPaymentStatus">Loading...</div>
+                    </div>
                 </div>
                 
-                <div class="order-summary">
-                    <div class="summary-row">
-                        <div>Subtotal:</div>
-                        <div>$129.99</div>
+                <div class="order-items">
+                    <h4>Order Items</h4>
+                    <div id="orderItemsList">
+                        <!-- Order items will be loaded here -->
                     </div>
-                    <div class="summary-row">
-                        <div>Shipping:</div>
-                        <div>$5.99</div>
-                    </div>
-                    <div class="summary-row">
-                        <div>Tax:</div>
-                        <div>$7.80</div>
-                    </div>
-                    <div class="summary-row">
-                        <div>Discount:</div>
-                        <div>-$15.00</div>
-                    </div>
-                    <div class="summary-row summary-total">
-                        <div>Total:</div>
-                        <div>$128.78</div>
+                    
+                    <div class="order-summary" id="orderSummary">
+                        <!-- Order summary will be loaded here -->
                     </div>
                 </div>
             </div>
             
             <div class="form-actions">
-                <button class="btn btn-danger">Cancel Order</button>
-                <button class="btn btn-primary">Update Status</button>
-                <button class="btn btn-warning">Print Invoice</button>
+                <button class="btn btn-danger" id="cancelOrderBtn">Cancel Order</button>
+                <button class="btn btn-primary" id="updateStatusBtn">Update Status</button>
+                <button class="btn btn-warning" id="printInvoiceBtn">Print Invoice</button>
             </div>
         </div>
     </div>
 
-    <script>
-        // Modal functionality
-        const viewOrderBtns = document.querySelectorAll('.view-order-btn');
-        const orderDetailsModal = document.getElementById('orderDetailsModal');
-        const closeBtn = document.querySelector('.close-btn');
+    <!-- Confirmation Modal -->
+    <div class="confirmation-modal" id="confirmationModal">
+        <div class="confirmation-content">
+            <h3 id="confirmationTitle">Confirm Action</h3>
+            <p id="confirmationMessage">Are you sure you want to perform this action?</p>
+            <div class="confirmation-actions">
+                <button class="btn btn-danger" id="confirmCancel">Cancel</button>
+                <button class="btn btn-primary" id="confirmAction">Confirm</button>
+            </div>
+        </div>
+    </div>
 
-        viewOrderBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                orderDetailsModal.style.display = 'flex';
-            });
-        });
-
-        closeBtn.addEventListener('click', () => {
-            orderDetailsModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === orderDetailsModal) {
-                orderDetailsModal.style.display = 'none';
-            }
-        });
-
-        // Filter functionality
-        document.getElementById('search').addEventListener('input', (e) => {
-            const searchValue = e.target.value.toLowerCase();
-            const rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const orderId = row.children[0].textContent.toLowerCase();
-                const customer = row.children[1].textContent.toLowerCase();
-                
-                if (orderId.includes(searchValue) || customer.includes(searchValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-
-        document.getElementById('statusFilter').addEventListener('change', (e) => {
-            const statusValue = e.target.value;
-            const rows = document.querySelectorAll('tbody tr');
-            
-            rows.forEach(row => {
-                const status = row.children[4].textContent.toLowerCase();
-                
-                if (statusValue === 'all' || status.includes(statusValue)) {
-                    row.style.display = '';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-        });
-    </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="../js/order_management.js"></script>
 </body>
 </html>
