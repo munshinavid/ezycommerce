@@ -1,4 +1,3 @@
-
 <?php
 require_once __DIR__ . '/../controllers/DashboardController.php';
 $dashboard = new DashboardController();
@@ -8,9 +7,6 @@ $recentOrders = $dashboard->getRecentOrders();
 $topProducts = $dashboard->getTopProducts();
 ?>
 
-
-<!DOCTYPE html>
-<!-- ...existing code... -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -31,9 +27,12 @@ $topProducts = $dashboard->getTopProducts();
         <div class="header">
             <div class="search-bar">
                 <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search...">
+                <input type="text" placeholder="Search orders, products...">
             </div>
             <div class="user-profile">
+                <button class="btn btn-icon" onclick="refreshDashboard()" title="Refresh Dashboard">
+                    <i class="fas fa-sync-alt"></i>
+                </button>
                 <img src="https://ui-avatars.com/api/?name=Super+Admin&background=random" alt="Admin">
                 <div>
                     <h4>Super Admin</h4>
@@ -42,13 +41,13 @@ $topProducts = $dashboard->getTopProducts();
         </div>
 
         <!-- Dashboard Cards -->
-                <div class="dashboard-cards">
+        <div class="dashboard-cards">
             <div class="card stat-card">
                 <div class="stat-icon bg-primary">
                     <i class="fas fa-shopping-cart"></i>
                 </div>
                 <div class="stat-info">
-                    <h3><?php echo $stats['total_orders']; ?></h3>
+                    <h3 data-target="<?php echo $stats['total_orders']; ?>"><?php echo $stats['total_orders']; ?></h3>
                     <p>Total Orders</p>
                 </div>
             </div>
@@ -57,7 +56,7 @@ $topProducts = $dashboard->getTopProducts();
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
-                    <h3><?php echo $stats['total_users']; ?></h3>
+                    <h3 data-target="<?php echo $stats['total_users']; ?>"><?php echo $stats['total_users']; ?></h3>
                     <p>Total Users</p>
                 </div>
             </div>
@@ -66,7 +65,7 @@ $topProducts = $dashboard->getTopProducts();
                     <i class="fas fa-box"></i>
                 </div>
                 <div class="stat-info">
-                    <h3><?php echo $stats['total_products']; ?></h3>
+                    <h3 data-target="<?php echo $stats['total_products']; ?>"><?php echo $stats['total_products']; ?></h3>
                     <p>Total Products</p>
                 </div>
             </div>
@@ -75,12 +74,11 @@ $topProducts = $dashboard->getTopProducts();
                     <i class="fas fa-dollar-sign"></i>
                 </div>
                 <div class="stat-info">
-                    <h3>$<?php echo number_format($stats['total_revenue'], 2); ?></h3>
+                    <h3 data-target="<?php echo $stats['total_revenue']; ?>">$<?php echo number_format($stats['total_revenue'], 2); ?></h3>
                     <p>Total Revenue</p>
                 </div>
             </div>
         </div>
-
 
         <!-- Charts -->
         <div class="charts-container">
@@ -88,21 +86,21 @@ $topProducts = $dashboard->getTopProducts();
                 <div class="chart-header">
                     <h3>Sales Overview</h3>
                     <select class="btn">
-                        <option>Last 7 Days</option>
-                        <option>Last 30 Days</option>
-                        <option>Last 90 Days</option>
+                        <option value="Last 7 Days">Last 7 Days</option>
+                        <option value="Last 30 Days">Last 30 Days</option>
+                        <option value="Last 90 Days">Last 90 Days</option>
                     </select>
                 </div>
-                <div class="chart-placeholder">
-                    Sales Chart (to be implemented with Chart.js)
+                <div class="chart-placeholder" style="height: 300px; padding: 20px;">
+                    <canvas id="salesChart"></canvas>
                 </div>
             </div>
             <div class="chart">
                 <div class="chart-header">
                     <h3>Revenue by Category</h3>
                 </div>
-                <div class="chart-placeholder">
-                    Pie Chart (to be implemented with Chart.js)
+                <div class="chart-placeholder" style="height: 300px; padding: 20px;">
+                    <canvas id="revenueChart"></canvas>
                 </div>
             </div>
         </div>
@@ -128,7 +126,7 @@ $topProducts = $dashboard->getTopProducts();
                     <?php foreach ($recentOrders as $order): ?>
                     <tr>
                         <td>#ORD-<?php echo $order['order_id']; ?></td>
-                        <td><?php echo $order['customer']; ?></td>
+                        <td><?php echo htmlspecialchars($order['customer']); ?></td>
                         <td><?php echo date("M d, Y", strtotime($order['created_at'])); ?></td>
                         <td>$<?php echo number_format($order['total_amount'], 2); ?></td>
                         <td>
@@ -136,11 +134,12 @@ $topProducts = $dashboard->getTopProducts();
                                 <?php echo ucfirst($order['order_status']); ?>
                             </span>
                         </td>
-                        <td><i class="fas fa-edit"></i></td>
+                        <td>
+                            <i class="fas fa-edit" style="cursor: pointer;" onclick="editOrder(<?php echo $order['order_id']; ?>)"></i>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
                 </tbody>
-
             </table>
         </div>
 
@@ -164,18 +163,27 @@ $topProducts = $dashboard->getTopProducts();
                 <tbody>
                     <?php foreach ($topProducts as $product): ?>
                     <tr>
-                        <td><?php echo $product['name']; ?></td>
-                        <td><?php echo $product['category']; ?></td>
+                        <td><?php echo htmlspecialchars($product['name']); ?></td>
+                        <td><?php echo htmlspecialchars($product['category'] ?? 'N/A'); ?></td>
                         <td>$<?php echo number_format($product['price'], 2); ?></td>
                         <td><?php echo $product['sold']; ?></td>
                         <td><?php echo $product['stock']; ?></td>
-                        <td><i class="fas fa-edit"></i></td>
+                        <td>
+                            <i class="fas fa-edit" style="cursor: pointer;" onclick="editProduct(<?php echo $product['product_id']; ?>)"></i>
+                        </td>
                     </tr>
                     <?php endforeach; ?>
+                </tbody>
             </table>
         </div>
     </div>
 
+    <!-- Chart.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+    
+    <!-- Dashboard JavaScript -->
+    <script src="../js/dashboard.js"></script>
+    
     <script>
         // Simple JavaScript for menu interaction
         document.querySelectorAll('.menu-item').forEach(item => {
