@@ -168,6 +168,6 @@
         </div>
     </div>
 
-    <script src="../scripts/product_management.js"></script>
+    <script src="../js/product_management.js"></script>
 </body>
 </html>
