@@ -56,6 +56,7 @@ class AuthController {
     
     public function login() {
         try {
+            session_start();
             $input = json_decode(file_get_contents('php://input'), true);
             if (!$input) {
                 $this->sendResponse(['error' => 'Invalid JSON input'], 400);
@@ -108,6 +109,17 @@ class AuthController {
                 $userData['lastName'] = $nameParts[1] ?? '';
                 $userData['phone'] = $userDetails[0]['phone'];
             }
+
+            // ✅ Store necessary info in session
+            $_SESSION['user'] = [
+                'id' => $userData['id'],
+                'username' => $userData['username'],
+                'email' => $userData['email'],
+                'role' => $userData['role'],
+                'firstName' => $userData['firstName'],
+                'lastName' => $userData['lastName'],
+                'phone' => $userData['phone']
+            ];
             
             $this->sendResponse([
                 'message' => 'Login successful',
