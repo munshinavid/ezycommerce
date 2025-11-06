@@ -312,6 +312,10 @@
             background-color: #fff3cd;
             color: #856404;
         }
+        .status-return-processing {
+            background-color: #cce7ff;
+            color: #004085;
+        }
 
         .status-return-approved {
             background-color: #d4edda;
@@ -509,9 +513,9 @@
             <div class="sidebar-menu">
                 <ul>
                     <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="#"><i class="fas fa-list"></i> All Orders</a></li>
+                    <li><a href="allshipping.php"><i class="fas fa-list"></i> All Orders</a></li>
                     <li><a href="#"><i class="fas fa-shipping-fast"></i> Shipping</a></li>
-                    <li><a href="#"><i class="fas fa-undo"></i> Returns</a></li>
+                    <li><a href="return.php"><i class="fas fa-undo"></i> Returns</a></li>
                     <li><a href="#"><i class="fas fa-chart-bar"></i> Analytics</a></li>
                     <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
@@ -746,6 +750,7 @@
                         <label for="modal-return-status">Action</label>
                         <select id="modal-return-status" class="form-control">
                             <option value="Pending">Pending</option>
+                            <option value="Processing">Mark as Processing</option>
                             <option value="Approved">Approve</option>
                             <option value="Rejected">Reject</option>
                         </select>

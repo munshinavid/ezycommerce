@@ -20,12 +20,12 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 
 $db = new Database();
 
+// Get handler ID from session
 function getHandlerId() {
     // For demonstration, returning a static user id
-    return 5; // In real implementation, 
+    // In real implementation, get from session: return $_SESSION['user_id'] ?? null;
+    return 5;
 }
-
-
 
 try {
     // Route requests
@@ -289,34 +289,39 @@ function updateOrderStatus($db) {
             return;
         }
         
+        // Get handler ID
+        $handlerId = getHandlerId();
+        
         $db->beginTransaction();
         
         // Update order status
         $orderQuery = "UPDATE orders SET order_status = ? WHERE order_id = ?";
         $db->update($orderQuery, [$data['status'], $data['order_id']]);
         
+        // Map order status to shipping status
+        $shippingStatusMap = [
+            'Pending' => 'Pending',
+            'Processing' => 'Processing',
+            'Shipped' => 'Shipped',
+            'Delivered' => 'Delivered',
+            'Cancelled' => 'Pending'
+        ];
+        $shippingStatus = $shippingStatusMap[$data['status']] ?? 'Pending';
+        
         // Update shipping status and tracking number if provided
         if (isset($data['tracking_number']) && !empty($data['tracking_number'])) {
-            $shippingStatus = $data['status'] === 'Shipped' ? 'Shipped' : 'Processing';
-            $shippingQuery = "UPDATE shipping SET shipping_status = ?, tracking_number = ? 
+            $shippingQuery = "UPDATE shipping SET shipping_status = ?, tracking_number = ?, handled_by = ? 
                             WHERE order_id = ?";
             $db->update($shippingQuery, [
                 $shippingStatus, 
-                $data['tracking_number'], 
+                $data['tracking_number'],
+                $handlerId,
                 $data['order_id']
             ]);
         } else {
-            // Just update shipping status based on order status
-            $shippingStatusMap = [
-                'Pending' => 'Pending',
-                'Processing' => 'Processing',
-                'Shipped' => 'Shipped',
-                'Delivered' => 'Delivered',
-                'Cancelled' => 'Pending'
-            ];
-            $shippingStatus = $shippingStatusMap[$data['status']] ?? 'Pending';
-            $shippingQuery = "UPDATE shipping SET shipping_status = ? WHERE order_id = ?";
-            $db->update($shippingQuery, [$shippingStatus, $data['order_id']]);
+            // Update shipping status without tracking number
+            $shippingQuery = "UPDATE shipping SET shipping_status = ?, handled_by = ? WHERE order_id = ?";
+            $db->update($shippingQuery, [$shippingStatus, $handlerId, $data['order_id']]);
         }
         
         // Update payment status if order is delivered
@@ -508,13 +513,16 @@ function processReturn($db) {
             return;
         }
         
+        // Get handler ID
+        $handlerId = getHandlerId();
+        
         $db->beginTransaction();
         
-        // Update return status
+        // Update return status with handler ID
         $query = "UPDATE returns SET status = ?, handled_by = ? WHERE return_id = ?";
         $db->update($query, [
             $data['status'], 
-            $data['handled_by'] ?? null, 
+            $handlerId, 
             $data['return_id']
         ]);
         
@@ -557,10 +565,14 @@ function updateReturn($db, $id) {
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $query = "UPDATE returns SET status = ?, reason = ? WHERE return_id = ?";
+        // Get handler ID
+        $handlerId = getHandlerId();
+        
+        $query = "UPDATE returns SET status = ?, reason = ?, handled_by = ? WHERE return_id = ?";
         $db->update($query, [
             $data['status'] ?? 'Pending',
             $data['reason'] ?? '',
+            $handlerId,
             $id
         ]);
         
@@ -673,23 +685,26 @@ function updateShippingStatus($db) {
             return;
         }
         
+        // Get handler ID
+        $handlerId = getHandlerId();
+        
         $db->beginTransaction();
         
-        // Update shipping record
+        // Update shipping record with handler ID
         if (isset($data['tracking_number']) && !empty($data['tracking_number'])) {
             $query = "UPDATE shipping SET shipping_status = ?, tracking_number = ?, handled_by = ? 
                      WHERE order_id = ?";
             $db->update($query, [
                 $data['shipping_status'],
                 $data['tracking_number'],
-                $data['handled_by'] ?? null,
+                $handlerId,
                 $data['order_id']
             ]);
         } else {
             $query = "UPDATE shipping SET shipping_status = ?, handled_by = ? WHERE order_id = ?";
             $db->update($query, [
                 $data['shipping_status'],
-                $data['handled_by'] ?? null,
+                $handlerId,
                 $data['order_id']
             ]);
         }
@@ -723,11 +738,15 @@ function updateShippingRecord($db, $orderId) {
     try {
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $query = "UPDATE shipping SET shipping_status = ?, tracking_number = ? 
+        // Get handler ID
+        $handlerId = getHandlerId();
+        
+        $query = "UPDATE shipping SET shipping_status = ?, tracking_number = ?, handled_by = ? 
                  WHERE order_id = ?";
         $db->update($query, [
             $data['shipping_status'] ?? 'Pending',
             $data['tracking_number'] ?? null,
+            $handlerId,
             $orderId
         ]);
         
