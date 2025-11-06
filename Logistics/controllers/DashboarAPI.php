@@ -20,6 +20,13 @@ $id = isset($_GET['id']) ? $_GET['id'] : null;
 
 $db = new Database();
 
+function getHandlerId() {
+    // For demonstration, returning a static user id
+    return 5; // In real implementation, 
+}
+
+
+
 try {
     // Route requests
     if ($request === 'dashboard' && $method === 'GET') {
