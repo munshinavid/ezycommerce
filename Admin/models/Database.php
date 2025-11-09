@@ -288,4 +288,15 @@ CREATE TABLE payments (
 okay now give me profile interface of a customer, where all user necessary info will dhow along his order,
  order items, user info change modal,etc necessary thing need a show in modern ecommerece website
   also provide js ajax to perform all the action with restful api backend
+
+
+  3. Vendor (Brand Manager) Dashboard 🏷️
+
+👉 Purpose: Manage their own products only.
+
+My Products → Add new product, update stock, edit details.
+
+My Orders → See orders that include their products.
+
+Sales Reports → See how much revenue their products generated.
 */

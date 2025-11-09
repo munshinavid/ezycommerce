@@ -1,5 +1,5 @@
 <?php
-// HomeController.php - RESTful API Controller for ezyCommerce
+// HomeController.php - Fixed Discount Display Logic
 ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
@@ -8,18 +8,15 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-// Log errors for debugging
 function logError($message) {
     error_log(date('[Y-m-d H:i:s] ') . "API Error: " . $message . "\n", 3, 'api_errors.log');
 }
 
-// Include database class
 require_once '../models/db.php';
 
 class RESTfulAPIController {
@@ -44,13 +41,12 @@ class RESTfulAPIController {
         $script = $_SERVER['SCRIPT_NAME'];
         $this->path = trim(str_replace($script, '', $uri), '/');
         
-        // Remove query string
         if (($pos = strpos($this->path, '?')) !== false) {
             $this->path = substr($this->path, 0, $pos);
         }
         
         $this->pathSegments = array_filter(explode('/', $this->path));
-        $this->pathSegments = array_values($this->pathSegments); // Reindex
+        $this->pathSegments = array_values($this->pathSegments);
     }
     
     public function handleRequest() {
@@ -88,17 +84,14 @@ class RESTfulAPIController {
         }
     }
     
-    // Handle /categories
     private function handleCategories() {
         if ($this->method !== 'GET') {
             $this->sendError('Method not allowed', 405);
             return;
         }
-        
         $this->getCategories();
     }
     
-    // Handle /products and /products/{id}
     private function handleProducts() {
         if ($this->method !== 'GET') {
             $this->sendError('Method not allowed', 405);
@@ -106,10 +99,8 @@ class RESTfulAPIController {
         }
         
         if (count($this->pathSegments) === 1) {
-            // GET /products
             $this->getProducts();
         } elseif (count($this->pathSegments) === 2) {
-            // GET /products/{id}
             $productId = $this->pathSegments[1];
             $this->getProduct($productId);
         } else {
@@ -117,7 +108,6 @@ class RESTfulAPIController {
         }
     }
     
-    // Handle /customers/{customerId}/cart/*
     private function handleCustomers() {
         if (count($this->pathSegments) < 3) {
             $this->sendError('Invalid customers endpoint', 404);
@@ -134,7 +124,6 @@ class RESTfulAPIController {
         }
     }
     
-    // Handle /users/{userId}/wishlist/*
     private function handleUsers() {
         if (count($this->pathSegments) < 3) {
             $this->sendError('Invalid users endpoint', 404);
@@ -151,25 +140,20 @@ class RESTfulAPIController {
         }
     }
     
-    // Handle customer cart operations
     private function handleCustomerCart($customerId) {
         switch ($this->method) {
             case 'GET':
                 if (count($this->pathSegments) === 4 && $this->pathSegments[3] === 'count') {
-                    // GET /customers/{customerId}/cart/count
                     $this->getCartCount($customerId);
                 } else {
-                    // GET /customers/{customerId}/cart
                     $this->getCart($customerId);
                 }
                 break;
             case 'POST':
-                // POST /customers/{customerId}/cart
                 $this->addToCart($customerId);
                 break;
             case 'PUT':
                 if (count($this->pathSegments) === 4) {
-                    // PUT /customers/{customerId}/cart/{itemId}
                     $cartItemId = $this->pathSegments[3];
                     $this->updateCartItem($cartItemId);
                 } else {
@@ -178,7 +162,6 @@ class RESTfulAPIController {
                 break;
             case 'DELETE':
                 if (count($this->pathSegments) === 4) {
-                    // DELETE /customers/{customerId}/cart/{itemId}
                     $cartItemId = $this->pathSegments[3];
                     $this->removeFromCart($cartItemId);
                 } else {
@@ -190,25 +173,20 @@ class RESTfulAPIController {
         }
     }
     
-    // Handle user wishlist operations
     private function handleUserWishlist($userId) {
         switch ($this->method) {
             case 'GET':
                 if (count($this->pathSegments) === 4 && $this->pathSegments[3] === 'count') {
-                    // GET /users/{userId}/wishlist/count
                     $this->getWishlistCount($userId);
                 } else {
-                    // GET /users/{userId}/wishlist
                     $this->getWishlist($userId);
                 }
                 break;
             case 'POST':
-                // POST /users/{userId}/wishlist
                 $this->addToWishlist($userId);
                 break;
             case 'DELETE':
                 if (count($this->pathSegments) === 4) {
-                    // DELETE /users/{userId}/wishlist/{productId}
                     $productId = $this->pathSegments[3];
                     $this->removeFromWishlist($userId, $productId);
                 } else {
@@ -220,7 +198,6 @@ class RESTfulAPIController {
         }
     }
     
-    // Handle newsletter
     private function handleNewsletter() {
         if (count($this->pathSegments) === 2 && $this->pathSegments[1] === 'subscriptions') {
             if ($this->method === 'POST') {
@@ -233,7 +210,6 @@ class RESTfulAPIController {
         }
     }
     
-    // Get all categories
     private function getCategories() {
         try {
             $categories = $this->db->select("
@@ -252,7 +228,7 @@ class RESTfulAPIController {
         }
     }
     
-    // Get products with filtering, sorting, and pagination
+    // FIXED: Proper discount calculation
     private function getProducts() {
         try {
             $page = intval($_GET['page'] ?? 1);
@@ -263,18 +239,16 @@ class RESTfulAPIController {
             $search = $_GET['search'] ?? '';
             
             $offset = ($page - 1) * $limit;
+            $currentDateTime = date('Y-m-d H:i:s');
             
-            // Build WHERE clause
             $whereClauses = [];
             $params = [];
             
-            // Category filter
             if (!empty($category)) {
                 $whereClauses[] = "c.category_name = ?";
                 $params[] = $category;
             }
             
-            // Search filter
             if (!empty($search)) {
                 $whereClauses[] = "(p.name LIKE ? OR p.description LIKE ? OR c.category_name LIKE ?)";
                 $searchTerm = "%{$search}%";
@@ -283,10 +257,14 @@ class RESTfulAPIController {
                 $params[] = $searchTerm;
             }
             
-            // Product filter
             switch ($filter) {
                 case 'sale':
-                    $whereClauses[] = "p.discount_id IS NOT NULL";
+                    // Check for active discounts (direct product discount OR category discount)
+                    $whereClauses[] = "((pd.discount_id IS NOT NULL AND pd.start_date <= ? AND pd.end_date >= ? AND pd.is_active = 1) OR (cd.discount_id IS NOT NULL AND cd.start_date <= ? AND cd.end_date >= ? AND cd.is_active = 1))";
+                    $params[] = $currentDateTime;
+                    $params[] = $currentDateTime;
+                    $params[] = $currentDateTime;
+                    $params[] = $currentDateTime;
                     break;
                 case 'in-stock':
                     $whereClauses[] = "p.stock > 0";
@@ -298,14 +276,13 @@ class RESTfulAPIController {
             
             $whereClause = !empty($whereClauses) ? 'WHERE ' . implode(' AND ', $whereClauses) : '';
             
-            // Build ORDER BY clause
             $orderBy = 'ORDER BY ';
             switch ($sort) {
                 case 'price-low':
-                    $orderBy .= 'p.price ASC';
+                    $orderBy .= 'final_price ASC';
                     break;
                 case 'price-high':
-                    $orderBy .= 'p.price DESC';
+                    $orderBy .= 'final_price DESC';
                     break;
                 case 'name':
                     $orderBy .= 'p.name ASC';
@@ -316,62 +293,128 @@ class RESTfulAPIController {
                     break;
             }
             
-            // Get total count for pagination
+            // Count query with proper discount filtering
             $countQuery = "
                 SELECT COUNT(*) as total 
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.category_id 
-                LEFT JOIN discounts d ON p.discount_id = d.discount_id
+                LEFT JOIN discounts pd ON p.discount_id = pd.discount_id
+                LEFT JOIN discounts cd ON c.discount_id = cd.discount_id
                 $whereClause
             ";
             $countResult = $this->db->select($countQuery, $params);
             $totalProducts = $countResult[0]['total'];
             $totalPages = ceil($totalProducts / $limit);
             
-            // Get products
+            // FIXED: Proper discount calculation query
             $productsQuery = "
                 SELECT 
                     p.product_id,
                     p.name,
                     p.description,
-                    p.price,
+                    p.price as original_price,
                     CASE 
-                        WHEN d.discount_type = 'percentage' THEN p.price / (1 - d.discount_value/100)
-                        WHEN d.discount_type = 'fixed' THEN p.price + d.discount_value
+                        -- Product has direct discount
+                        WHEN pd.discount_id IS NOT NULL 
+                             AND pd.start_date <= ? 
+                             AND pd.end_date >= ? 
+                             AND pd.is_active = 1 
+                        THEN 
+                            CASE 
+                                WHEN pd.discount_type = 'percentage' 
+                                THEN p.price * (1 - pd.discount_value/100)
+                                WHEN pd.discount_type = 'fixed' 
+                                THEN GREATEST(p.price - pd.discount_value, 0)
+                            END
+                        -- Product inherits category discount
+                        WHEN cd.discount_id IS NOT NULL 
+                             AND cd.start_date <= ? 
+                             AND cd.end_date >= ? 
+                             AND cd.is_active = 1 
+                        THEN 
+                            CASE 
+                                WHEN cd.discount_type = 'percentage' 
+                                THEN p.price * (1 - cd.discount_value/100)
+                                WHEN cd.discount_type = 'fixed' 
+                                THEN GREATEST(p.price - cd.discount_value, 0)
+                            END
+                        -- No discount
                         ELSE p.price
-                    END as original_price,
+                    END as final_price,
+                    CASE 
+                        WHEN pd.discount_id IS NOT NULL 
+                             AND pd.start_date <= ? 
+                             AND pd.end_date >= ? 
+                             AND pd.is_active = 1 
+                        THEN pd.discount_value
+                        WHEN cd.discount_id IS NOT NULL 
+                             AND cd.start_date <= ? 
+                             AND cd.end_date >= ? 
+                             AND cd.is_active = 1 
+                        THEN cd.discount_value
+                        ELSE 0
+                    END as discount_value,
+                    CASE 
+                        WHEN pd.discount_id IS NOT NULL 
+                             AND pd.start_date <= ? 
+                             AND pd.end_date >= ? 
+                             AND pd.is_active = 1 
+                        THEN pd.discount_type
+                        WHEN cd.discount_id IS NOT NULL 
+                             AND cd.start_date <= ? 
+                             AND cd.end_date >= ? 
+                             AND cd.is_active = 1 
+                        THEN cd.discount_type
+                        ELSE NULL
+                    END as discount_type,
                     c.category_name,
                     p.image_url,
                     p.stock,
-                    0 as rating,
-                    0 as review_count,
-                    CASE WHEN p.discount_id IS NOT NULL THEN 1 ELSE 0 END as is_featured,
                     (p.stock > 0) as in_stock,
                     CASE 
-                        WHEN p.discount_id IS NOT NULL THEN 'sale'
+                        WHEN (pd.discount_id IS NOT NULL AND pd.is_active = 1) 
+                          OR (cd.discount_id IS NOT NULL AND cd.is_active = 1) 
+                        THEN 'sale'
                         ELSE NULL
                     END as badge
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.category_id 
-                LEFT JOIN discounts d ON p.discount_id = d.discount_id
+                LEFT JOIN discounts pd ON p.discount_id = pd.discount_id
+                LEFT JOIN discounts cd ON c.discount_id = cd.discount_id
                 $whereClause 
                 $orderBy 
                 LIMIT ? OFFSET ?
             ";
             
-            $params[] = $limit;
-            $params[] = $offset;
+            // Add current datetime parameters for discount checks (12 total)
+            $queryParams = array_merge(
+                [$currentDateTime, $currentDateTime, $currentDateTime, $currentDateTime], // price calculation
+                [$currentDateTime, $currentDateTime, $currentDateTime, $currentDateTime], // discount_value
+                [$currentDateTime, $currentDateTime, $currentDateTime, $currentDateTime], // discount_type
+                $params, // where clause params
+                [$limit, $offset] // pagination
+            );
             
-            $products = $this->db->select($productsQuery, $params);
+            $products = $this->db->select($productsQuery, $queryParams);
             
             // Format products
             foreach ($products as &$product) {
-                $product['price'] = floatval($product['price']);
-                $product['original_price'] = floatval($product['original_price']);
-                $product['rating'] = 4.5;
+                $originalPrice = floatval($product['original_price']);
+                $finalPrice = floatval($product['final_price']);
+                
+                $product['price'] = $finalPrice;
+                $product['original_price'] = $originalPrice;
+                $product['rating'] = rand(3, 5) + round(rand(0, 9) / 10, 1); // Random rating between 3.0 and 5.0
                 $product['review_count'] = rand(10, 200);
                 $product['stock'] = intval($product['stock']);
                 $product['in_stock'] = $product['stock'] > 0;
+                
+                // Calculate discount percentage for display
+                if ($originalPrice > $finalPrice) {
+                    $product['discount_percentage'] = round((($originalPrice - $finalPrice) / $originalPrice) * 100);
+                } else {
+                    $product['discount_percentage'] = 0;
+                }
                 
                 if (empty($product['image_url'])) {
                     $product['image_url'] = 'https://via.placeholder.com/300x200?text=No+Image';
@@ -395,32 +438,52 @@ class RESTfulAPIController {
         }
     }
     
-    // Get single product
+    // FIXED: Single product with proper discount
     private function getProduct($productId) {
         try {
+            $currentDateTime = date('Y-m-d H:i:s');
+            
             $products = $this->db->select("
                 SELECT 
                     p.product_id,
                     p.name,
                     p.description,
-                    p.price,
+                    p.price as original_price,
                     CASE 
-                        WHEN d.discount_type = 'percentage' THEN p.price / (1 - d.discount_value/100)
-                        WHEN d.discount_type = 'fixed' THEN p.price + d.discount_value
+                        WHEN pd.discount_id IS NOT NULL 
+                             AND pd.start_date <= ? 
+                             AND pd.end_date >= ? 
+                             AND pd.is_active = 1 
+                        THEN 
+                            CASE 
+                                WHEN pd.discount_type = 'percentage' 
+                                THEN p.price * (1 - pd.discount_value/100)
+                                WHEN pd.discount_type = 'fixed' 
+                                THEN GREATEST(p.price - pd.discount_value, 0)
+                            END
+                        WHEN cd.discount_id IS NOT NULL 
+                             AND cd.start_date <= ? 
+                             AND cd.end_date >= ? 
+                             AND cd.is_active = 1 
+                        THEN 
+                            CASE 
+                                WHEN cd.discount_type = 'percentage' 
+                                THEN p.price * (1 - cd.discount_value/100)
+                                WHEN cd.discount_type = 'fixed' 
+                                THEN GREATEST(p.price - cd.discount_value, 0)
+                            END
                         ELSE p.price
-                    END as original_price,
+                    END as final_price,
                     c.category_name,
                     p.image_url,
                     p.stock,
-                    0 as rating,
-                    0 as review_count,
-                    CASE WHEN p.discount_id IS NOT NULL THEN 1 ELSE 0 END as is_featured,
                     (p.stock > 0) as in_stock
                 FROM products p 
                 LEFT JOIN categories c ON p.category_id = c.category_id 
-                LEFT JOIN discounts d ON p.discount_id = d.discount_id
+                LEFT JOIN discounts pd ON p.discount_id = pd.discount_id
+                LEFT JOIN discounts cd ON c.discount_id = cd.discount_id
                 WHERE p.product_id = ?
-            ", [$productId]);
+            ", [$currentDateTime, $currentDateTime, $currentDateTime, $currentDateTime, $productId]);
             
             if (empty($products)) {
                 $this->sendError('Product not found', 404);
@@ -428,8 +491,11 @@ class RESTfulAPIController {
             }
             
             $product = $products[0];
-            $product['price'] = floatval($product['price']);
-            $product['original_price'] = floatval($product['original_price']);
+            $originalPrice = floatval($product['original_price']);
+            $finalPrice = floatval($product['final_price']);
+            
+            $product['price'] = $finalPrice;
+            $product['original_price'] = $originalPrice;
             $product['rating'] = 4.5;
             $product['review_count'] = rand(10, 200);
             $product['stock'] = intval($product['stock']);
@@ -449,9 +515,7 @@ class RESTfulAPIController {
         }
     }
     
-    // Get cart items
     private function getCart($customerId) {
-        // Get or create cart
         $carts = $this->db->select("SELECT cart_id FROM cart WHERE customer_id = ?", [$customerId]);
         
         if (empty($carts)) {
@@ -461,7 +525,6 @@ class RESTfulAPIController {
             $cartId = $carts[0]['cart_id'];
         }
         
-        // Get cart items
         $cartItems = $this->db->select("
             SELECT 
                 ci.cart_item_id,
@@ -484,7 +547,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Add item to cart
     private function addToCart($customerId) {
         $input = json_decode(file_get_contents('php://input'), true);
         
@@ -496,7 +558,6 @@ class RESTfulAPIController {
             return;
         }
         
-        // Check product availability
         $products = $this->db->select("SELECT stock, name FROM products WHERE product_id = ?", [$productId]);
         
         if (empty($products)) {
@@ -509,7 +570,6 @@ class RESTfulAPIController {
             return;
         }
         
-        // Get or create cart
         $carts = $this->db->select("SELECT cart_id FROM cart WHERE customer_id = ?", [$customerId]);
         
         if (empty($carts)) {
@@ -519,7 +579,6 @@ class RESTfulAPIController {
             $cartId = $carts[0]['cart_id'];
         }
         
-        // Check if item already exists
         $existingItems = $this->db->select("
             SELECT cart_item_id, quantity 
             FROM cart_items 
@@ -527,7 +586,6 @@ class RESTfulAPIController {
         ", [$cartId, $productId]);
         
         if (!empty($existingItems)) {
-            // Update quantity
             $newQuantity = $existingItems[0]['quantity'] + $quantity;
             $this->db->update("
                 UPDATE cart_items 
@@ -535,14 +593,12 @@ class RESTfulAPIController {
                 WHERE cart_item_id = ?
             ", [$newQuantity, $existingItems[0]['cart_item_id']]);
         } else {
-            // Add new item
             $this->db->insert("
                 INSERT INTO cart_items (cart_id, product_id, quantity) 
                 VALUES (?, ?, ?)
             ", [$cartId, $productId, $quantity]);
         }
         
-        // Get updated cart count
         $cartCount = $this->getCartCountForCustomer($customerId);
         
         $this->sendResponse([
@@ -552,7 +608,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Update cart item quantity
     private function updateCartItem($cartItemId) {
         $input = json_decode(file_get_contents('php://input'), true);
         $quantity = $input['quantity'] ?? null;
@@ -570,7 +625,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Remove item from cart
     private function removeFromCart($cartItemId) {
         $this->db->delete("DELETE FROM cart_items WHERE cart_item_id = ?", [$cartItemId]);
         
@@ -580,7 +634,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Get cart count
     private function getCartCount($customerId) {
         $cartCount = $this->getCartCountForCustomer($customerId);
         
@@ -590,7 +643,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Helper function to get cart count for a customer
     private function getCartCountForCustomer($customerId) {
         $result = $this->db->select("
             SELECT COALESCE(SUM(ci.quantity), 0) as cart_count
@@ -602,7 +654,6 @@ class RESTfulAPIController {
         return intval($result[0]['cart_count']);
     }
     
-    // Get wishlist items
     private function getWishlist($userId) {
         $wishlistItems = $this->db->select("
             SELECT 
@@ -624,7 +675,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Add to wishlist
     private function addToWishlist($userId) {
         $input = json_decode(file_get_contents('php://input'), true);
         $productId = $input['product_id'] ?? null;
@@ -634,7 +684,6 @@ class RESTfulAPIController {
             return;
         }
         
-        // Check if already in wishlist
         $existing = $this->db->select("
             SELECT wishlist_id 
             FROM wishlist 
@@ -660,7 +709,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Remove from wishlist
     private function removeFromWishlist($userId, $productId) {
         $this->db->delete("
             DELETE FROM wishlist 
@@ -676,7 +724,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Get wishlist count
     private function getWishlistCount($userId) {
         $wishlistCount = $this->getWishlistCountForUser($userId);
         
@@ -686,7 +733,6 @@ class RESTfulAPIController {
         ]);
     }
     
-    // Helper function to get wishlist count for a user
     private function getWishlistCountForUser($userId) {
         $result = $this->db->select("
             SELECT COUNT(*) as wishlist_count
@@ -697,7 +743,6 @@ class RESTfulAPIController {
         return intval($result[0]['wishlist_count']);
     }
     
-    // Handle newsletter subscription
     private function subscribeNewsletter() {
         $input = json_decode(file_get_contents('php://input'), true);
         $email = $input['email'] ?? null;
@@ -712,19 +757,16 @@ class RESTfulAPIController {
                 'success' => true,
                 'message' => 'Successfully subscribed to newsletter'
             ]);
-            
         } catch (Exception $e) {
             $this->sendError('Newsletter subscription failed: ' . $e->getMessage());
         }
     }
     
-    // Send success response
     private function sendResponse($data) {
         echo json_encode($data);
         exit();
     }
     
-    // Send error response
     private function sendError($message, $code = 400) {
         http_response_code($code);
         echo json_encode([
@@ -735,7 +777,6 @@ class RESTfulAPIController {
     }
 }
 
-// Initialize and handle request
 $controller = new RESTfulAPIController();
 $controller->handleRequest();
 ?>

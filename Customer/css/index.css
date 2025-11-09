@@ -913,3 +913,15 @@
                 flex-wrap: wrap;
             }
         }
+        .product-discount-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #e74c3c;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 14px;
+    z-index: 2;
+}

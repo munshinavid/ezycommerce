@@ -1,4 +1,4 @@
-// home.js - Fixed Homepage Frontend JavaScript with RESTful API calls
+// home.js - Fixed Homepage Frontend JavaScript with Proper Discount Display
 
 // Configuration
 const userData = JSON.parse(localStorage.getItem("userData"));
@@ -327,7 +327,7 @@ function getStarRating(rating) {
     return starsHTML;
 }
 
-// Render products - Enhanced with wishlist tracking
+// FIXED: Render products with proper discount display from backend
 function renderProducts(products) {
     const productsContainer = document.getElementById('products-container');
     if (!productsContainer) return;
@@ -337,16 +337,44 @@ function renderProducts(products) {
         return;
     }
     
+    // Debug: Log first product to see backend data structure
+    if (products.length > 0) {
+        console.log('Sample product data from backend:', products[0]);
+    }
+    
     let productsHTML = '';
     
     products.forEach(product => {
+        // Backend returns: original_price, final_price (as 'price'), discount_percentage
         const originalPrice = parseFloat(product.original_price);
-        const currentPrice = parseFloat(product.price);
-        const discount = originalPrice > currentPrice ? Math.round(((originalPrice - currentPrice) / originalPrice) * 100) : 0;
+        // Check both 'price' and 'final_price' fields
+        const finalPrice = parseFloat(product.final_price || product.price);
+        
+        console.log(`Product: ${product.name}, Original: ${originalPrice}, Final: ${finalPrice}`);
+        
+        // Calculate discount percentage if not provided by backend
+        let discountPercentage = 0;
+        if (product.discount_percentage) {
+            discountPercentage = parseInt(product.discount_percentage);
+        } else if (originalPrice > finalPrice && finalPrice > 0) {
+            discountPercentage = Math.round(((originalPrice - finalPrice) / originalPrice) * 100);
+        }
+        
+        const hasDiscount = originalPrice > finalPrice && discountPercentage > 0;
+        
+        console.log(`Has discount: ${hasDiscount}, Percentage: ${discountPercentage}`);
+        
+        // Determine badge
+        let badgeHTML = '';
+        if (hasDiscount) {
+            badgeHTML = `<div class="product-badge badge-sale">-${discountPercentage}%</div>`;
+        } else if (product.badge && product.badge === 'sale') {
+            badgeHTML = `<div class="product-badge badge-sale">Sale</div>`;
+        }
         
         productsHTML += `
             <div class="product-card" data-product-id="${product.product_id}">
-                ${product.badge ? `<div class="product-badge badge-${product.badge}">${product.badge.charAt(0).toUpperCase() + product.badge.slice(1)}</div>` : ''}
+                ${badgeHTML}
                 <img src="${product.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${product.name}" class="product-image">
                 <div class="product-info">
                     <div class="product-category">${product.category_name || 'Uncategorized'}</div>
@@ -358,9 +386,11 @@ function renderProducts(products) {
                         <span class="rating-count">(${product.review_count})</span>
                     </div>
                     <div class="product-price">
-                        <span class="current-price">$${currentPrice.toFixed(2)}</span>
-                        ${originalPrice > currentPrice ? `<span class="original-price">$${originalPrice.toFixed(2)}</span>` : ''}
-                        ${discount > 0 ? `<span class="discount">${discount}% off</span>` : ''}
+                        <span class="current-price">${finalPrice.toFixed(2)}</span>
+                        ${hasDiscount ? `
+                            <span class="original-price">${originalPrice.toFixed(2)}</span>
+                            <span class="discount">${discountPercentage}% off</span>
+                        ` : ''}
                     </div>
                     <div class="product-stock ${product.in_stock ? '' : 'out-of-stock'}">
                         ${product.in_stock ? `${product.stock} in stock` : 'Out of stock'}
