@@ -170,7 +170,7 @@ CREATE TABLE discounts (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     apply_to ENUM('all', 'selected', 'categories') DEFAULT 'all',
-    is_active BOOLEAN DEFAULT TRUE,
+    is_active BOOLEAN DEFAULT TRUE,--set false instead of deleting for future tracking
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
