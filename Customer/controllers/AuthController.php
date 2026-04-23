@@ -56,7 +56,9 @@ class AuthController {
     
     public function login() {
         try {
-            session_start();
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             $input = json_decode(file_get_contents('php://input'), true);
             if (!$input) {
                 $this->sendResponse(['error' => 'Invalid JSON input'], 400);
@@ -79,7 +81,7 @@ class AuthController {
                 [$email]
             );
             
-            if (empty($user) || $password !== $user[0]['password']) {
+            if (empty($user) || !password_verify($password, $user[0]['password'])) {
                 $this->sendResponse(['error' => 'Invalid credentials'], 401);
                 return;
             }
@@ -174,7 +176,7 @@ class AuthController {
                 $roleId = $customerRole[0]['role_id'];
             }
             
-            $hashedPassword = $password; // In production, use password_hash()
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
             $success = $this->db->insert(
                 "INSERT INTO Users (username, email, password, role_id) VALUES (?, ?, ?, ?)",
                 [$username, $email, $hashedPassword, $roleId]
@@ -188,7 +190,7 @@ class AuthController {
             if (!empty($firstName) || !empty($lastName) || !empty($phone)) {
                 $fullName = trim($firstName . ' ' . $lastName);
                 $this->db->insert(
-                    "INSERT INTO CustomerDetails (user_id, full_name, address, phone) VALUES (?, ?, '', ?)",
+                    "INSERT INTO CustomerDetails (user_id, full_name, billing_address, shipping_address, phone) VALUES (?, ?, '', '', ?)",
                     [$userId, $fullName, $phone]
                 );
             }
@@ -217,23 +219,25 @@ class AuthController {
     }
     
     public function logout() {
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        session_destroy();
         $this->sendResponse(['message' => 'Logout successful']);
     }
     
     public function verifyToken() {
         try {
-            $headers = getallheaders();
-            if (!isset($headers['Authorization'])) {
-                $this->sendResponse(['error' => 'Authorization header missing'], 401);
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
+            
+            if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+                $this->sendResponse(['error' => 'Not authenticated'], 401);
                 return;
             }
             
-            $token = str_replace('Bearer ', '', $headers['Authorization']);
-            $userId = $this->validateToken($token);
-            if (!$userId) {
-                $this->sendResponse(['error' => 'Invalid token'], 401);
-                return;
-            }
+            $userId = $_SESSION['user']['id'];
             
             $user = $this->db->select(
                 "SELECT u.user_id, u.username, u.email, r.role_name 
@@ -279,15 +283,11 @@ class AuthController {
     }
     
     private function generateToken($userId) {
-        return 'demo-token-' . $userId . '-' . time();
+        return session_id(); // Use session ID as a dummy token for frontend compatibility
     }
     
     private function validateToken($token) {
-        if (strpos($token, 'demo-token-') === 0) {
-            $parts = explode('-', $token);
-            return isset($parts[2]) ? intval($parts[2]) : false;
-        }
-        return false;
+        return false; // Not used anymore with PHP sessions
     }
     
     private function sendResponse($data, $status = 200) {

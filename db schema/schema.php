@@ -4,17 +4,7 @@ CREATE TABLE Roles (
     role_name VARCHAR(50) UNIQUE NOT NULL
 );
 
-CREATE TABLE Wishlist (
-    wishlist_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_product (user_id, product_id)
-);
 
- 
 -- USERS TABLE
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -29,9 +19,11 @@ CREATE TABLE Users (
 -- VENDORS (For Brand Managers / Sellers)
 CREATE TABLE Vendors (
     vendor_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
     vendor_name VARCHAR(100) NOT NULL,
     contact_email VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
  
 -- DISCOUNTS
@@ -63,6 +55,17 @@ CREATE TABLE Products (
     FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL,
     FOREIGN KEY (discount_id) REFERENCES Discounts(discount_id) ON DELETE SET NULL,
     FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id) ON DELETE SET NULL
+);
+ 
+-- WISHLIST
+CREATE TABLE Wishlist (
+    wishlist_id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    product_id INT NOT NULL,
+    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_product (user_id, product_id)
 );
  
 -- ORDERS
@@ -133,7 +136,8 @@ CREATE TABLE CustomerDetails (
     detail_id INT AUTO_INCREMENT PRIMARY KEY,
     user_id INT NOT NULL,
     full_name VARCHAR(100) NOT NULL,
-    address TEXT NOT NULL,
+    billing_address TEXT,
+    shipping_address TEXT,
     phone VARCHAR(20) NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE

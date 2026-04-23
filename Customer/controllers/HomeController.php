@@ -27,6 +27,9 @@ class RESTfulAPIController {
     
     public function __construct() {
         try {
+            if (session_status() === PHP_SESSION_NONE) {
+                session_start();
+            }
             $this->db = new Database();
             $this->method = $_SERVER['REQUEST_METHOD'];
             $this->parsePath();
@@ -140,7 +143,17 @@ class RESTfulAPIController {
         }
     }
     
+    private function authenticate($requiredId = null) {
+        if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+            $this->sendError('Unauthorized access', 401);
+        }
+        if ($requiredId !== null && $_SESSION['user']['id'] != $requiredId) {
+            $this->sendError('Forbidden: Access denied', 403);
+        }
+    }
+
     private function handleCustomerCart($customerId) {
+        $this->authenticate($customerId);
         switch ($this->method) {
             case 'GET':
                 if (count($this->pathSegments) === 4 && $this->pathSegments[3] === 'count') {
@@ -174,6 +187,7 @@ class RESTfulAPIController {
     }
     
     private function handleUserWishlist($userId) {
+        $this->authenticate($userId);
         switch ($this->method) {
             case 'GET':
                 if (count($this->pathSegments) === 4 && $this->pathSegments[3] === 'count') {

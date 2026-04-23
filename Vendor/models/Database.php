@@ -154,9 +154,9 @@ CREATE TABLE users (
 -- vendors table
 CREATE TABLE vendors (
     vendor_id INT AUTO_INCREMENT PRIMARY KEY,
-    vendor_name VARCHAR(100) NOT NULL,
-    contact_email VARCHAR(100),
-    user_id INT UNIQUE,  -- link to users table (login credentials)
+    user_id INT UNIQUE,  -- link to users table
+    vendor_name VARCHAR(100) NOT NULL,  -- official business name/display name
+    contact_email VARCHAR(100),          --official, non-login contact email
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(user_id) ON DELETE CASCADE
 );
@@ -170,7 +170,7 @@ CREATE TABLE discounts (
     start_date DATETIME NOT NULL,
     end_date DATETIME NOT NULL,
     apply_to ENUM('all', 'selected', 'categories') DEFAULT 'all',
-    is_active BOOLEAN DEFAULT TRUE,--set false instead of deleting for future tracking
+    is_active BOOLEAN DEFAULT TRUE,--hide/show products without deleting
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
@@ -194,7 +194,7 @@ CREATE TABLE products (
     category_id INT DEFAULT NULL,
     discount_id INT DEFAULT NULL,
     vendor_id INT DEFAULT NULL,
-    is_active BOOLEAN DEFAULT TRUE
+    is_active BOOLEAN DEFAULT TRUE,
     FOREIGN KEY (category_id) REFERENCES categories(category_id) ON DELETE SET NULL,
     FOREIGN KEY (discount_id) REFERENCES discounts(discount_id) ON DELETE SET NULL,
     FOREIGN KEY (vendor_id) REFERENCES vendors(vendor_id) ON DELETE SET NULL
@@ -217,6 +217,7 @@ CREATE TABLE order_items (
     product_id INT NOT NULL,
     quantity INT NOT NULL,
     price_at_purchase DECIMAL(10, 2) NOT NULL,
+    vendor_status ENUM('Pending', 'ReadyToShip', 'Cancelled') DEFAULT 'Pending',
     FOREIGN KEY (order_id) REFERENCES orders(order_id) ON DELETE CASCADE,
     FOREIGN KEY (product_id) REFERENCES products(product_id) ON DELETE CASCADE
 );

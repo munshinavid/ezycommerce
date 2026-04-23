@@ -265,6 +265,16 @@ class DashboardAPI {
 }
 
 // Handle API Requests
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'Admin') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.']);
+    exit();
+}
+
 $api = new DashboardAPI();
 $action = $_GET['action'] ?? '';
 $method = $_SERVER['REQUEST_METHOD'];

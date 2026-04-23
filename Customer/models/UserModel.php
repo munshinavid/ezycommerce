@@ -31,8 +31,9 @@ class UserModel {
     }
 
     public function registerUser($username, $email, $password, $fullName, $phone, $billingAddress, $shippingAddress) {
+        $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         $query = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
-        $result = $this->db->execute($query, [$username, $email, $password]);
+        $result = $this->db->execute($query, [$username, $email, $hashedPassword]);
 
         if ($result) {
             // Get the user_id of the inserted user
@@ -53,7 +54,7 @@ class UserModel {
     public function updateUser($userId, $username, $email, $newPassword = null) {
         // If a new password is provided, hash it before saving
         if ($newPassword) {
-            $hashedPassword = $newPassword;
+            $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
         } else {
             // If no new password is provided, retain the current password
             $currentPasswordQuery = "SELECT password FROM users WHERE user_id = ?";
