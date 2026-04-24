@@ -1,5 +1,9 @@
 <?php
 // vendor_orders_api.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT');
@@ -11,11 +15,9 @@ require_once '../models/Database.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-// Mock vendor_id - In production, get this from session
-$vendor_id = isset($_GET['vendor_id']) ? (int)$_GET['vendor_id'] : 1;
-
 try {
     $db = new Database();
+    $vendor_id = getAuthenticatedVendorId($db);
     
     switch ($action) {
         case 'get_orders':
@@ -43,6 +45,26 @@ try {
     
 } catch (Exception $e) {
     sendResponse(500, ['error' => $e->getMessage()]);
+}
+
+function getAuthenticatedVendorId($db) {
+    if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+        sendResponse(401, ['error' => 'Authentication required']);
+    }
+
+    $role = isset($_SESSION['user']['role']) ? strtolower((string)$_SESSION['user']['role']) : '';
+    if ($role !== 'vendor') {
+        sendResponse(403, ['error' => 'Vendor access only']);
+    }
+
+    $userId = (int)$_SESSION['user']['id'];
+    $vendor = $db->select('SELECT vendor_id FROM vendors WHERE user_id = ?', [$userId]);
+
+    if (empty($vendor)) {
+        sendResponse(403, ['error' => 'Vendor profile not found']);
+    }
+
+    return (int)$vendor[0]['vendor_id'];
 }
 
 /**

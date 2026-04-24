@@ -1,5 +1,9 @@
 <?php
 // vendor_dashboard_api.php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT');
@@ -11,11 +15,9 @@ require_once '../models/Database.php';
 $method = $_SERVER['REQUEST_METHOD'];
 $action = isset($_GET['action']) ? $_GET['action'] : '';
 
-// Mock vendor_id - In production, get this from session
-$vendor_id = isset($_GET['vendor_id']) ? (int)$_GET['vendor_id'] : 1;
-
 try {
     $db = new Database();
+    $vendor_id = getAuthenticatedVendorId($db);
     
     switch ($action) {
         case 'get_stats':
@@ -82,12 +84,32 @@ try {
     sendResponse(500, ['error' => $e->getMessage()]);
 }
 
+function getAuthenticatedVendorId($db) {
+    if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+        sendResponse(401, ['error' => 'Authentication required']);
+    }
+
+    $role = isset($_SESSION['user']['role']) ? strtolower((string)$_SESSION['user']['role']) : '';
+    if ($role !== 'vendor') {
+        sendResponse(403, ['error' => 'Vendor access only']);
+    }
+
+    $userId = (int)$_SESSION['user']['id'];
+    $vendor = $db->select('SELECT vendor_id FROM vendors WHERE user_id = ?', [$userId]);
+
+    if (empty($vendor)) {
+        sendResponse(403, ['error' => 'Vendor profile not found']);
+    }
+
+    return (int)$vendor[0]['vendor_id'];
+}
+
 /**
  * Get vendor statistics
  */
 function getVendorStats($db, $vendor_id) {
     // Total products
-    $productsQuery = "SELECT COUNT(*) as total FROM products WHERE vendor_id = ? AND is_active = 1";
+    $productsQuery = "SELECT COUNT(*) as total FROM products WHERE vendor_id = ?";
     $totalProducts = $db->select($productsQuery, [$vendor_id]);
     
     // Pending orders (orders with vendor's products in Pending status)
@@ -95,7 +117,8 @@ function getVendorStats($db, $vendor_id) {
         SELECT COUNT(DISTINCT oi.order_id) as total
         FROM order_items oi
         INNER JOIN products p ON oi.product_id = p.product_id
-        WHERE p.vendor_id = ? AND oi.vendor_status = 'Pending'
+        INNER JOIN orders o ON oi.order_id = o.order_id
+        WHERE p.vendor_id = ? AND o.order_status = 'Pending'
     ";
     $pendingOrders = $db->select($pendingQuery, [$vendor_id]);
     
@@ -116,7 +139,7 @@ function getVendorStats($db, $vendor_id) {
     $lowStockQuery = "
         SELECT COUNT(*) as total 
         FROM products 
-        WHERE vendor_id = ? AND stock < 20 AND is_active = 1
+        WHERE vendor_id = ? AND stock < 20
     ";
     $lowStockItems = $db->select($lowStockQuery, [$vendor_id]);
     
@@ -176,7 +199,7 @@ function getLowStockProducts($db, $vendor_id) {
             CONCAT('SKU-', product_id) as sku,
             stock
         FROM products
-        WHERE vendor_id = ? AND stock < 20 AND is_active = 1
+        WHERE vendor_id = ? AND stock < 20
         ORDER BY stock ASC
         LIMIT 10
     ";
@@ -211,7 +234,7 @@ function getProducts($db, $vendor_id) {
             c.category_name as category
         FROM products p
         LEFT JOIN categories c ON p.category_id = c.category_id
-        WHERE p.vendor_id = ? AND p.is_active = 1
+        WHERE p.vendor_id = ?
         ORDER BY p.product_id DESC
     ";
     

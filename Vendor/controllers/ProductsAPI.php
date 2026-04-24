@@ -22,15 +22,33 @@ try {
     $uri_parts = explode('/', trim($request, '/'));
     $action = isset($_GET['action']) ? $_GET['action'] : '';
     
-    // Get vendor_id from session or request
-    // In production, get this from authenticated session
-    session_start();
-    $vendor_id = isset($_SESSION['vendor_id']) ? $_SESSION['vendor_id'] : null;
-    
-    // For testing purposes, you can set a default vendor_id
-    if (!$vendor_id && isset($_GET['vendor_id'])) {
-        $vendor_id = intval($_GET['vendor_id']);
+    // Resolve vendor identity from authenticated user session
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
     }
+
+    if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+        sendResponse(401, ['error' => 'Authentication required']);
+        return;
+    }
+
+    $role = isset($_SESSION['user']['role']) ? strtolower((string)$_SESSION['user']['role']) : '';
+    if ($role !== 'vendor') {
+        sendResponse(403, ['error' => 'Vendor access only']);
+        return;
+    }
+
+    $vendorLookup = $db->select(
+        'SELECT vendor_id FROM vendors WHERE user_id = ?',
+        [(int)$_SESSION['user']['id']]
+    );
+
+    if (empty($vendorLookup)) {
+        sendResponse(403, ['error' => 'Vendor profile not found']);
+        return;
+    }
+
+    $vendor_id = (int)$vendorLookup[0]['vendor_id'];
     
     switch ($method) {
         case 'GET':

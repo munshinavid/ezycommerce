@@ -46,7 +46,7 @@
             <span>Settings</span>
         </a>
 
-        <a href="logout.php" class="menu-item">
+        <a href="/ezycommerce/Admin/logout.php" class="menu-item">
             <i class="fas fa-sign-out-alt"></i>
             <span>Logout</span>
         </a>

@@ -238,14 +238,16 @@
     }
 
     function getDashboardUrl(role) {
-        switch (role) {
-            case 'Admin':
+        const normalizedRole = String(role || '').toLowerCase();
+
+        switch (normalizedRole) {
+            case 'admin':
                 return '/ezycommerce/Admin/views/index.php';
-            case 'Logistics':
+            case 'logistics':
                 return '/ezycommerce/Logistics/views/dashboard.php';
-            case 'Vendor':
-                return '/ezycommerce/Customer/views/profile.php';
-            case 'Customer':
+            case 'vendor':
+                return '/ezycommerce/Vendor/views/dashboard.php';
+            case 'customer':
             default:
                 return '/ezycommerce/Customer/views/profile.php';
         }

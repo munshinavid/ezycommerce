@@ -1,6 +1,5 @@
 // Configuration
 const API_BASE_URL = '../controllers/vendor-Dashboard.php';
-const VENDOR_ID = 1; // In production, get from session/auth
 
 // DOM Elements
 const productModal = document.getElementById('product-modal');
@@ -27,7 +26,7 @@ let salesChart, productsChart;
 
 // Current vendor data
 let currentVendor = {
-    id: VENDOR_ID,
+    id: null,
     name: "Loading...",
     email: "Loading..."
 };
@@ -54,12 +53,12 @@ function setupEventListeners() {
     // Navigation
     document.getElementById('nav-products')?.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Products page would load here');
+        window.location.href = 'products.php';
     });
     
     document.getElementById('nav-orders')?.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Orders page would load here');
+        window.location.href = 'orders.php';
     });
     
     document.getElementById('nav-sales')?.addEventListener('click', (e) => {
@@ -74,7 +73,7 @@ function setupEventListeners() {
     
     document.getElementById('nav-discounts')?.addEventListener('click', (e) => {
         e.preventDefault();
-        alert('Discounts page would load here');
+        window.location.href = 'v-discount.php';
     });
     
     document.getElementById('nav-profile')?.addEventListener('click', (e) => {
@@ -176,7 +175,7 @@ function removeImage() {
 
 // Load vendor data from API
 function loadVendorData() {
-    fetch(`${API_BASE_URL}?action=get_vendor_info&vendor_id=${VENDOR_ID}`)
+    fetch(`${API_BASE_URL}?action=get_vendor_info`, { credentials: 'include' })
         .then(response => response.json())
         .then(data => {
             if (data.error) throw new Error(data.error);
@@ -196,7 +195,7 @@ function loadVendorData() {
 
 // Load categories from API
 function loadCategories() {
-    fetch(`${API_BASE_URL}?action=get_categories`)
+    fetch(`${API_BASE_URL}?action=get_categories`, { credentials: 'include' })
         .then(response => response.json())
         .then(data => {
             if (data.error) throw new Error(data.error);
@@ -231,15 +230,20 @@ function populateCategoryDropdown(selectedCategoryId = null) {
 // Load dashboard data from API
 function loadDashboardData() {
     Promise.all([
-        fetch(`${API_BASE_URL}?action=get_stats&vendor_id=${VENDOR_ID}`).then(r => r.json()),
-        fetch(`${API_BASE_URL}?action=get_recent_orders&vendor_id=${VENDOR_ID}`).then(r => r.json()),
-        fetch(`${API_BASE_URL}?action=get_low_stock&vendor_id=${VENDOR_ID}`).then(r => r.json()),
-        fetch(`${API_BASE_URL}?action=get_products&vendor_id=${VENDOR_ID}`).then(r => r.json())
+        fetch(`${API_BASE_URL}?action=get_stats`, { credentials: 'include' }).then(r => r.json()),
+        fetch(`${API_BASE_URL}?action=get_recent_orders`, { credentials: 'include' }).then(r => r.json()),
+        fetch(`${API_BASE_URL}?action=get_low_stock`, { credentials: 'include' }).then(r => r.json()),
+        fetch(`${API_BASE_URL}?action=get_products`, { credentials: 'include' }).then(r => r.json())
     ]).then(([stats, orders, lowStock, products]) => {
+        if (stats?.error || orders?.error || lowStock?.error || products?.error) {
+            const firstError = stats?.error || orders?.error || lowStock?.error || products?.error;
+            throw new Error(firstError);
+        }
+
         updateDashboardCards(stats);
-        renderRecentOrders(orders);
-        renderLowStockProducts(lowStock);
-        renderProducts(products);
+        renderRecentOrders(Array.isArray(orders) ? orders : []);
+        renderLowStockProducts(Array.isArray(lowStock) ? lowStock : []);
+        renderProducts(Array.isArray(products) ? products : []);
         updateCharts(stats);
     }).catch(error => {
         console.error('Error loading dashboard data:', error);
@@ -249,7 +253,7 @@ function loadDashboardData() {
 
 // Load products data
 function loadProductsData() {
-    fetch(`${API_BASE_URL}?action=get_products&vendor_id=${VENDOR_ID}`)
+    fetch(`${API_BASE_URL}?action=get_products`, { credentials: 'include' })
         .then(response => response.json())
         .then(products => {
             renderProducts(products);
@@ -395,7 +399,7 @@ function openProductModal(productId = null) {
         currentProductId = productId;
         
         // Fetch product details
-        fetch(`${API_BASE_URL}?action=get_product&vendor_id=${VENDOR_ID}&product_id=${productId}`)
+        fetch(`${API_BASE_URL}?action=get_product&product_id=${productId}`, { credentials: 'include' })
             .then(response => response.json())
             .then(data => {
                 if (data.error) throw new Error(data.error);
@@ -491,8 +495,9 @@ function saveProduct(e) {
     }
     
     // Send to API
-    fetch(`${API_BASE_URL}?action=save_product&vendor_id=${VENDOR_ID}`, {
+    fetch(`${API_BASE_URL}?action=save_product`, {
         method: 'POST',
+        credentials: 'include',
         body: formData
     })
     .then(response => response.json())
@@ -540,8 +545,9 @@ function updateStock(e) {
         reason: reason
     };
     
-    fetch(`${API_BASE_URL}?action=update_stock&vendor_id=${VENDOR_ID}`, {
+    fetch(`${API_BASE_URL}?action=update_stock`, {
         method: 'POST',
+        credentials: 'include',
         headers: {
             'Content-Type': 'application/json'
         },

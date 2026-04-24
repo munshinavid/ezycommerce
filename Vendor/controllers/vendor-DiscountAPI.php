@@ -8,7 +8,9 @@ header('Access-Control-Allow-Headers: Content-Type');
 require_once '../models/Database.php';
 
 // Start session to get vendor info
-// session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
 // Helper function to send JSON response
 function sendResponse($success, $data = null, $message = '', $statusCode = 200) {
@@ -23,23 +25,26 @@ function sendResponse($success, $data = null, $message = '', $statusCode = 200) 
 
 // Get current vendor ID from session
 function getCurrentVendorId() {
-    // In production, validate the session and get vendor_id from database
-    // if (!isset($_SESSION['user_id'])) {
-    //     sendResponse(false, null, 'Unauthorized access', 401);
-    // }
-    
-    // $db = new Database();
-    // $vendor = $db->select(
-    //     "SELECT vendor_id FROM vendors WHERE user_id = ?",
-    //     [$_SESSION['user_id']]
-    // );
-    
-    // if (empty($vendor)) {
-    //     sendResponse(false, null, 'Vendor not found', 404);
-    // }
-    
-    // return $vendor[0]['vendor_id'];
-    return 1; // For testing purposes, assume vendor_id = 1
+    if (!isset($_SESSION['user']) || !isset($_SESSION['user']['id'])) {
+        sendResponse(false, null, 'Authentication required', 401);
+    }
+
+    $role = isset($_SESSION['user']['role']) ? strtolower((string)$_SESSION['user']['role']) : '';
+    if ($role !== 'vendor') {
+        sendResponse(false, null, 'Vendor access only', 403);
+    }
+
+    $db = new Database();
+    $vendor = $db->select(
+        'SELECT vendor_id FROM vendors WHERE user_id = ?',
+        [(int)$_SESSION['user']['id']]
+    );
+
+    if (empty($vendor)) {
+        sendResponse(false, null, 'Vendor not found', 404);
+    }
+
+    return (int)$vendor[0]['vendor_id'];
 }
 
 try {
