@@ -1,79 +1,131 @@
-<?php
-echo "<!-- this is the wishlist.php -->";
-// wishlist.php
-//session_start();
+<?php require_once __DIR__ . '/components/header.php'; ?>
 
-// Include header or common files if needed
-// Example: include '../header.php';
-?>
-
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopEasy - Your Wishlist</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/index.css">
-</head>
-<body>
-    <header>
-        <!-- You can include your existing header -->
-        <div class="header-content">
-            <a href="index.php" class="logo"><i class="fas fa-shopping-bag"></i> ShopEasy</a>
-            <!-- Wishlist and Cart counts are already handled by main.js -->
-        </div>
-    </header>
-
-    <main>
-        <section class="wishlist-section">
-            <h2>Your Wishlist</h2>
-            <div id="wishlist-container" class="products-container">
-                <!-- Products will be dynamically loaded here using JS -->
+<main>
+    <section class="products-section" style="padding-top: 60px;">
+        <div class="container">
+            <div class="section-header">
+                <h2 class="section-title">Your Wishlist</h2>
+                <a href="index.php" class="btn btn-primary">
+                    <i class="fas fa-arrow-left"></i> Continue Shopping
+                </a>
             </div>
 
-            <!-- Optional: Empty state -->
-            <div id="wishlist-empty" class="empty-state" style="display:none;">
+            <div id="wishlist-empty" class="empty-state" style="display:none; text-align:center; padding: 40px 0;">
                 Your wishlist is empty. <a href="index.php">Start shopping!</a>
             </div>
-        </section>
-    </main>
 
-    <!-- Footer -->
-    <footer>
-        <!-- Your existing footer HTML -->
-    </footer>
+            <div id="wishlist-container" class="product-grid">
+                <!-- Products will load here -->
+            </div>
+        </div>
+    </section>
+</main>
 
-    <!-- Toast notifications -->
-    <div id="toast-container"></div>
+<?php require_once __DIR__ . '/components/footer.php'; ?>
 
-    <!-- Include main.js -->
-    <script src="../scripts/main.js"></script>
-    <script>
-        // On page load, fetch wishlist items
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                const wishlistItems = await window.ecommerceAPI.getWishlistItems();
-                const container = document.getElementById('wishlist-container');
-                const empty = document.getElementById('wishlist-empty');
+<script src="../scripts/home.js"></script>
+<script>
+    const currentUser = JSON.parse(localStorage.getItem('userData'));
+    const currentUserId = currentUser ? currentUser.id : null;
 
-                if (!wishlistItems || wishlistItems.length === 0) {
-                    container.style.display = 'none';
-                    empty.style.display = 'block';
-                    return;
-                }
+    function renderWishlistItems(items) {
+        const container = document.getElementById('wishlist-container');
+        const empty = document.getElementById('wishlist-empty');
 
-                empty.style.display = 'none';
-                container.style.display = 'grid'; // same as home products grid
+        if (!container || !empty) {
+            return;
+        }
 
-                // Use existing renderProducts function
-                window.renderProducts(wishlistItems);
+        if (!items || items.length === 0) {
+            container.innerHTML = '';
+            empty.style.display = 'block';
+            return;
+        }
 
-            } catch (error) {
-                console.error('Failed to load wishlist items:', error);
+        empty.style.display = 'none';
+        container.innerHTML = items.map(item => `
+            <div class="product-card" data-product-id="${item.product_id}">
+                <div class="product-image-wrap">
+                    <img src="${item.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${item.name}" class="product-image">
+                </div>
+                <div class="product-info">
+                    <div class="product-category">${item.category_name || 'Wishlist'}</div>
+                    <h3 class="product-title">${item.name}</h3>
+                    <div class="product-price">
+                        <span class="current-price">$${Number(item.price || 0).toFixed(2)}</span>
+                    </div>
+                    <div class="product-actions">
+                        <button class="btn-cart" type="button" onclick="addItemToCart(${item.product_id})">
+                            <i class="fas fa-shopping-cart"></i> Add to Cart
+                        </button>
+                        <button class="btn-wishlist in-wishlist" type="button" onclick="removeFromWishlist(${item.product_id})">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    async function loadWishlistPage() {
+        if (!currentUserId) {
+            const container = document.getElementById('wishlist-container');
+            const empty = document.getElementById('wishlist-empty');
+
+            if (container && empty) {
+                container.innerHTML = '';
+                empty.innerHTML = 'Please <a href="login.php">log in</a> to view your wishlist.';
+                empty.style.display = 'block';
+            }
+            return;
+        }
+
+        try {
+            const items = await window.ecommerceAPI.getWishlistItems();
+            renderWishlistItems(items);
+        } catch (error) {
+            console.error('Failed to load wishlist items:', error);
+            if (typeof showToast === 'function') {
                 showToast('Failed to load wishlist. Please refresh.', 'error');
             }
-        });
-    </script>
-</body>
-</html>
+        }
+    }
+
+    async function addItemToCart(productId) {
+        if (!currentUserId) {
+            window.location.href = 'login.php';
+            return;
+        }
+
+        await window.ecommerceAPI.addToCart(productId);
+    }
+
+    async function removeFromWishlist(productId) {
+        if (!currentUserId) {
+            window.location.href = 'login.php';
+            return;
+        }
+
+        try {
+            const response = await window.ecommerceAPI.apiCall(`users/${currentUserId}/wishlist/${productId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.success) {
+                if (typeof showToast === 'function') {
+                    showToast(response.message || 'Removed from wishlist', 'success');
+                }
+                loadWishlistPage();
+            } else if (typeof showToast === 'function') {
+                showToast(response.error || 'Failed to remove item', 'error');
+            }
+        } catch (error) {
+            console.error('Failed to remove wishlist item:', error);
+            if (typeof showToast === 'function') {
+                showToast('Failed to remove item from wishlist.', 'error');
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadWishlistPage);
+</script>

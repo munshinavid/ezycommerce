@@ -49,7 +49,7 @@
     <nav>
         <div class="nav-container">
             <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.php">Home</a></li>
                 <li><a href="#">New Arrivals</a></li>
                 <li><a href="#">Best Sellers</a></li>
                 <li><a href="#">Sale</a></li>
@@ -64,7 +64,7 @@
     <div class="breadcrumb">
         <div class="breadcrumb-container">
             <ul>
-                <li><a href="index.html">Home</a></li>
+                <li><a href="index.php">Home</a></li>
                 <li>My Account</li>
             </ul>
         </div>
@@ -106,7 +106,7 @@
                     </a>
                 </li>
                 <li class="profile-menu-item">
-                    <a href="#" class="profile-menu-link" id="logout-btn">
+                    <a href="logout.php" class="profile-menu-link" id="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </li>
@@ -233,6 +233,7 @@
                 <div class="products-container" id="wishlist-items-container">
                     <!-- Wishlist items will be loaded dynamically -->
                 </div>
+            </div>
 
             <!-- Account Settings Section -->
             <div class="content-section" id="settings-section" style="display: none;">

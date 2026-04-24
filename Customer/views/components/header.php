@@ -1,3 +1,18 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+$isLoggedIn = isset($_SESSION['user']) && isset($_SESSION['user']['id']);
+$username = $isLoggedIn ? ($_SESSION['user']['username'] ?? 'Account') : 'Guest';
+$avatarText = strtoupper(substr($username, 0, 2));
+$homeUrl = '/ezycommerce/Customer/views/index.php';
+$cartUrl = '/ezycommerce/Customer/views/cart.php';
+$wishlistUrl = '/ezycommerce/Customer/views/wishlist.php';
+$profileUrl = '/ezycommerce/Customer/views/profile.php';
+$loginUrl = '/ezycommerce/Customer/views/login.php';
+$logoutUrl = '/ezycommerce/Customer/views/logout.php';
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,8 +30,8 @@
                 <span>Free shipping on orders over $50 | 30-day money-back guarantee</span>
             </div>
             <div class="top-header-links">
-                <a href="#"><i class="fas fa-phone"></i> +1 (555) 123-4567</a>
-                <a href="#"><i class="fas fa-envelope"></i> support@shopease.com</a>
+                <a href="tel:+15551234567"><i class="fas fa-phone"></i> +1 (555) 123-4567</a>
+                <a href="mailto:support@shopease.com"><i class="fas fa-envelope"></i> support@shopease.com</a>
             </div>
         </div>
     </div>
@@ -26,7 +41,7 @@
         <div class="main-header">
             <div class="container">
                 <div class="header-content">
-                    <a href="#" class="logo">
+                    <a href="<?php echo $homeUrl; ?>" class="logo">
                         <i class="fas fa-shopping-bag"></i>
                         ShopEase
                     </a>
@@ -37,18 +52,30 @@
                     </div>
                     
                     <div class="header-actions">
-                        <div class="header-action user-menu">
-                            <div class="user-avatar">JS</div>
-                            <span>John Smith</span>
-                        </div>
-                        <div class="header-action">
+                        <?php if ($isLoggedIn): ?>
+                            <a href="<?php echo $profileUrl; ?>" class="header-action user-menu">
+                                <div class="user-avatar"><?php echo htmlspecialchars($avatarText); ?></div>
+                                <span><?php echo htmlspecialchars($username); ?></span>
+                            </a>
+                        <?php else: ?>
+                            <a href="<?php echo $loginUrl; ?>" class="header-action user-menu">
+                                <div class="user-avatar">GN</div>
+                                <span>Login</span>
+                            </a>
+                        <?php endif; ?>
+                        <a href="<?php echo $isLoggedIn ? $wishlistUrl : $loginUrl; ?>" class="header-action" aria-label="Wishlist">
                             <i class="far fa-heart"></i>
-                            <span class="badge">3</span>
-                        </div>
-                        <div class="header-action">
+                            <span class="badge" id="wishlist-count">0</span>
+                        </a>
+                        <a href="<?php echo $isLoggedIn ? $cartUrl : $loginUrl; ?>" class="header-action" aria-label="Cart">
                             <i class="fas fa-shopping-cart"></i>
-                            <span class="badge">2</span>
-                        </div>
+                            <span class="badge" id="cart-count">0</span>
+                        </a>
+                        <?php if ($isLoggedIn): ?>
+                            <a href="<?php echo $logoutUrl; ?>" class="header-action">Logout</a>
+                        <?php else: ?>
+                            <a href="<?php echo $loginUrl; ?>" class="header-action">Login</a>
+                        <?php endif; ?>
                     </div>
                 </div>
             </div>
@@ -59,10 +86,7 @@
             <div class="container">
                 <ul class="nav-links" id="categories-nav">
                     <!-- Categories will be loaded here via AJAX -->
-                    <li><a href="#"><i class="fas fa-home"></i> Home</a></li>
-                    <div class="loading">
-                        <div class="spinner"></div>
-                    </div>
+                    <li><a href="<?php echo $homeUrl; ?>"><i class="fas fa-home"></i> Home</a></li>
                 </ul>
             </div>
         </nav>

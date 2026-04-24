@@ -51,7 +51,21 @@ class RESTfulAPIController {
         $this->pathSegments = array_filter(explode('/', $this->path));
         $this->pathSegments = array_values($this->pathSegments);
     }
-    
+    private function normalizeImageUrl(?string $imageUrl): string {
+        if (empty($imageUrl)) {
+            return '/ezycommerce/uploads/images/product1.jpg';
+        }
+
+        if (strpos($imageUrl, 'http://') === 0 || strpos($imageUrl, 'https://') === 0) {
+            return $imageUrl;
+        }
+
+        if (strpos($imageUrl, '/') === 0) {
+            return $imageUrl;
+        }
+
+        return '/ezycommerce/' . ltrim($imageUrl, '/');
+    }    
     public function handleRequest() {
         try {
             if (empty($this->pathSegments)) {
@@ -430,9 +444,7 @@ class RESTfulAPIController {
                     $product['discount_percentage'] = 0;
                 }
                 
-                if (empty($product['image_url'])) {
-                    $product['image_url'] = 'https://via.placeholder.com/300x200?text=No+Image';
-                }
+                $product['image_url'] = $this->normalizeImageUrl($product['image_url'] ?? '');
             }
             
             $this->sendResponse([
@@ -515,9 +527,7 @@ class RESTfulAPIController {
             $product['stock'] = intval($product['stock']);
             $product['in_stock'] = $product['stock'] > 0;
             
-            if (empty($product['image_url'])) {
-                $product['image_url'] = 'https://via.placeholder.com/300x200?text=No+Image';
-            }
+            $product['image_url'] = $this->normalizeImageUrl($product['image_url'] ?? '');
             
             $this->sendResponse([
                 'success' => true,

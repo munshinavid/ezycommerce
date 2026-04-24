@@ -30,8 +30,6 @@ async function apiCall(endpoint, options = {}) {
         url = `${API_BASE_URL}/${endpoint}`;
     }
     
-    console.log('API Call to:', url);
-    
     const config = {
         method: 'GET',
         headers: {
@@ -61,8 +59,6 @@ async function safeApiCall(endpoint, options = {}) {
     try {
         return await apiCall(endpoint, options);
     } catch (error) {
-        console.error(`API call to ${endpoint} failed:`, error);
-        
         // Show user-friendly error messages
         if (error.message.includes('404')) {
             showToast('Resource not found', 'error');
@@ -234,27 +230,19 @@ async function loadCategories() {
 
 // Render categories in dropdown
 function renderCategories(categories) {
-    const categoryMenu = document.querySelector('.category-menu');
-    if (!categoryMenu) return;
+    const categoryCards = document.querySelectorAll('.category-card');
     
-    let categoriesHTML = '<a href="#" class="category-item" data-category="">All Categories</a>';
-    
-    categories.forEach(category => {
-        categoriesHTML += `<a href="#" class="category-item" data-category="${category.category_name}">${category.category_name}</a>`;
-    });
-    
-    categoryMenu.innerHTML = categoriesHTML;
-    
-    // Add event listeners to category items
-    const categoryItems = document.querySelectorAll('.category-item');
-    categoryItems.forEach(item => {
-        item.addEventListener('click', function(e) {
-            e.preventDefault();
-            const category = this.dataset.category;
-            filterByCategory(category);
-            categoryMenu.style.display = 'none';
+    if (categoryCards.length > 0) {
+        categoryCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                categoryCards.forEach(c => c.classList.remove('active'));
+                this.classList.add('active');
+                const category = this.dataset.category;
+                filterByCategory(category);
+            });
         });
-    });
+    }
 }
 
 // Load products from backend (RESTful with query parameters)
@@ -273,7 +261,7 @@ async function loadProducts(page = 1, filter = 'all', sort = 'newest', category 
         // Build query parameters for RESTful endpoint
         const params = new URLSearchParams({
             page: page,
-            limit: 8,
+            limit: 12,
             filter: filter,
             sort: sort
         });
@@ -327,7 +315,7 @@ function getStarRating(rating) {
     return starsHTML;
 }
 
-// FIXED: Render products with proper discount display from backend
+// Render products with proper discount display and image aspect ratio
 function renderProducts(products) {
     const productsContainer = document.getElementById('products-container');
     if (!productsContainer) return;
@@ -337,20 +325,11 @@ function renderProducts(products) {
         return;
     }
     
-    // Debug: Log first product to see backend data structure
-    if (products.length > 0) {
-        console.log('Sample product data from backend:', products[0]);
-    }
-    
     let productsHTML = '';
     
     products.forEach(product => {
-        // Backend returns: original_price, final_price (as 'price'), discount_percentage
         const originalPrice = parseFloat(product.original_price);
-        // Check both 'price' and 'final_price' fields
         const finalPrice = parseFloat(product.final_price || product.price);
-        
-        console.log(`Product: ${product.name}, Original: ${originalPrice}, Final: ${finalPrice}`);
         
         // Calculate discount percentage if not provided by backend
         let discountPercentage = 0;
@@ -362,8 +341,6 @@ function renderProducts(products) {
         
         const hasDiscount = originalPrice > finalPrice && discountPercentage > 0;
         
-        console.log(`Has discount: ${hasDiscount}, Percentage: ${discountPercentage}`);
-        
         // Determine badge
         let badgeHTML = '';
         if (hasDiscount) {
@@ -372,10 +349,14 @@ function renderProducts(products) {
             badgeHTML = `<div class="product-badge badge-sale">Sale</div>`;
         }
         
+        const imageUrl = product.image_url || 'https://via.placeholder.com/300x200?text=No+Image';
+        
         productsHTML += `
             <div class="product-card" data-product-id="${product.product_id}">
                 ${badgeHTML}
-                <img src="${product.image_url || 'https://via.placeholder.com/300x200?text=No+Image'}" alt="${product.name}" class="product-image">
+                <div class="product-image-wrap">
+                    <img src="${imageUrl}" alt="${product.name}" class="product-image">
+                </div>
                 <div class="product-info">
                     <div class="product-category">${product.category_name || 'Uncategorized'}</div>
                     <h3 class="product-title">${product.name}</h3>
@@ -386,10 +367,9 @@ function renderProducts(products) {
                         <span class="rating-count">(${product.review_count})</span>
                     </div>
                     <div class="product-price">
-                        <span class="current-price">${finalPrice.toFixed(2)}</span>
+                        <span class="current-price">$${finalPrice.toFixed(2)}</span>
                         ${hasDiscount ? `
-                            <span class="original-price">${originalPrice.toFixed(2)}</span>
-                            <span class="discount">${discountPercentage}% off</span>
+                            <span class="original-price">$${originalPrice.toFixed(2)}</span>
                         ` : ''}
                     </div>
                     <div class="product-stock ${product.in_stock ? '' : 'out-of-stock'}">
@@ -913,6 +893,9 @@ window.ecommerceAPI = {
     safeApiCall: safeApiCall,
     testAPIConnection: testAPIConnection
 };
+
+window.showToast = showToast;
+window.renderProducts = renderProducts;
 
 // Add some helpful console messages for developers
 console.log('EzyCommerce Frontend loaded successfully');

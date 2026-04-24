@@ -2,7 +2,6 @@
 class AuthManager {
     constructor() {
         this.apiBaseUrl = '../controllers/AuthController.php';
-        this.authToken = localStorage.getItem('authToken');
         this.userData = this.getUserData();
     }
 
@@ -14,7 +13,7 @@ class AuthManager {
 
     // Check if user is authenticated
     isAuthenticated() {
-        return this.authToken && this.userData;
+        return !!this.userData;
     }
 
     // Get current user info
@@ -22,27 +21,17 @@ class AuthManager {
         return this.userData;
     }
 
-    // Get auth token
-    getToken() {
-        return this.authToken;
-    }
-
-    // Verify token with server
-    async verifyToken() {
-        if (!this.authToken) throw new Error('No auth token found');
-
+    async verifySession() {
         try {
             const response = await fetch(`${this.apiBaseUrl}?endpoint=verify`, {
                 method: 'GET',
-                headers: {
-                    'Authorization': 'Bearer ' + this.authToken,
-                    'Content-Type': 'application/json'
-                }
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.error || 'Token verification failed');
+                throw new Error(errorData.error || 'Session verification failed');
             }
 
             const data = await response.json();
@@ -51,10 +40,10 @@ class AuthManager {
                 localStorage.setItem('userData', JSON.stringify(data.user));
                 return data.user;
             } else {
-                throw new Error('Invalid token');
+                throw new Error('Invalid session');
             }
         } catch (error) {
-            console.error('Token verification error:', error);
+            console.error('Session verification error:', error);
             this.clearAuth();
             throw error;
         }
@@ -63,20 +52,16 @@ class AuthManager {
     // Logout user
     async logout() {
         try {
-            if (this.authToken) {
-                await fetch(`${this.apiBaseUrl}?endpoint=logout`, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': 'Bearer ' + this.authToken,
-                        'Content-Type': 'application/json'
-                    }
-                });
-            }
+            await fetch(`${this.apiBaseUrl}?endpoint=logout`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' }
+            });
         } catch (error) {
             console.error('Logout error:', error);
         } finally {
             this.clearAuth();
-            window.location.href = 'login.html';
+            window.location.href = 'login.php';
         }
     }
 
@@ -84,16 +69,23 @@ class AuthManager {
     async login(email, password) {
         const response = await fetch(`${this.apiBaseUrl}?endpoint=login`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password })
         });
-        return await response.json();
+        const data = await response.json();
+        if (response.ok && data.user) {
+            this.userData = data.user;
+            localStorage.setItem('userData', JSON.stringify(data.user));
+        }
+        return data;
     }
 
     // Register
     async register(data) {
         const response = await fetch(`${this.apiBaseUrl}?endpoint=register`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
@@ -102,9 +94,7 @@ class AuthManager {
 
     // Clear auth info
     clearAuth() {
-        this.authToken = null;
         this.userData = null;
-        localStorage.removeItem('authToken');
         localStorage.removeItem('userData');
     }
 
@@ -112,8 +102,8 @@ class AuthManager {
     requireAuth(redirectUrl = null) {
         if (!this.isAuthenticated()) {
             const loginUrl = redirectUrl ?
-                `login.html?redirect=${encodeURIComponent(redirectUrl)}` :
-                'login.html';
+                `login.php?redirect=${encodeURIComponent(redirectUrl)}` :
+                'login.php';
             window.location.href = loginUrl;
             return false;
         }
@@ -127,12 +117,10 @@ class AuthManager {
 
     // Authenticated API request helper
     async apiRequest(url, options = {}) {
-        if (!this.authToken) throw new Error('Not authenticated');
-
         const config = {
             ...options,
+            credentials: 'include',
             headers: {
-                'Authorization': 'Bearer ' + this.authToken,
                 'Content-Type': 'application/json',
                 ...options.headers
             }
@@ -142,7 +130,7 @@ class AuthManager {
 
         if (response.status === 401) {
             this.clearAuth();
-            window.location.href = 'login.html';
+            window.location.href = 'login.php';
             throw new Error('Session expired');
         }
 
@@ -156,34 +144,27 @@ const authManager = new AuthManager();
 // Utility functions
 function isLoggedIn() { return authManager.isAuthenticated(); }
 function getCurrentUser() { return authManager.getCurrentUser(); }
-function getAuthToken() { return authManager.getToken(); }
 function requireLogin(redirectUrl = null) { return authManager.requireAuth(redirectUrl); }
 function logout() { return authManager.logout(); }
 function hasRole(role) { return authManager.hasRole(role); }
 
 // DOM helpers
 function initializeAuth() {
-    const isLoginPage = window.location.pathname.includes('login.html');
+    const isLoginPage = window.location.pathname.includes('login.php');
 
-    if (!isLoginPage && !isLoggedIn()) {
+    if (isLoginPage) {
+        authManager.verifySession().then(() => {
+            window.location.href = 'index.php';
+        }).catch(() => {});
+        return true;
+    }
+
+    authManager.verifySession().then(() => {
+        updateUserInterface();
+    }).catch(() => {
         const currentUrl = window.location.href;
-        window.location.href = `login.html?redirect=${encodeURIComponent(currentUrl)}`;
-        return false;
-    }
-
-    if (isLoggedIn()) {
-        authManager.verifyToken().catch(error => {
-            console.error('Token verification failed:', error);
-            if (!isLoginPage) window.location.href = 'login.html';
-        });
-
-        setInterval(() => {
-            authManager.verifyToken().catch(error => {
-                console.error('Token verification failed:', error);
-                if (!isLoginPage) window.location.href = 'login.html';
-            });
-        }, 15 * 60 * 1000);
-    }
+        window.location.href = `login.php?redirect=${encodeURIComponent(currentUrl)}`;
+    });
 
     return true;
 }
@@ -218,10 +199,10 @@ document.addEventListener('DOMContentLoaded', initializeAuth);
 function handleLoginRedirect() {
     const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
     if (redirectUrl) window.location.href = decodeURIComponent(redirectUrl);
-    else window.location.href = 'index.html';
+    else window.location.href = 'index.php';
 }
 
 // Export for modules
 if (typeof module !== 'undefined' && module.exports) {
-    module.exports = { authManager, isLoggedIn, getCurrentUser, getAuthToken, requireLogin, logout, hasRole, initializeAuth, updateUserInterface, handleLoginRedirect };
+    module.exports = { authManager, isLoggedIn, getCurrentUser, requireLogin, logout, hasRole, initializeAuth, updateUserInterface, handleLoginRedirect };
 }

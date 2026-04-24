@@ -148,9 +148,8 @@
         loginUser(email, password, rememberMe)
             .then(response => {
                 showToast('Login successful! Redirecting...', 'success');
-                localStorage.setItem('authToken', response.token);
                 localStorage.setItem('userData', JSON.stringify(response.user));
-                setTimeout(() => window.location.href = 'index.php', 1500);
+                setTimeout(() => window.location.href = getDashboardUrl(response.user?.role), 1500);
             })
             .catch(error => showToast(error.message, 'error'))
             .finally(() => {
@@ -200,6 +199,7 @@
     function loginUser(email, password, rememberMe) {
         return fetch(`${API_BASE_URL}?endpoint=login`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, remember_me: rememberMe })
         })
@@ -210,6 +210,7 @@
     function registerUser(username, firstName, lastName, email, phone, password) {
         return fetch(`${API_BASE_URL}?endpoint=register`, {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ username, firstName, lastName, email, phone, password })
         })
@@ -236,23 +237,34 @@
         setTimeout(() => toast.remove(), 5000);
     }
 
+    function getDashboardUrl(role) {
+        switch (role) {
+            case 'Admin':
+                return '/ezycommerce/Admin/views/index.php';
+            case 'Logistics':
+                return '/ezycommerce/Logistics/views/dashboard.php';
+            case 'Vendor':
+                return '/ezycommerce/Customer/views/profile.php';
+            case 'Customer':
+            default:
+                return '/ezycommerce/Customer/views/profile.php';
+        }
+    }
+
     function checkAuthStatus() {
-        const token = localStorage.getItem('authToken');
-        if (!token) return;
         fetch(`${API_BASE_URL}?endpoint=verify`, {
             method: 'GET',
-            headers: { 'Authorization': `Bearer ${token}` }
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
         })
         .then(r => r.json())
         .then(data => {
-            if (data.valid) window.location.href = 'index.php';
+            if (data.valid && data.user) window.location.href = getDashboardUrl(data.user.role);
             else {
-                localStorage.removeItem('authToken');
                 localStorage.removeItem('userData');
             }
         })
         .catch(() => {
-            localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
         });
     }

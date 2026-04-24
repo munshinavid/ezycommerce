@@ -5,7 +5,7 @@
                 <div class="footer-column">
                     <h3>ShopEase</h3>
                     <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
-                    <div class="social-links">
+                    <div class="social-icons">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
                         <a href="#"><i class="fab fa-twitter"></i></a>
                         <a href="#"><i class="fab fa-instagram"></i></a>
@@ -15,21 +15,21 @@
                 <div class="footer-column">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="#">Home</a></li>
-                        <li><a href="#">About Us</a></li>
-                        <li><a href="#">Products</a></li>
-                        <li><a href="#">Deals</a></li>
-                        <li><a href="#">Contact</a></li>
+                        <li><a href="/ezycommerce/Customer/views/index.php">Home</a></li>
+                        <li><a href="/ezycommerce/Customer/views/cart.php">Cart</a></li>
+                        <li><a href="/ezycommerce/Customer/views/wishlist.php">Wishlist</a></li>
+                        <li><a href="/ezycommerce/Customer/views/profile.php">My Account</a></li>
+                        <li><a href="/ezycommerce/Customer/views/login.php">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Customer Service</h3>
                     <ul class="footer-links">
-                        <li><a href="#">FAQ</a></li>
-                        <li><a href="#">Shipping Policy</a></li>
-                        <li><a href="#">Returns & Refunds</a></li>
-                        <li><a href="#">Track Order</a></li>
-                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="/ezycommerce/Customer/views/contact.php">Contact</a></li>
+                        <li><a href="/ezycommerce/Customer/views/cart.php">Review Cart</a></li>
+                        <li><a href="/ezycommerce/Customer/views/wishlist.php">View Wishlist</a></li>
+                        <li><a href="/ezycommerce/Customer/views/profile.php">Order History</a></li>
+                        <li><a href="/ezycommerce/Customer/views/login.php">Account Help</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">

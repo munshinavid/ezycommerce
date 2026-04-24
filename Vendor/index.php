@@ -26,8 +26,8 @@
                     <span class="cart-count" id="cartCount">0</span>
                 </div>
                 <div class="user-menu">
-                    <button class="login-btn">Login</button>
-                    <button class="register-btn">Register</button>
+                    <a class="login-btn" href="../Customer/views/login.php">Login</a>
+                    <a class="register-btn" href="../Customer/views/register.php">Register</a>
                 </div>
             </div>
         </div>
@@ -37,21 +37,21 @@
     <nav class="main-nav">
         <div class="container">
             <ul class="nav-menu">
-                <li><a href="#" class="active">Home</a></li>
+                <li><a href="index.php" class="active">Home</a></li>
                 <li class="dropdown">
-                    <a href="#">Categories <i class="fas fa-chevron-down"></i></a>
+                    <a href="#" aria-disabled="true" tabindex="-1">Categories <i class="fas fa-chevron-down"></i></a>
                     <div class="dropdown-content">
-                        <a href="#" data-category="electronics">Electronics</a>
-                        <a href="#" data-category="clothing">Clothing</a>
-                        <a href="#" data-category="books">Books</a>
-                        <a href="#" data-category="home">Home & Garden</a>
-                        <a href="#" data-category="sports">Sports</a>
+                        <a href="#" aria-disabled="true" tabindex="-1" data-category="electronics">Electronics</a>
+                        <a href="#" aria-disabled="true" tabindex="-1" data-category="clothing">Clothing</a>
+                        <a href="#" aria-disabled="true" tabindex="-1" data-category="books">Books</a>
+                        <a href="#" aria-disabled="true" tabindex="-1" data-category="home">Home & Garden</a>
+                        <a href="#" aria-disabled="true" tabindex="-1" data-category="sports">Sports</a>
                     </div>
                 </li>
-                <li><a href="#">Best Sellers</a></li>
-                <li><a href="#">New Arrivals</a></li>
-                <li><a href="#">Deals</a></li>
-                <li><a href="#">Contact</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Best Sellers</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">New Arrivals</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Deals</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Contact</a></li>
             </ul>
         </div>
     </nav>

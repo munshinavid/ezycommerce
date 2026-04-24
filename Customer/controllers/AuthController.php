@@ -65,7 +65,7 @@ class AuthController {
                 return;
             }
             
-            $email = $input['email'] ?? '';
+            $email = trim($input['email'] ?? '');
             $password = $input['password'] ?? '';
             
             if (empty($email) || empty($password)) {
@@ -87,7 +87,6 @@ class AuthController {
             }
             
             $user = $user[0];
-            $token = $this->generateToken($user['user_id']);
             
             $userDetails = $this->db->select(
                 "SELECT full_name, phone FROM CustomerDetails WHERE user_id = ? LIMIT 1",
@@ -125,7 +124,6 @@ class AuthController {
             
             $this->sendResponse([
                 'message' => 'Login successful',
-                'token' => $token,
                 'user' => $userData
             ]);
             
@@ -142,12 +140,12 @@ class AuthController {
                 return;
             }
             
-            $username = $input['username'] ?? '';
-            $email = $input['email'] ?? '';
+            $username = trim($input['username'] ?? '');
+            $email = trim($input['email'] ?? '');
             $password = $input['password'] ?? '';
-            $firstName = $input['firstName'] ?? '';
-            $lastName = $input['lastName'] ?? '';
-            $phone = $input['phone'] ?? '';
+            $firstName = trim($input['firstName'] ?? '');
+            $lastName = trim($input['lastName'] ?? '');
+            $phone = trim($input['phone'] ?? '');
             
             if (empty($username) || empty($email) || empty($password)) {
                 $this->sendResponse(['error' => 'Username, email, and password are required'], 400);
@@ -177,6 +175,7 @@ class AuthController {
             }
             
             $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+
             $success = $this->db->insert(
                 "INSERT INTO Users (username, email, password, role_id) VALUES (?, ?, ?, ?)",
                 [$username, $email, $hashedPassword, $roleId]
@@ -194,8 +193,7 @@ class AuthController {
                     [$userId, $fullName, $phone]
                 );
             }
-            
-            $token = $this->generateToken($userId);
+
             $userData = [
                 'id' => $userId,
                 'username' => $username,
@@ -209,7 +207,6 @@ class AuthController {
             
             $this->sendResponse([
                 'message' => 'Registration successful',
-                'token' => $token,
                 'user' => $userData
             ], 201);
             
@@ -280,14 +277,6 @@ class AuthController {
         } catch (Exception $e) {
             $this->sendResponse(['error' => 'Token verification failed'], 500);
         }
-    }
-    
-    private function generateToken($userId) {
-        return session_id(); // Use session ID as a dummy token for frontend compatibility
-    }
-    
-    private function validateToken($token) {
-        return false; // Not used anymore with PHP sessions
     }
     
     private function sendResponse($data, $status = 200) {

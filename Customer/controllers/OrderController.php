@@ -15,7 +15,7 @@ if ($_GET['action'] == 'placeOrder') {
 
 // Place Order Function (No order details insertion)
 function placeOrder($db) {
-    $userId = $_SESSION['user_id'];
+    $userId = $_SESSION['user']['id'] ?? null;
     $totalAmount = isset($_GET['total_amount']) ? floatval(str_replace(',', '', $_GET['total_amount'])) : 0;
 
     if ($totalAmount <= 0) {
@@ -40,7 +40,7 @@ function placeOrder($db) {
 
 // Clear Cart Function
 function clearCart($db, $outputJson = true) {
-    $userId = $_SESSION['user_id'];
+    $userId = $_SESSION['user']['id'] ?? null;
     $query = "DELETE FROM cart WHERE customer_id = ?";
     $db->execute($query, [$userId]);
 

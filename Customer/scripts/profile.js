@@ -10,11 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Initialize the profile functionality
-function initializeProfile() {
+async function initializeProfile() {
     console.log('Profile page initialized');
     
-    // Check if user is logged in
-    if (!isUserLoggedIn()) {
+    // Check if the session is valid
+    const sessionUser = await verifySession();
+    if (!sessionUser) {
         redirectToLogin();
         return;
     }
@@ -31,20 +32,38 @@ function initializeProfile() {
 
 // Check if user is logged in
 function isUserLoggedIn() {
-    const token = localStorage.getItem('authToken');
     const userData = localStorage.getItem('userData');
-    //alert(token);
-    return token && userData;
+    return !!userData;
+}
+
+async function verifySession() {
+    try {
+        const response = await fetch('../controllers/AuthController.php?endpoint=verify', {
+            method: 'GET',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+        });
+
+        if (!response.ok) {
+            return false;
+        }
+
+        const data = await response.json();
+        if (data.valid && data.user) {
+            localStorage.setItem('userData', JSON.stringify(data.user));
+            return data.user;
+        }
+
+        return false;
+    } catch (error) {
+        console.error('Session verification failed:', error);
+        return false;
+    }
 }
 
 // Redirect to login page
 function redirectToLogin() {
     window.location.href = '../views/login.php';
-}
-
-// Get authentication token
-function getAuthToken() {
-    return localStorage.getItem('authToken');
 }
 
 // Get current user data from localStorage
@@ -55,19 +74,15 @@ function getCurrentUser() {
 
 // Make authenticated API request
 async function makeApiRequest(url, options = {}) {
-    const token = getAuthToken();
-    if (!token) {
-        throw new Error('No authentication token found');
-    }
     console.log('Making API request to:', url);
 
     const defaultHeaders = {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Content-Type': 'application/json'
     };
 
     const requestOptions = {
         ...options,
+        credentials: 'include',
         headers: {
             ...defaultHeaders,
             ...options.headers
@@ -79,7 +94,6 @@ async function makeApiRequest(url, options = {}) {
         
         // Handle authentication errors
         if (response.status === 401) {
-            localStorage.removeItem('authToken');
             localStorage.removeItem('userData');
             redirectToLogin();
             throw new Error('Authentication failed');
@@ -183,10 +197,14 @@ function setupEventListeners() {
 
 // Logout function
 function logout() {
-    localStorage.removeItem('authToken');
     localStorage.removeItem('userData');
     localStorage.removeItem('cartCount');
     localStorage.removeItem('wishlistCount');
+    fetch('../controllers/AuthController.php?endpoint=logout', {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' }
+    }).catch(() => {});
     redirectToLogin();
 }
 

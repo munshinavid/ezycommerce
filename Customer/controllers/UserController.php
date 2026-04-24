@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type, Authorization');
+header('Access-Control-Allow-Headers: Content-Type');
 
 // Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -18,7 +18,10 @@ class UserController {
     
     public function __construct() {
         $this->db = new Database();
-        $this->user_id = $this->getUserIdFromToken();
+        if (session_status() === PHP_SESSION_NONE) {
+            session_start();
+        }
+        $this->user_id = $this->getUserIdFromSession();
     }
     
     public function handleRequest() {
@@ -119,24 +122,12 @@ class UserController {
         }
     }
     
-    private function getUserIdFromToken() {
-        $headers = getallheaders();
-        if (!isset($headers['Authorization'])) {
-            $this->sendResponse(['error' => 'Authorization header missing'], 401);
-            exit();
+    private function getUserIdFromSession() {
+        if (isset($_SESSION['user']) && isset($_SESSION['user']['id'])) {
+            return $_SESSION['user']['id'];
         }
-        
-        $token = trim(str_replace('Bearer ', '', $headers['Authorization'])); // Note the space
-        
-        // Use the same validation logic as AuthController
-        if (strpos($token, 'demo-token-') === 0) {
-            $parts = explode('-', $token);
-            if (isset($parts[2])) {
-                return intval($parts[2]); // Return user ID from token
-            }
-        }
-        
-        $this->sendResponse(['error' => 'Invalid token'], 401);
+
+        $this->sendResponse(['error' => 'Not authenticated'], 401);
         exit();
    }
     

@@ -1048,7 +1048,7 @@
         <div class="main-header">
             <div class="header-container">
                 <!-- Logo -->
-                <a href="index.html" class="logo">
+                <a href="index.php" class="logo">
                     <div class="logo-icon">
                         <i class="fas fa-shopping-bag"></i>
                     </div>
@@ -1095,7 +1095,7 @@
         <div class="nav-container">
             <div class="main-nav">
                 <ul class="nav-links">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.php">Home</a></li>
                     <li>
                         <a href="products.html">Categories <i class="fas fa-chevron-down"></i></a>
                         <div class="dropdown-menu">
@@ -1481,7 +1481,7 @@
             <div class="footer-column">
                 <h3>Quick Links</h3>
                 <ul class="footer-links">
-                    <li><a href="index.html">Home</a></li>
+                    <li><a href="index.php">Home</a></li>
                     <li><a href="about.html">About Us</a></li>
                     <li><a href="contact.html">Contact Us</a></li>
                     <li><a href="faq.html">FAQ</a></li>

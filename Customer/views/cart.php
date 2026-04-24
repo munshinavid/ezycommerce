@@ -1,3 +1,8 @@
+<?php
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -20,29 +25,26 @@
                 <input type="text" placeholder="Search for products...">
             </div>
             <div class="header-icons">
-                <button class="icon-btn">
+                <a href="profile.php" class="icon-btn" aria-label="Profile">
                     <i class="fas fa-user"></i>
-                </button>
-                <button class="icon-btn">
+                </a>
+                <a href="wishlist.php" class="icon-btn" aria-label="Wishlist">
                     <i class="fas fa-heart"></i>
-                    <span class="wishlist-count">3</span>
-                </button>
-                <button class="icon-btn">
+                    <span class="wishlist-count" id="wishlist-count">0</span>
+                </a>
+                <a href="cart.php" class="icon-btn" aria-label="Cart">
                     <i class="fas fa-shopping-cart"></i>
                     <span class="count" id="cart-count">3</span>
-                </button>
+                </a>
             </div>
         </div>
         <nav>
             <ul class="nav-menu">
-                <li><a href="index.html">Home</a></li>
-                <li><a href="#">Electronics</a></li>
-                <li><a href="#">Clothing</a></li>
-                <li><a href="#">Home & Kitchen</a></li>
-                <li><a href="#">Books</a></li>
-                <li><a href="#">Sports</a></li>
-                <li><a href="#">Beauty</a></li>
-                <li><a href="#">Sale</a></li>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="wishlist.php">Wishlist</a></li>
+                <li><a href="cart.php">Cart</a></li>
+                <li><a href="profile.php">Profile</a></li>
+                <li><a href="login.php">Login</a></li>
             </ul>
         </nav>
     </header>
@@ -50,7 +52,7 @@
     <!-- Breadcrumb -->
     <div class="breadcrumb">
         <ul>
-            <li><a href="index.html">Home</a></li>
+            <li><a href="index.php">Home</a></li>
             <li>Shopping Cart</li>
         </ul>
     </div>
@@ -72,7 +74,7 @@
                     <i class="fas fa-shopping-cart"></i>
                     <h3>Your cart is empty</h3>
                     <p>Looks like you haven't added anything to your cart yet.</p>
-                    <a href="index.html" class="btn btn-primary">Continue Shopping</a>
+                    <a href="index.php" class="btn btn-primary">Continue Shopping</a>
                 </div>
             </div>
         </div>

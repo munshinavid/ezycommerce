@@ -5,7 +5,7 @@ session_start();
 // Check if the update request was made
 if (isset($_POST['update'])) {
     // Assuming you have all the necessary data from the form
-    $userId = $_SESSION['user_id'];
+    $userId = $_SESSION['user']['id'] ?? null;
     $username = $_POST['name'];
     $email = $_POST['email'];
     $newPassword = $_POST['new_password'] ?? null;

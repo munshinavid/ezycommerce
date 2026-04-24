@@ -512,12 +512,12 @@
             </div>
             <div class="sidebar-menu">
                 <ul>
-                    <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="active"><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
                     <li><a href="allshipping.php"><i class="fas fa-list"></i> All Orders</a></li>
-                    <li><a href="#"><i class="fas fa-shipping-fast"></i> Shipping</a></li>
+                    <li><a href="allshipping.php"><i class="fas fa-shipping-fast"></i> Shipping</a></li>
                     <li><a href="return.php"><i class="fas fa-undo"></i> Returns</a></li>
-                    <li><a href="#"><i class="fas fa-chart-bar"></i> Analytics</a></li>
-                    <li><a href="#"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-bar"></i> Analytics</a></li>
+                    <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-cog"></i> Settings</a></li>
                 </ul>
             </div>
         </div>

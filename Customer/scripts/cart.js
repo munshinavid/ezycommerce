@@ -3,7 +3,6 @@ document.addEventListener('DOMContentLoaded', initializeCart);
 
 // Configuration
 const userData = JSON.parse(localStorage.getItem("userData"));
-const authToken= localStorage.getItem("authToken");
 const API_BASE_URL = '../controllers/CartController.php'; // Base API endpoint
 const CURRENT_USER_ID = userData ? userData.id : null;
 
@@ -153,9 +152,11 @@ function updateCartSummary(data) {
 let quantityUpdateTimeout = null;
 
 async function changeQuantity(itemEl, delta) {
-    console.log('changeQuantity called with delta:', delta); // Debug log
+    if (!itemEl) return;
     
     const input = itemEl.querySelector('.quantity-input');
+    if (!input) return;
+    
     const currentQty = parseInt(input.value) || 0;
     let newQty = currentQty + delta;
     
@@ -165,6 +166,12 @@ async function changeQuantity(itemEl, delta) {
     input.value = newQty;
     updateCartItemCountAndTotal();
 
+    // Update disabled state of minus button
+    const minusBtn = itemEl.querySelector('.quantity-minus');
+    if (minusBtn) {
+        minusBtn.disabled = newQty <= 1;
+    }
+
     // Clear any existing timeout
     if (quantityUpdateTimeout) {
         clearTimeout(quantityUpdateTimeout);
@@ -172,8 +179,13 @@ async function changeQuantity(itemEl, delta) {
 
     // Debounce the backend call
     quantityUpdateTimeout = setTimeout(async () => {
-        console.log('Sending quantity update to backend:', newQty);
-        const result = await updateQuantityBackend(itemEl.dataset.cartItemId, newQty);
+        const cartItemId = itemEl.dataset.cartItemId;
+        if (!cartItemId) {
+            console.error('No cart item ID found');
+            return;
+        }
+        
+        const result = await updateQuantityBackend(cartItemId, newQty);
         
         // If backend operation fails, revert the UI change
         if (!result.success) {
@@ -181,11 +193,13 @@ async function changeQuantity(itemEl, delta) {
             // Revert UI change
             input.value = currentQty;
             updateCartItemCountAndTotal();
+            if (minusBtn) {
+                minusBtn.disabled = currentQty <= 1;
+            }
             alert('Failed to update quantity: ' + result.message);
-        } else {
-            console.log('Quantity updated successfully');
         }
     }, 300); // 300ms debounce
+}
 }
 
 // Set quantity from input with debouncing
@@ -328,13 +342,11 @@ function updateCartItemCountAndTotal() {
 // Update quantity
 async function updateQuantityBackend(cartItemId, quantity) {
     try {
-        console.log(`Updating quantity for cart item ${cartItemId} to ${quantity}`);
         const res = await fetch(
-            `../controllers/CartController.php?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${quantity}&user_id=${CURRENT_USER_ID}`,
-            { method: 'GET', credentials: 'include' }
+            `../controllers/CartController.php?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${quantity}`,
+            { method: 'POST', credentials: 'include' }
         );
         const data = await res.json();
-        console.log('updateQuantityBackend response:', data);
         return data;
     } catch (err) {
         console.error('updateQuantityBackend failed:', err);
@@ -345,13 +357,11 @@ async function updateQuantityBackend(cartItemId, quantity) {
 // Remove item
 async function removeItemBackend(cartItemId) {
     try {
-        console.log(`Removing cart item ${cartItemId}`);
         const res = await fetch(
-            `../controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}&user_id=${CURRENT_USER_ID}`,
-            { method: 'GET', credentials: 'include' }
+            `../controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}`,
+            { method: 'POST', credentials: 'include' }
         );
         const data = await res.json();
-        console.log('removeItemBackend response:', data);
         return data;
     } catch (err) {
         console.error('removeItemBackend failed:', err);
@@ -449,15 +459,9 @@ async function loadAddresses() {
     //     alert("You are not logged in!");
     //     return;
     // }
-    //get authtoken from localstorage
-    console.log(authToken);
-
     try {
         const res = await fetch("../controllers/UserController.php?endpoint=addresses", {
             method: "GET",
-            headers: {
-                "Authorization": `Bearer ${authToken}`
-            },
             credentials: "include"
         });
 

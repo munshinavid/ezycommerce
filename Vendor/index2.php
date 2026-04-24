@@ -527,7 +527,7 @@
     <!-- Header -->
     <header>
         <div class="top-header">
-            <a href="#" class="logo">
+            <a href="index.php" class="logo">
                 <i class="fas fa-shopping-bag"></i>
                 ShopEasy
             </a>
@@ -551,14 +551,14 @@
         </div>
         <nav>
             <ul class="nav-menu">
-                <li><a href="#">Home</a></li>
-                <li><a href="#">Electronics</a></li>
-                <li><a href="#">Clothing</a></li>
-                <li><a href="#">Home & Kitchen</a></li>
-                <li><a href="#">Books</a></li>
-                <li><a href="#">Sports</a></li>
-                <li><a href="#">Beauty</a></li>
-                <li><a href="#">Sale</a></li>
+                <li><a href="index.php">Home</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Electronics</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Clothing</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Home & Kitchen</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Books</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Sports</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Beauty</a></li>
+                <li><a href="#" aria-disabled="true" tabindex="-1">Sale</a></li>
             </ul>
         </nav>
     </header>
@@ -920,11 +920,11 @@
             <div class="footer-column">
                 <h3>Customer Service</h3>
                 <ul>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">FAQs</a></li>
-                    <li><a href="#">Shipping & Returns</a></li>
-                    <li><a href="#">Track Order</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#" aria-disabled="true" tabindex="-1">Contact Us</a></li>
+                        <li><a href="#" aria-disabled="true" tabindex="-1">FAQs</a></li>
+                        <li><a href="#" aria-disabled="true" tabindex="-1">Shipping & Returns</a></li>
+                        <li><a href="#" aria-disabled="true" tabindex="-1">Track Order</a></li>
+                        <li><a href="#" aria-disabled="true" tabindex="-1">Privacy Policy</a></li>
                 </ul>
             </div>
             <div class="footer-column">

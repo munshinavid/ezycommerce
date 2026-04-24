@@ -1,9 +1,10 @@
-<!-- navbar starts here  -->
 <?php
-session_start(); // Start the session to access session data
+if (session_status() === PHP_SESSION_NONE) {
+  session_start();
+}
 
-// Check if user is logged in
-$isLoggedIn = isset($_SESSION['user_id']);
+$isLoggedIn = isset($_SESSION['user']) && isset($_SESSION['user']['id']);
+$username = $isLoggedIn ? ($_SESSION['user']['username'] ?? 'Account') : '';
 ?>
 
 <!-- navbar starts here -->
@@ -12,13 +13,13 @@ $isLoggedIn = isset($_SESSION['user_id']);
 
   <ul class="nav-lower flex-space-around">
     <li class="nav__list">
-      <a href="/index.html" class="nav__brand nav__link">Navid Express</a>
+      <a href="../views/index.php" class="nav__brand nav__link">Navid Express</a>
     </li>
     <li class="nav__list">
       <?php if ($isLoggedIn): ?>
         <a href="../views/cart.php" class="nav__link">
           <span><i class="fa-solid fa-cart-shopping"></i> </span>
-          Cart (<?php echo $_SESSION['cart_count']; ?> items - $<?php echo $_SESSION['cart_total']; ?>)
+          Cart (<?php echo $_SESSION['cart_count'] ?? 0; ?> items - $<?php echo $_SESSION['cart_total'] ?? '0.00'; ?>)
         </a>
       <?php else: ?>
         <a href="../views/login.php" class="nav__link">
@@ -37,7 +38,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
     <?php if (!$isLoggedIn): ?>
       <!-- Show Register and Login links if not logged in -->
       <li class="nav__list">
-        <a href="../views/customer_registration.php" class="nav__link">Register</a>
+        <a href="../views/register.php" class="nav__link">Register</a>
       </li>
       <li class="nav__list">
         <a href="../views/login.php" class="nav__link">Login</a>
@@ -48,7 +49,7 @@ $isLoggedIn = isset($_SESSION['user_id']);
         <a href="../views/logout.php" class="nav__link">Logout</a>
       </li>
       <li class="nav__list">
-        <a href="../views/profile.php" class="nav__link">Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
+        <a href="../views/profile.php" class="nav__link">Welcome, <?php echo htmlspecialchars($username); ?></a>
       </li>
     <?php endif; ?>
 

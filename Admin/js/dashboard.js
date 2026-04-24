@@ -49,9 +49,9 @@ function setupEventListeners() {
     viewAllButtons.forEach((btn, index) => {
         btn.addEventListener('click', function() {
             if (index === 0) {
-                window.location.href = 'orders.php';
+                window.location.href = 'order_management.php';
             } else {
-                window.location.href = 'products.php';
+                window.location.href = 'product_management.php';
             }
         });
     });

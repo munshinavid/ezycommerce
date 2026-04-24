@@ -52,7 +52,8 @@ class CartController {
                     $this->sendResponse(false, 'Invalid action', null, 400);
             }
         } catch (Exception $e) {
-            $this->sendResponse(false, $e->getMessage(), null, 500);
+            // Let the global error handler manage the exception and response
+            throw $e;
         }
     }
 
@@ -574,29 +575,10 @@ class CartController {
 
     // Helper methods
     private function getCustomerId() {
-        // Try session first
-        if (isset($_SESSION['user_id'])) {
-            return $_SESSION['user_id'];
+        if (isset($_SESSION['user']) && isset($_SESSION['user']['id'])) {
+            return $_SESSION['user']['id'];
         }
 
-        //get user_id from json body
-        // JSON body handling
-        $input = json_decode(file_get_contents("php://input"), true);
-        if (isset($input['user_id'])) {
-            return $input['user_id'];
-        }
-
-        // after JSON and before return null
-        if (isset($_POST['user_id'])) {
-            return $_POST['user_id'];
-        }
-        
-        // Try from GET data (for API calls)
-        if (isset($_GET['user_id'])) {
-            return $_GET['user_id'];
-        }
-        
-        
         return null;
     }
 

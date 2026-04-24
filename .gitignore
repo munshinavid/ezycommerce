@@ -1,0 +1,7 @@
+composer.phar
+api_errors.log
+logs/*.log
+Vendor/composer/
+Vendor/nikic/
+Vendor/autoload.php
+*.cache

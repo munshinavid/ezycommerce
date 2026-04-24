@@ -620,13 +620,13 @@
             
             <div class="sidebar-menu">
                 <ul>
-                    <li class="active"><a href="#"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="#" id="nav-products"><i class="fas fa-box"></i> Products</a></li>
-                    <li><a href="#" id="nav-orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
-                    <li><a href="#" id="nav-sales"><i class="fas fa-chart-line"></i> Sales Analytics</a></li>
-                    <li><a href="#" id="nav-returns"><i class="fas fa-undo"></i> Returns</a></li>
-                    <li><a href="#" id="nav-discounts"><i class="fas fa-tag"></i> Discounts</a></li>
-                    <li><a href="#" id="nav-profile"><i class="fas fa-user"></i> Profile</a></li>
+                    <li class="active"><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="products.php" id="nav-products"><i class="fas fa-box"></i> Products</a></li>
+                    <li><a href="orders.php" id="nav-orders"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+                    <li><a href="#" id="nav-sales" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-line"></i> Sales Analytics</a></li>
+                    <li><a href="#" id="nav-returns" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-undo"></i> Returns</a></li>
+                    <li><a href="v-discount.php" id="nav-discounts"><i class="fas fa-tag"></i> Discounts</a></li>
+                    <li><a href="#" id="nav-profile" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-user"></i> Profile</a></li>
                 </ul>
             </div>
         </div>
