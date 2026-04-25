@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    image: ezycommerce-app:latest
+    container_name: ezycommerce_app
+    restart: unless-stopped
+    ports:
+      - "8080:80"
+    env_file:
+      - .env
+    networks:
+      - shared_network
+
+networks:
+  shared_network:
+    external: true
+    name: fullstack-blog-angular-aspnetcore_default   # ⚠️ MUST match your existing postgres network
