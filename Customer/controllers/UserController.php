@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once '../models/db.php';
+require_once __DIR__ . '/../models/db.php';
 
 class UserController {
     private $db;
@@ -301,7 +301,7 @@ class UserController {
                 [$this->user_id, $input['full_name'], $full_address, $input['phone']]
             );
             
-            if ($success) {
+            if ($success !== false) {
                 $this->sendResponse(['message' => 'Address created successfully'], 201);
             } else {
                 $this->sendResponse(['error' => 'Failed to create address'], 500);
@@ -355,7 +355,7 @@ class UserController {
                 [$input['full_name'], $full_address, $input['phone'], $id, $this->user_id]
             );
             
-            if ($success) {
+            if ($success !== false) {
                 $this->sendResponse(['message' => 'Address updated successfully']);
             } else {
                 $this->sendResponse(['error' => 'Failed to update address'], 500);
@@ -384,7 +384,7 @@ class UserController {
                 [$id, $this->user_id]
             );
             
-            if ($success) {
+            if ($success !== false) {
                 $this->sendResponse(['message' => 'Address deleted successfully']);
             } else {
                 $this->sendResponse(['error' => 'Failed to delete address'], 500);
@@ -570,7 +570,7 @@ class UserController {
                 [$this->user_id, $input['product_id']]
             );
             
-            if ($success) {
+            if ($success !== false) {
                 $this->sendResponse(['message' => 'Product added to wishlist'], 201);
             } else {
                 $this->sendResponse(['error' => 'Failed to add to wishlist'], 500);
@@ -588,7 +588,7 @@ class UserController {
                 [$this->user_id, $productId]
             );
             
-            if ($success) {
+            if ($success !== false) {
                 $this->sendResponse(['message' => 'Product removed from wishlist']);
             } else {
                 $this->sendResponse(['error' => 'Failed to remove from wishlist'], 500);

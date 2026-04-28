@@ -1,3 +1,3 @@
 <?php
-header('Location: /ezycommerce/Admin/views/order_management.php');
+header('Location: ' . url('/admin/orders'));
 exit;

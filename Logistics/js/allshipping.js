@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = '../controllers/AllShippingAPI.php';
+const API_BASE_URL = '/api/logistics/shipping';
 
 // DOM Elements
 const sidebarMenuItems = document.querySelectorAll('.sidebar-menu a[data-status]');

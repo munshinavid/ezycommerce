@@ -1,110 +1,134 @@
 <?php
 require_once __DIR__ . '/../../utils/ErrorHandler.php';
+
+/**
+ * Database class for the Customer module.
+ * Uses mysqli with centralized config from config/db.php.
+ */
 class Database {
-    private $host = 'localhost';
-    private $db_name = 'ecomm';
-    private $username = 'root';
-    private $password = '';
     private $conn;
+    private $lastRowCount = 0;
 
     public function __construct() {
         $this->connect();
     }
 
     private function connect() {
-        $this->conn = new mysqli($this->host, $this->username, $this->password, $this->db_name);
+        $cfg = require __DIR__ . '/../../config/db.php';
 
-        if ($this->conn->connect_error) {
-            throw new Exception("Error in DB connection", 1);
-            
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
+        try {
+            $this->conn = new mysqli(
+                $cfg['host'],
+                $cfg['username'],
+                $cfg['password'],
+                $cfg['database'],
+                $cfg['port']
+            );
+            $this->conn->set_charset($cfg['charset'] ?? 'utf8mb4');
+        } catch (mysqli_sql_exception $e) {
+            die("DB Connection Failed: " . $e->getMessage());
         }
     }
 
-    // Execute a SELECT query and return results
+    /**
+     * Execute a SELECT query and return associative array results.
+     */
     public function select($query, $params = []) {
         $stmt = $this->conn->prepare($query);
         if ($stmt === false) {
-            throw new Exception("Error in DB select", 1);
-            
+            throw new Exception("Error in DB select: " . $this->conn->error);
         }
-    
+
         if (!empty($params)) {
-            $this->bindParams($stmt, $params);
+            $types = $this->detectTypes($params);
+            $stmt->bind_param($types, ...$params);
         }
-    
+
         $stmt->execute();
         $result = $stmt->get_result();
-    
-        // Fetch data row by row using fetch_assoc
-        $data = [];
-        while ($row = $result->fetch_assoc()) {
-            $data[] = $row;
-        }
-    
+        $data = $result->fetch_all(MYSQLI_ASSOC);
+        $this->lastRowCount = count($data);
         $stmt->close();
+
         return $data;
     }
-    
 
-    // Execute an INSERT/UPDATE/DELETE query
+    /**
+     * Execute an INSERT/UPDATE/DELETE query.
+     */
     public function execute($query, $params = []) {
         $stmt = $this->conn->prepare($query);
         if ($stmt === false) {
-            //make actual error in json response
-            throw new Exception("Error Processing execute", 1);
-            
+            throw new Exception("Error Processing execute: " . $this->conn->error);
         }
 
         if (!empty($params)) {
-            $this->bindParams($stmt, $params);
+            $types = $this->detectTypes($params);
+            $stmt->bind_param($types, ...$params);
         }
 
-        $success = $stmt->execute();
-        if ($stmt->affected_rows === -1) {
-            throw new Exception("Error Processing Request", 1);
-            
-        }
+        $stmt->execute();
+        $this->lastRowCount = $stmt->affected_rows;
         $stmt->close();
-        return $success;
+
+        return true;
     }
 
-    // Insert wrapper
+    /**
+     * Insert wrapper — returns the last inserted ID.
+     */
     public function insert($query, $params = []) {
-        $this->execute($query, $params);
-        return $this->getLastInsertId();
+        $stmt = $this->conn->prepare($query);
+        if ($stmt === false) {
+            throw new Exception("Error Processing insert: " . $this->conn->error);
+        }
+
+        if (!empty($params)) {
+            $types = $this->detectTypes($params);
+            $stmt->bind_param($types, ...$params);
+        }
+
+        $stmt->execute();
+        $id = $stmt->insert_id;
+        $this->lastRowCount = $stmt->affected_rows;
+        $stmt->close();
+
+        return $id;
     }
 
-    // Update wrapper
+    /**
+     * Update wrapper.
+     */
     public function update($query, $params = []) {
         return $this->execute($query, $params);
     }
 
-    // Delete wrapper
+    /**
+     * Delete wrapper.
+     */
     public function delete($query, $params = []) {
         return $this->execute($query, $params);
     }
 
-    // Bind parameters to the prepared statement
-    private function bindParams($stmt, $params) {
-        $types = '';
-        foreach ($params as $param) {
-            if (is_int($param)) {
-                $types .= 'i';
-            } elseif (is_double($param)) {
-                $types .= 'd';
-            } else {
-                $types .= 's';
-            }
-        }
-        $stmt->bind_param($types, ...$params);
-    }
-
-    // Get the last inserted ID
+    /**
+     * Get the last inserted ID.
+     */
     public function getLastInsertId() {
         return $this->conn->insert_id;
     }
 
-    // Transaction controls
+    /**
+     * Return the number of rows affected/returned by the last operation.
+     */
+    public function rowCount() {
+        return $this->lastRowCount ?? 0;
+    }
+
+    /**
+     * Transaction controls.
+     */
     public function beginTransaction() {
         $this->conn->begin_transaction();
     }
@@ -117,162 +141,31 @@ class Database {
         $this->conn->rollback();
     }
 
-    // Close the connection
+    /**
+     * Close the connection.
+     */
     public function close() {
-        $this->conn->close();
+        if ($this->conn) {
+            $this->conn->close();
+            $this->conn = null;
+        }
+    }
+
+    /**
+     * Auto-detect parameter types for mysqli bind_param.
+     * i = integer, d = double, s = string, b = blob
+     */
+    private function detectTypes(array $params): string {
+        $types = '';
+        foreach ($params as $param) {
+            if (is_int($param)) {
+                $types .= 'i';
+            } elseif (is_float($param)) {
+                $types .= 'd';
+            } else {
+                $types .= 's';
+            }
+        }
+        return $types;
     }
 }
-/*
-here my db schema
--- ROLES TABLE
-CREATE TABLE Roles (
-    role_id INT AUTO_INCREMENT PRIMARY KEY,
-    role_name VARCHAR(50) UNIQUE NOT NULL
-);
-
-CREATE TABLE Wishlist (
-    wishlist_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    product_id INT NOT NULL,
-    added_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_product (user_id, product_id)
-);
-
- 
--- USERS TABLE
-CREATE TABLE Users (
-    user_id INT AUTO_INCREMENT PRIMARY KEY,
-    username VARCHAR(50) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    password VARCHAR(255) NOT NULL,
-    role_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (role_id) REFERENCES Roles(role_id) ON DELETE CASCADE
-);
- 
--- VENDORS (For Brand Managers / Sellers)
-CREATE TABLE Vendors (
-    vendor_id INT AUTO_INCREMENT PRIMARY KEY,
-    vendor_name VARCHAR(100) NOT NULL,
-    contact_email VARCHAR(100),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
- 
--- DISCOUNTS
-CREATE TABLE Discounts (
-    discount_id INT AUTO_INCREMENT PRIMARY KEY,
-    discount_type ENUM('percentage', 'fixed') NOT NULL,
-    discount_value DECIMAL(10, 2) NOT NULL,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL
-);
- 
--- ✅ CATEGORIES (NEW TABLE)
-CREATE TABLE Categories (
-    category_id INT AUTO_INCREMENT PRIMARY KEY,
-    category_name VARCHAR(100) UNIQUE NOT NULL
-);
- 
--- PRODUCTS (with category_id instead of plain text)
-CREATE TABLE Products (
-    product_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
-    description TEXT,
-    price DECIMAL(10, 2) NOT NULL,
-    stock INT NOT NULL,
-    image_url VARCHAR(255),
-    category_id INT DEFAULT NULL,
-    discount_id INT DEFAULT NULL,
-    vendor_id INT DEFAULT NULL,
-    FOREIGN KEY (category_id) REFERENCES Categories(category_id) ON DELETE SET NULL,
-    FOREIGN KEY (discount_id) REFERENCES Discounts(discount_id) ON DELETE SET NULL,
-    FOREIGN KEY (vendor_id) REFERENCES Vendors(vendor_id) ON DELETE SET NULL
-);
- 
--- ORDERS
-CREATE TABLE Orders (
-    order_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    order_status ENUM('Pending', 'Shipped', 'Delivered', 'Cancelled') NOT NULL,
-    total_amount DECIMAL(10, 2) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
- 
--- ORDER ITEMS
-CREATE TABLE Order_Items (
-    order_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    price_at_purchase DECIMAL(10, 2) NOT NULL,
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
-);
- 
--- SHIPPING
-CREATE TABLE Shipping (
-    shipping_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    shipping_status ENUM('Pending', 'Shipped', 'Delivered') NOT NULL,
-    tracking_number VARCHAR(100),
-    handled_by INT DEFAULT NULL,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (handled_by) REFERENCES Users(user_id) ON DELETE SET NULL
-);
- 
--- RETURNS
-CREATE TABLE Returns (
-    return_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    reason TEXT,
-    status ENUM('Pending', 'Approved', 'Rejected') NOT NULL,
-    processed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    handled_by INT DEFAULT NULL,
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE,
-    FOREIGN KEY (handled_by) REFERENCES Users(user_id) ON DELETE SET NULL
-);
- 
--- CART
-CREATE TABLE Cart (
-    cart_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
- 
--- CART ITEMS
-CREATE TABLE Cart_Items (
-    cart_item_id INT AUTO_INCREMENT PRIMARY KEY,
-    cart_id INT NOT NULL,
-    product_id INT NOT NULL,
-    quantity INT NOT NULL,
-    FOREIGN KEY (cart_id) REFERENCES Cart(cart_id) ON DELETE CASCADE,
-    FOREIGN KEY (product_id) REFERENCES Products(product_id) ON DELETE CASCADE
-);
- 
--- CUSTOMER DETAILS
-CREATE TABLE CustomerDetails (
-    detail_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT NOT NULL,
-    full_name VARCHAR(100) NOT NULL,
-    address TEXT NOT NULL,
-    phone VARCHAR(20) NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
- 
--- PAYMENTS
-CREATE TABLE Payments (
-    payment_id INT AUTO_INCREMENT PRIMARY KEY,
-    order_id INT NOT NULL,
-    amount DECIMAL(10,2) NOT NULL,
-    method ENUM('Cash on Delivery', 'Credit Card', 'Mobile Banking') NOT NULL,
-    status ENUM('Pending', 'Completed', 'Failed') DEFAULT 'Pending',
-    transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE CASCADE
-);
-*/

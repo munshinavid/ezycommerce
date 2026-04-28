@@ -23,7 +23,7 @@
 
 <?php require_once __DIR__ . '/components/footer.php'; ?>
 
-<script src="../scripts/home.js"></script>
+<script src="<?php echo url('/Customer/scripts/home.js'); ?>"></script>
 <script>
     const currentUser = JSON.parse(localStorage.getItem('userData'));
     const currentUserId = currentUser ? currentUser.id : null;

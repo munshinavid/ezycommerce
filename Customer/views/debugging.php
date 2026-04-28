@@ -1,6 +1,6 @@
 <?php
-require_once '../models/OrderModel.php';
-require_once '../models/UserModel.php';
+require_once __DIR__ . '/../models/OrderModel.php';
+require_once __DIR__ . '/../models/UserModel.php';
 session_start();
 
 // if (!isset($_SESSION['user_id'])) {

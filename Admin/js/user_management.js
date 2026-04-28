@@ -1,5 +1,5 @@
 // API Configuration
-const API_BASE_URL = '../controllers/UserController.php';
+const API_BASE_URL = '/api/admin/user';
 const USERS_ENDPOINT = `${API_BASE_URL}/users`;
 
 // State management

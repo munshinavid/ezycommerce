@@ -1,6 +1,6 @@
 // <script>
     // Configuration (simpler: point directly to PHP controller)
-    const API_BASE_URL = '../controllers/AuthController.php';
+    const API_BASE_URL = '/api/auth';
     
     document.addEventListener('DOMContentLoaded', function() {
         initializeAuth();
@@ -242,14 +242,14 @@
 
         switch (normalizedRole) {
             case 'admin':
-                return '/ezycommerce/Admin/views/index.php';
+                return '/admin';
             case 'logistics':
-                return '/ezycommerce/Logistics/views/dashboard.php';
+                return '/logistics';
             case 'vendor':
-                return '/ezycommerce/Vendor/views/dashboard.php';
+                return '/vendor';
             case 'customer':
             default:
-                return '/ezycommerce/Customer/views/profile.php';
+                return '/profile';
         }
     }
 

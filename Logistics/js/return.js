@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = '../controllers/ReturnAPI.php';
+const API_BASE_URL = '/api/logistics/returns';
 
 // DOM Elements
 const tabs = document.querySelectorAll('.tab');

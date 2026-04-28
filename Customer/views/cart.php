@@ -10,7 +10,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Cart - ShopEasy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/cart.css">
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/cart.css'); ?>">
 </head>
 <body>
     <!-- Header -->
@@ -270,6 +270,6 @@ if (session_status() === PHP_SESSION_NONE) {
     </footer>
 
     <!-- JavaScript Files -->
-    <script src="../scripts/cart.js"></script>
+    <script src="<?php echo url('/Customer/scripts/cart.js'); ?>"></script>
 </body>
 </html>

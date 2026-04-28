@@ -6,7 +6,7 @@
     <title>Login - ShopEasy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="../css/login.css">
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/login.css'); ?>">
 </head>
 <body>
     <div class="auth-container">
@@ -112,6 +112,6 @@
     </div>
 
     <!-- <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> -->
-    <script src="../scripts/login.js"></script>
+    <script src="<?php echo url('/Customer/scripts/login.js'); ?>"></script>
 </body>
 </html>

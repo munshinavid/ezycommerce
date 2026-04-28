@@ -15,21 +15,21 @@
                 <div class="footer-column">
                     <h3>Quick Links</h3>
                     <ul class="footer-links">
-                        <li><a href="/ezycommerce/Customer/views/index.php">Home</a></li>
-                        <li><a href="/ezycommerce/Customer/views/cart.php">Cart</a></li>
-                        <li><a href="/ezycommerce/Customer/views/wishlist.php">Wishlist</a></li>
-                        <li><a href="/ezycommerce/Customer/views/profile.php">My Account</a></li>
-                        <li><a href="/ezycommerce/Customer/views/login.php">Login</a></li>
+                        <li><a href="<?php echo url('/'); ?>">Home</a></li>
+                        <li><a href="<?php echo url('/cart'); ?>">Cart</a></li>
+                        <li><a href="<?php echo url('/wishlist'); ?>">Wishlist</a></li>
+                        <li><a href="<?php echo url('/profile'); ?>">My Account</a></li>
+                        <li><a href="<?php echo url('/login'); ?>">Login</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
                     <h3>Customer Service</h3>
                     <ul class="footer-links">
-                        <li><a href="/ezycommerce/Customer/views/contact.php">Contact</a></li>
-                        <li><a href="/ezycommerce/Customer/views/cart.php">Review Cart</a></li>
-                        <li><a href="/ezycommerce/Customer/views/wishlist.php">View Wishlist</a></li>
-                        <li><a href="/ezycommerce/Customer/views/profile.php">Order History</a></li>
-                        <li><a href="/ezycommerce/Customer/views/login.php">Account Help</a></li>
+                        <li><a href="<?php echo url('/contact'); ?>">Contact</a></li>
+                        <li><a href="<?php echo url('/cart'); ?>">Review Cart</a></li>
+                        <li><a href="<?php echo url('/wishlist'); ?>">View Wishlist</a></li>
+                        <li><a href="<?php echo url('/profile'); ?>">Order History</a></li>
+                        <li><a href="<?php echo url('/login'); ?>">Account Help</a></li>
                     </ul>
                 </div>
                 <div class="footer-column">
@@ -57,6 +57,6 @@
         </div>
     </div>
 
-    <script src="/ezycommerce/Customer/scripts/home.js"></script>
+    <script src="<?php echo url('/Customer/scripts/home.js'); ?>"></script>
 </body>
 </html>

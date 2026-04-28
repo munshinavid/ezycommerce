@@ -6,7 +6,7 @@
     <title>My Profile - ShopEasy</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="../css/profile.css">
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/profile.css'); ?>">
 </head>
 <body>
     <!-- Top Bar -->
@@ -357,6 +357,6 @@
         <!-- Toasts will be added here dynamically -->
     </div>
     <!-- JavaScript Files -->
-    <script src="../scripts/profile.js"></script>
+    <script src="<?php echo url('/Customer/scripts/profile.js'); ?>"></script>
 </body>
 </html>

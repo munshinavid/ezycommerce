@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once '../models/db.php';
+require_once __DIR__ . '/../models/db.php';
 
 class AuthController {
     private $db;

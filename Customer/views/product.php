@@ -27,9 +27,9 @@ echo "<p>Product ID: $product_id</p>";
       crossorigin="anonymous"
       referrerpolicy="no-referrer"
     />
-    <link rel="stylesheet" href="../css/style.css" />
-    <link rel="stylesheet" href="../css/nav.css" />
-    <link rel="stylesheet" href="../css/footer.css" />
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/style.css'); ?>" />
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/nav.css'); ?>" />
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/footer.css'); ?>" />
   </head>
   <body>
     <!-- navbar starts here  -->

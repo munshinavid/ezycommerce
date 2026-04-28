@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = '../controllers/vendor-Dashboard.php';
+const API_BASE_URL = '/api/vendor/dashboard';
 
 // DOM Elements
 const productModal = document.getElementById('product-modal');

@@ -7,7 +7,7 @@ class DummyDataSeeder extends AbstractSeed
 {
     private function resetSeedTables(): void
     {
-        $this->execute('SET FOREIGN_KEY_CHECKS=0');
+        //$this->execute('SET FOREIGN_KEY_CHECKS=0');
 
         foreach ([
             'order_items',
@@ -28,7 +28,7 @@ class DummyDataSeeder extends AbstractSeed
             $this->table($tableName)->truncate();
         }
 
-        $this->execute('SET FOREIGN_KEY_CHECKS=1');
+        //$this->execute('SET FOREIGN_KEY_CHECKS=1');
     }
 
     public function run(): void

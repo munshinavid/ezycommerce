@@ -35,7 +35,7 @@ class UserModel {
         $query = "INSERT INTO users (username, email, password) VALUES (?, ?, ?)";
         $result = $this->db->execute($query, [$username, $email, $hashedPassword]);
 
-        if ($result) {
+        if ($result !== false) {
             // Get the user_id of the inserted user
             $userId = $this->db->getLastInsertId();
 
@@ -70,15 +70,15 @@ class UserModel {
         // Prepare the update query for the user
         $query = "UPDATE users SET username = ?, email = ?, password = ? WHERE user_id = ?";
         $result = $this->db->execute($query, [$username, $email, $hashedPassword, $userId]);
-    
-        return $result ? true : false;
+
+        return $result !== false;
     }
     public function updateCustomerDetails($userId, $fullName, $phone, $billingAddress, $shippingAddress) {
         // Prepare the update query for customer details
         $query = "UPDATE CustomerDetails SET full_name = ?, phone = ?, billing_address = ?, shipping_address = ? WHERE user_id = ?";
         $result = $this->db->execute($query, [$fullName, $phone, $billingAddress, $shippingAddress, $userId]);
-    
-        return $result ? true : false;
+
+        return $result !== false;
     }
     
     

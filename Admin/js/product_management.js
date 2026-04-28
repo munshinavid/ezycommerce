@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     // ===== API Configuration =====
-    const API_URL = '../controllers/ProductAPI.php';
+    const API_URL = '/api/admin/product';
     
     // ===== DOM Elements =====
     const addProductBtn = document.getElementById('addProductBtn');

@@ -14,8 +14,8 @@ $topProducts = $dashboard->getTopProducts();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E-Commerce Super Admin Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/index.css">
-    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="<?php echo url('/Admin/css/index.css'); ?>">
+    <link rel="stylesheet" href="<?php echo url('/Admin/css/sidebar.css'); ?>">
 </head>
 <body>
     <!-- Sidebar -->
@@ -182,7 +182,7 @@ $topProducts = $dashboard->getTopProducts();
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
     
     <!-- Dashboard JavaScript -->
-    <script src="../js/dashboard.js"></script>
+    <script src="<?php echo url('/Admin/js/dashboard.js'); ?>"></script>
     
     <script>
         // Simple JavaScript for menu interaction

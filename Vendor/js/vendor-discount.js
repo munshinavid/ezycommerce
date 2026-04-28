@@ -17,7 +17,7 @@ const discountsContainer = document.getElementById('discounts-container');
 const exportDiscountsBtn = document.getElementById('export-discounts');
 
 // API Configuration
-const API_BASE_URL = '../controllers/vendor-DiscountAPI.php';
+const API_BASE_URL = '/api/vendor/discounts';
 
 // Current state
 let currentTab = 'active';

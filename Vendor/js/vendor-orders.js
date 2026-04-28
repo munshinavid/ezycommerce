@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = '../controllers/vendor-OrderAPI.php';
+const API_BASE_URL = '/api/vendor/orders';
 const VENDOR_ID = 1; // In production, get from session/auth
 
 // DOM Elements

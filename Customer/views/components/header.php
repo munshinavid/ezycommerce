@@ -6,12 +6,12 @@ if (session_status() === PHP_SESSION_NONE) {
 $isLoggedIn = isset($_SESSION['user']) && isset($_SESSION['user']['id']);
 $username = $isLoggedIn ? ($_SESSION['user']['username'] ?? 'Account') : 'Guest';
 $avatarText = strtoupper(substr($username, 0, 2));
-$homeUrl = '/ezycommerce/Customer/views/index.php';
-$cartUrl = '/ezycommerce/Customer/views/cart.php';
-$wishlistUrl = '/ezycommerce/Customer/views/wishlist.php';
-$profileUrl = '/ezycommerce/Customer/views/profile.php';
-$loginUrl = '/ezycommerce/Customer/views/login.php';
-$logoutUrl = '/ezycommerce/Customer/views/logout.php';
+$homeUrl = url('/');
+$cartUrl = url('/cart');
+$wishlistUrl = url('/wishlist');
+$profileUrl = url('/profile');
+$loginUrl = url('/login');
+$logoutUrl = url('/logout');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -20,7 +20,7 @@ $logoutUrl = '/ezycommerce/Customer/views/logout.php';
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ShopEase - Your Online Shopping Destination</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="/ezycommerce/Customer/css/index.css">
+    <link rel="stylesheet" href="<?php echo url('/Customer/css/index.css'); ?>">
 </head>
 <body>
     <!-- Top Header -->

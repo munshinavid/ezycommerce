@@ -1,6 +1,5 @@
 // API Configuration - FIXED
-const API_BASE_URL = '../controllers';
-const ORDERS_ENDPOINT = `${API_BASE_URL}/OrderController.php`;
+const ORDERS_ENDPOINT = '/api/admin/order';
 
 // State management
 let currentPage = 1;

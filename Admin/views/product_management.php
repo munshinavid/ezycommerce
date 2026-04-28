@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Product Management - E-Commerce Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/product_management.css">
-    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="<?php echo url('/Admin/css/product_management.css'); ?>">
+    <link rel="stylesheet" href="<?php echo url('/Admin/css/sidebar.css'); ?>">
 </head>
 <body>
     <!-- Sidebar -->
@@ -168,6 +168,6 @@
         </div>
     </div>
 
-    <script src="../js/product_management.js"></script>
+    <script src="<?php echo url('/Admin/js/product_management.js'); ?>"></script>
 </body>
 </html>

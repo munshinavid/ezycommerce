@@ -59,7 +59,7 @@ function setupEventListeners() {
 
 // Load Dashboard Statistics
 function loadStats() {
-    fetch('../controllers/DashboardAPI.php?action=stats')
+    fetch('/api/admin/dashboard?action=stats')
         .then(response => response.json())
         .then(result => {
             if (result.success) {
@@ -107,7 +107,7 @@ function animateNumbers() {
 
 // Load Sales Chart
 function loadSalesChart(days) {
-    fetch(`../controllers/DashboardAPI.php?action=sales_data&days=${days}`)
+    fetch(`/api/admin/dashboard?action=sales_data&days=${days}`)
         .then(response => response.json())
         .then(result => {
             if (result.success) {
@@ -223,7 +223,7 @@ function renderSalesChart(data) {
 
 // Load Revenue by Category Chart
 function loadRevenueChart() {
-    fetch('../controllers/DashboardAPI.php?action=revenue_by_category')
+    fetch('/api/admin/dashboard?action=revenue_by_category')
         .then(response => response.json())
         .then(result => {
             if (result.success) {
@@ -351,7 +351,7 @@ function editOrder(orderId) {
 
 // Update Order Status
 function updateOrderStatus(orderId, status) {
-    fetch('../controllers/DashboardAPI.php?action=update_order_status', {
+    fetch('/api/admin/dashboard?action=update_order_status', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

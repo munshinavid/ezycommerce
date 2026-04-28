@@ -1,5 +1,5 @@
 // Configuration
-const API_BASE_URL = '../controllers/DashboarAPI.php';
+const API_BASE_URL = '/api/logistics/dashboard';
 
 // DOM Elements
 const recentOrdersBody = document.getElementById('recent-orders-body');

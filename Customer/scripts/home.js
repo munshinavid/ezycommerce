@@ -2,7 +2,7 @@
 
 // Configuration
 const userData = JSON.parse(localStorage.getItem("userData"));
-const API_BASE_URL = '../controllers/HomeController.php'; // Base API endpoint
+const API_BASE_URL = '/api/home'; // Routed through front controller
 const CURRENT_USER_ID = userData ? userData.id : null;
 
 initializeEcommerce();

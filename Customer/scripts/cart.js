@@ -3,7 +3,7 @@ document.addEventListener('DOMContentLoaded', initializeCart);
 
 // Configuration
 const userData = JSON.parse(localStorage.getItem("userData"));
-const API_BASE_URL = '../controllers/CartController.php'; // Base API endpoint
+const API_BASE_URL = '/api/cart'; // Routed through front controller
 const CURRENT_USER_ID = userData ? userData.id : null;
 
 function initializeCart() {
@@ -73,7 +73,7 @@ async function loadCartData() {
     container.classList.add('loading');
 
     try {
-        const res = await fetch('../controllers/CartController.php?action=fetchCart', {
+        const res = await fetch('/api/cart?action=fetchCart', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: CURRENT_USER_ID }),
@@ -199,7 +199,6 @@ async function changeQuantity(itemEl, delta) {
             alert('Failed to update quantity: ' + result.message);
         }
     }, 300); // 300ms debounce
-}
 }
 
 // Set quantity from input with debouncing
@@ -343,7 +342,7 @@ function updateCartItemCountAndTotal() {
 async function updateQuantityBackend(cartItemId, quantity) {
     try {
         const res = await fetch(
-            `../controllers/CartController.php?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${quantity}`,
+            `/api/cart?action=updateQuantity&cart_item_id=${cartItemId}&quantity=${quantity}`,
             { method: 'POST', credentials: 'include' }
         );
         const data = await res.json();
@@ -358,7 +357,7 @@ async function updateQuantityBackend(cartItemId, quantity) {
 async function removeItemBackend(cartItemId) {
     try {
         const res = await fetch(
-            `../controllers/CartController.php?action=removeFromCart&cart_item_id=${cartItemId}`,
+            `/api/cart?action=removeFromCart&cart_item_id=${cartItemId}`,
             { method: 'POST', credentials: 'include' }
         );
         const data = await res.json();
@@ -373,7 +372,7 @@ async function removeItemBackend(cartItemId) {
 async function addToCart(productId, quantity = 1) {
     try {
         const res = await fetch(
-            `../controllers/CartController.php?action=addToCart&product_id=${productId}&quantity=${quantity}&user_id=${CURRENT_USER_ID}`,
+            `/api/cart?action=addToCart&product_id=${productId}&quantity=${quantity}&user_id=${CURRENT_USER_ID}`,
             { method: 'GET', credentials: 'include' }
         );
         const data = await res.json();
@@ -398,7 +397,7 @@ async function placeOrder(customerDetails, paymentMethod = 'Cash on Delivery') {
             formData.append(`customer_details[${key}]`, customerDetails[key]);
         });
 
-        const res = await fetch('../controllers/CartController.php', {
+        const res = await fetch('/api/cart', {
             method: 'POST',
             body: formData,
             credentials: 'include'
@@ -417,7 +416,7 @@ async function placeOrder(customerDetails, paymentMethod = 'Cash on Delivery') {
 async function clearCart() {
     try {
         const res = await fetch(
-            `../controllers/CartController.php?action=clearCart&user_id=${CURRENT_USER_ID}`,
+            `/api/cart?action=clearCart&user_id=${CURRENT_USER_ID}`,
             { method: 'GET', credentials: 'include' }
         );
         const data = await res.json();
@@ -460,7 +459,7 @@ async function loadAddresses() {
     //     return;
     // }
     try {
-        const res = await fetch("../controllers/UserController.php?endpoint=addresses", {
+        const res = await fetch("/api/user?endpoint=addresses", {
             method: "GET",
             credentials: "include"
         });

@@ -688,7 +688,7 @@
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-undo"></i> Returns</a></li>
                     <li class="active"><a href="v-discount.php"><i class="fas fa-tag"></i> Discounts</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-user"></i> Profile</a></li>
-                    <li><a href="/ezycommerce/Vendor/logout.php" style="color: #e63946;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                    <li><a href="<?php echo url('/vendor/logout'); ?>" style="color: #e63946;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>
@@ -877,6 +877,6 @@
         </div>
     </div>
     
-    <script src="../js/vendor-discount.js"></script>
+    <script src="<?php echo url('/Vendor/js/vendor-discount.js'); ?>"></script>
 </body>
 </html>

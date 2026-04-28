@@ -1,7 +1,7 @@
 // this is Customer/scripts/auth-utils.js
 class AuthManager {
     constructor() {
-        this.apiBaseUrl = '../controllers/AuthController.php';
+        this.apiBaseUrl = '/api/auth';
         this.userData = this.getUserData();
     }
 

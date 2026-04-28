@@ -1,5 +1,5 @@
 // discount_manage.js - Simplified for Automatic Discounts
-const API_BASE_URL = '../controllers/DiscountManageAPI.php';
+const API_BASE_URL = '/api/admin/discounts';
 const DISCOUNTS_ENDPOINT = `${API_BASE_URL}/discounts`;
 const PRODUCTS_ENDPOINT = `${API_BASE_URL}/products`;
 const CATEGORIES_ENDPOINT = `${API_BASE_URL}/categories`;

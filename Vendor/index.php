@@ -26,8 +26,8 @@
                     <span class="cart-count" id="cartCount">0</span>
                 </div>
                 <div class="user-menu">
-                    <a class="login-btn" href="../Customer/views/login.php">Login</a>
-                    <a class="register-btn" href="../Customer/views/register.php">Register</a>
+                    <a class="login-btn" href="<?php echo url('/login'); ?>">Login</a>
+                    <a class="register-btn" href="<?php echo url('/register'); ?>">Register</a>
                 </div>
             </div>
         </div>

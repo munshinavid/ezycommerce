@@ -1,6 +1,6 @@
 <?php
 // Include the Database class
-require_once '../models/db.php';
+require_once __DIR__ . '/../models/db.php';
 
 session_start();
 
@@ -27,7 +27,7 @@ function placeOrder($db) {
     $query = "INSERT INTO orders (customer_id, total_amount, order_status) VALUES (?, ?, ?)";
     $orderInserted = $db->execute($query, [$userId, $totalAmount, 'Pending']);
 
-    if ($orderInserted) {
+    if ($orderInserted !== false) {
         // Clear cart silently (without extra output)
         clearCart($db, false);
 

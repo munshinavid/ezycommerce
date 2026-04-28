@@ -241,7 +241,7 @@ class ProductAPI {
             }
             
             if (move_uploaded_file($_FILES['image']['tmp_name'], $targetPath)) {
-                return '../../uploads/images/' . $fileName;
+                return '/uploads/images/' . $fileName;
             }
         }
         

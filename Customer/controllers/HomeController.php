@@ -17,7 +17,7 @@ function logError($message) {
     error_log(date('[Y-m-d H:i:s] ') . "API Error: " . $message . "\n", 3, 'api_errors.log');
 }
 
-require_once '../models/db.php';
+require_once __DIR__ . '/../models/db.php';
 
 class RESTfulAPIController {
     private $db;

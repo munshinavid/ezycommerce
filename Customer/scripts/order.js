@@ -138,7 +138,7 @@ async function fetchOrdersData() {
     console.log('Fetching orders data...');
     
     try {
-        const url = '../controllers/OrderController.php?action=fetchOrders';
+        const url = '/api/order?action=fetchOrders';
         console.log('Making request to:', url);
         
         const response = await fetch(url, {
@@ -356,7 +356,7 @@ async function viewOrderDetails(orderId) {
     try {
         showLoading('Loading order details...');
         
-        const url = `../controllers/OrderController.php?action=getOrderDetails&order_id=${orderId}`;
+        const url = `/api/order?action=getOrderDetails&order_id=${orderId}`;
         console.log('Making request to:', url);
         
         const response = await fetch(url, {
@@ -503,7 +503,7 @@ async function cancelOrder(orderId) {
     }
     
     try {
-        const url = `../controllers/OrderController.php?action=cancelOrder&order_id=${orderId}`;
+        const url = `/api/order?action=cancelOrder&order_id=${orderId}`;
         console.log('Making request to:', url);
         
         const response = await fetch(url, {
@@ -548,7 +548,7 @@ async function reorder(orderId) {
     try {
         showLoading('Adding items to cart...');
         
-        const url = `../controllers/OrderController.php?action=reorder&order_id=${orderId}`;
+        const url = `/api/order?action=reorder&order_id=${orderId}`;
         console.log('Making request to:', url);
         
         const response = await fetch(url, {

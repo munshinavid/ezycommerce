@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   app:
     build: .
@@ -10,10 +8,53 @@ services:
       - "8080:80"
     env_file:
       - .env
+    depends_on:
+      db:
+        condition: service_healthy
     networks:
-      - shared_network
+      - ezycommerce_network
+
+  db:
+    image: mysql:8
+    container_name: ezycommerce_db
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: ecomm
+      MYSQL_USER: ezy_user
+      MYSQL_PASSWORD: ezy_pass
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    networks:
+      - ezycommerce_network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: ezycommerce_pma
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root_password
+    depends_on:
+      - db
+    networks:
+      - ezycommerce_network
+
+volumes:
+  mysql_data:
 
 networks:
-  shared_network:
-    external: true
-    name: fullstack-blog-angular-aspnetcore_default   # ⚠️ MUST match your existing postgres network
+  ezycommerce_network:
+    driver: bridge

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>User Management - E-Commerce Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="../css/user_management.css">
-    <link rel="stylesheet" href="../css/sidebar.css">
+    <link rel="stylesheet" href="<?php echo url('/Admin/css/user_management.css'); ?>">
+    <link rel="stylesheet" href="<?php echo url('/Admin/css/sidebar.css'); ?>">
     <style>
         /* Additional styles for enhanced functionality */
         .loading {
@@ -215,6 +215,6 @@
     </div>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="../js/user_management.js"></script>
+    <script src="<?php echo url('/Admin/js/user_management.js'); ?>"></script>
 </body>
 </html>

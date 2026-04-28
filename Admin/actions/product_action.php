@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-require_once '../controllers/ProductManagementController.php';
+require_once __DIR__ . '/../controllers/ProductManagementController.php';
 
 $pmc = new ProductManagementController();
 $action = $_GET['action'] ?? '';

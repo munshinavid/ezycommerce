@@ -764,6 +764,6 @@
         </div>
     </div>
     
-    <script src="../js/dashboard.js"></script>
+    <script src="<?php echo url('/Logistics/js/dashboard.js'); ?>"></script>
 </body>
 </html>

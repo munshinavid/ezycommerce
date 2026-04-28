@@ -1,5 +1,5 @@
 <?php
-require_once '../models/UserModel.php';
+require_once __DIR__ . '/../models/UserModel.php';
 session_start();
 
 // Check if the update request was made
@@ -17,7 +17,7 @@ if (isset($_POST['update'])) {
     // Check if the new email is duplicated
     if ($userModel->isEmailTaken($email, $userId)) {
         $_SESSION['error_message'] = 'This email is already in use. Please choose another one.';
-        header("Location: ../views/update_profile.php");
+        header('Location: ' . url('/profile'));
         exit();
     }
 
@@ -35,7 +35,7 @@ if (isset($_POST['update'])) {
         $_SESSION['error_message'] = 'There was an error updating your profile.';
     }
 
-    header("Location: ../views/update_profile.php");
+    header('Location: ' . url('/profile'));
     exit();
 
 } else {

@@ -2,7 +2,7 @@
 // Direct API connection to UserController (no authManager dependency)
 
 // API Base URL - Updated to match UserController structure
-const API_BASE_URL = '../controllers/UserController.php';
+const API_BASE_URL = '/api/user';
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {
@@ -38,7 +38,7 @@ function isUserLoggedIn() {
 
 async function verifySession() {
     try {
-        const response = await fetch('../controllers/AuthController.php?endpoint=verify', {
+        const response = await fetch('/api/auth?endpoint=verify', {
             method: 'GET',
             credentials: 'include',
             headers: { 'Content-Type': 'application/json' }
@@ -63,7 +63,7 @@ async function verifySession() {
 
 // Redirect to login page
 function redirectToLogin() {
-    window.location.href = '../views/login.php';
+    window.location.href = '/login';
 }
 
 // Get current user data from localStorage
@@ -200,7 +200,7 @@ function logout() {
     localStorage.removeItem('userData');
     localStorage.removeItem('cartCount');
     localStorage.removeItem('wishlistCount');
-    fetch('../controllers/AuthController.php?endpoint=logout', {
+    fetch('/api/auth?endpoint=logout', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' }
@@ -876,7 +876,7 @@ async function addToCart(productId) {
         if (!customerId) throw new Error('User not logged in');
 
         const quantity = 1; // Default quantity to add
-        const API_URL = '../controllers/HomeController.php/cart'; // RESTful path
+        const API_URL = '/api/home/cart'; // RESTful path
 
         const response = await makeApiRequest(API_URL, {
             method: 'POST',

@@ -1,6 +1,6 @@
 // Configuration
-const API_BASE_URL = '../controllers/ProductsAPI.php'; // Adjust path as needed
-const VENDOR_API_URL = '../controllers/vendor-Dashboard.php'; // For categories
+const API_BASE_URL = '/api/vendor/products';
+const VENDOR_API_URL = '/api/vendor/dashboard'; // For categories
 const VENDOR_ID = 1; // In production, get from session
 
 // DOM Elements

@@ -1,5 +1,5 @@
 <?php
-require_once '../models/UserModel.php';
+require_once __DIR__ . '/../models/UserModel.php';
 
 session_start();
 
@@ -15,7 +15,7 @@ $shippingAddress = $_POST['shipping_address'];
 // Basic backend validation
 if (empty($username) || empty($email) || empty($password) || empty($fullName) || empty($phone) || empty($billingAddress) || empty($shippingAddress)) {
     $_SESSION['error_message'] = "All fields are required.";
-    header("Location: ../views/customer_registration.php");
+    header('Location: ' . url('/register'));
     exit();
 }
 
@@ -23,7 +23,7 @@ if (empty($username) || empty($email) || empty($password) || empty($fullName) ||
 $userModel = new UserModel();
 if ($userModel->isEmailTaken2($email)) {
     $_SESSION['error_message'] = "This email is already registered. Please use a different email.";
-    header("Location: ../views/customer_registration.php");
+    header('Location: ' . url('/register'));
     exit();
 }
 
@@ -34,10 +34,10 @@ $isRegistered = $userModel->registerUser($username, $email, $password, $fullName
 
 if ($isRegistered) {
     $_SESSION['success_message'] = "Registration successful! You can now log in.";
-    header("Location: ../views/customer_registration.php");
+    header('Location: ' . url('/register'));
 } else {
     $_SESSION['error_message'] = "There was an error during registration. Please try again.";
-    header("Location: ../views/customer_registration.php.php");
+    header('Location: ' . url('/register'));
 }
 
 exit();

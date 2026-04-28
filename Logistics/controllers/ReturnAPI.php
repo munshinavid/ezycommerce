@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
-require_once '../models/Database.php';
+require_once __DIR__ . '/../models/Database.php';
 
 // Parse the request
 $method = $_SERVER['REQUEST_METHOD'];

@@ -10,7 +10,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-require_once '../models/Database.php';
+require_once __DIR__ . '/../models/Database.php';
 
 class DiscountManagementAPI {
     private $db;
