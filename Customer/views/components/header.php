@@ -12,17 +12,27 @@ $wishlistUrl = url('/wishlist');
 $profileUrl = url('/profile');
 $loginUrl = url('/login');
 $logoutUrl = url('/logout');
+
+// $minimalHeader can be set before including this file to render a compact header
+// suitable for dashboard/profile pages (no search, no category nav, no promo banner)
+$minimalHeader = $minimalHeader ?? false;
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopEase - Your Online Shopping Destination</title>
+    <title>EzyCommerce - Your Online Shopping Destination</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo url('/Customer/css/index.css'); ?>">
+    <?php if (!empty($extraCss)): ?>
+        <?php foreach ((array)$extraCss as $css): ?>
+            <link rel="stylesheet" href="<?php echo $css; ?>">
+        <?php endforeach; ?>
+    <?php endif; ?>
 </head>
 <body>
+    <?php if (!$minimalHeader): ?>
     <!-- Top Header -->
     <div class="top-header">
         <div class="container">
@@ -31,10 +41,11 @@ $logoutUrl = url('/logout');
             </div>
             <div class="top-header-links">
                 <a href="tel:+15551234567"><i class="fas fa-phone"></i> +1 (555) 123-4567</a>
-                <a href="mailto:support@shopease.com"><i class="fas fa-envelope"></i> support@shopease.com</a>
+                <a href="mailto:support@ezycommerce.com"><i class="fas fa-envelope"></i> support@ezycommerce.com</a>
             </div>
         </div>
     </div>
+    <?php endif; ?>
 
     <!-- Main Header -->
     <header>
@@ -43,13 +54,15 @@ $logoutUrl = url('/logout');
                 <div class="header-content">
                     <a href="<?php echo $homeUrl; ?>" class="logo">
                         <i class="fas fa-shopping-bag"></i>
-                        ShopEase
+                        EzyCommerce
                     </a>
                     
+                    <?php if (!$minimalHeader): ?>
                     <div class="search-bar">
                         <input type="text" placeholder="Search for products...">
                         <button><i class="fas fa-search"></i></button>
                     </div>
+                    <?php endif; ?>
                     
                     <div class="header-actions">
                         <?php if ($isLoggedIn): ?>
@@ -63,6 +76,7 @@ $logoutUrl = url('/logout');
                                 <span>Login</span>
                             </a>
                         <?php endif; ?>
+                        <?php if (!$minimalHeader): ?>
                         <a href="<?php echo $isLoggedIn ? $wishlistUrl : $loginUrl; ?>" class="header-action" aria-label="Wishlist">
                             <i class="far fa-heart"></i>
                             <span class="badge" id="wishlist-count">0</span>
@@ -71,9 +85,10 @@ $logoutUrl = url('/logout');
                             <i class="fas fa-shopping-cart"></i>
                             <span class="badge" id="cart-count">0</span>
                         </a>
+                        <?php endif; ?>
                         <?php if ($isLoggedIn): ?>
                             <a href="<?php echo $logoutUrl; ?>" class="header-action">Logout</a>
-                        <?php else: ?>
+                        <?php elseif (!$minimalHeader): ?>
                             <a href="<?php echo $loginUrl; ?>" class="header-action">Login</a>
                         <?php endif; ?>
                     </div>
@@ -81,6 +96,7 @@ $logoutUrl = url('/logout');
             </div>
         </div>
         
+        <?php if (!$minimalHeader): ?>
         <!-- Navigation with Categories -->
         <nav>
             <div class="container">
@@ -90,5 +106,6 @@ $logoutUrl = url('/logout');
                 </ul>
             </div>
         </nav>
+        <?php endif; ?>
     </header>
 

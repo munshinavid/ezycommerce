@@ -6,6 +6,7 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../../utils/UrlHelper.php';
 
 // Start session to get vendor info
 if (session_status() === PHP_SESSION_NONE) {
@@ -187,6 +188,13 @@ function getVendorProducts($db, $vendorId) {
         [$vendorId]
     );
     
+    // Normalize image URLs
+    foreach ($products as &$product) {
+        if (isset($product['image_url'])) {
+            $product['image_url'] = UrlHelper::normalizeImageUrl($product['image_url']);
+        }
+    }
+    
     sendResponse(true, $products);
 }
 
@@ -242,6 +250,13 @@ function getDiscountProducts($db, $vendorId) {
              WHERE c.discount_id = ? AND p.vendor_id = ? AND p.is_active = 1",
             [$discountId, $vendorId]
         );
+    }
+    
+    // Normalize image URLs
+    foreach ($products as &$product) {
+        if (isset($product['image_url'])) {
+            $product['image_url'] = UrlHelper::normalizeImageUrl($product['image_url']);
+        }
     }
     
     sendResponse(true, $products);

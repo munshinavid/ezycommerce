@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopEase - Your One-Stop E-Commerce Destination</title>
+    <title>EzyCommerce - Your One-Stop E-Commerce Destination</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.8.1/slick-theme.min.css">
@@ -1052,7 +1052,7 @@
                     <div class="logo-icon">
                         <i class="fas fa-shopping-bag"></i>
                     </div>
-                    <div class="logo-text">ShopEase</div>
+                    <div class="logo-text">EzyCommerce</div>
                 </a>
 
                 <!-- Search Bar -->
@@ -1466,7 +1466,7 @@
     <footer class="footer">
         <div class="footer-container">
             <div class="footer-column">
-                <h3>ShopEase</h3>
+                <h3>EzyCommerce</h3>
                 <div class="footer-about">
                     <p>Your one-stop destination for all your shopping needs. We offer quality products at affordable prices with excellent customer service.</p>
                     <div class="social-links">
@@ -1513,7 +1513,7 @@
                     </li>
                     <li>
                         <i class="fas fa-envelope"></i>
-                        <span>support@shopease.com</span>
+                        <span>support@ezycommerce.com</span>
                     </li>
                 </ul>
             </div>
@@ -1522,7 +1522,7 @@
         <div class="footer-bottom">
             <div class="footer-bottom-container">
                 <div class="copyright">
-                    &copy; 2023 ShopEase. All rights reserved.
+                    &copy; 2026 EzyCommerce. All rights reserved.
                 </div>
                 <div class="payment-methods">
                     <div class="payment-method">Visa</div>

@@ -37,22 +37,22 @@ echo "<p>Product ID: $product_id</p>";
     <nav id="menu" class="hidden">
       <ul class="nav-upper flex-space-around">
         <li class="nav__list">
-          <a href="index.php" class="nav__link">Home</a>
+          <a href="<?php echo url('/'); ?>" class="nav__link">Home</a>
         </li>
         <li class="nav__list">
-          <a href="register.php" class="nav__link">Register</a>
+          <a href="<?php echo url('/register'); ?>" class="nav__link">Register</a>
         </li>
         <li class="nav__list">
-          <a href="login.php" class="nav__link">Login</a>
+          <a href="<?php echo url('/login'); ?>" class="nav__link">Login</a>
         </li>
         <li class="nav__list">
-          <a href="logout.php" class="nav__link">Logout</a>
+          <a href="<?php echo url('/logout'); ?>" class="nav__link">Logout</a>
         </li>
         <li class="nav__list">
-          <a href="contact.php" class="nav__link">Contact</a>
+          <a href="<?php echo url('/contact'); ?>" class="nav__link">Contact</a>
         </li>
         <li class="nav__list">
-          <a href="profile.php" class="nav__link">
+          <a href="<?php echo url('/profile'); ?>" class="nav__link">
             <img
               class="profile-icon"
               src="./images/profile1.png"
@@ -64,10 +64,10 @@ echo "<p>Product ID: $product_id</p>";
 
       <ul class="nav-lower flex-space-around">
         <li class="nav__list">
-          <a href="index.php" class="nav__brand nav__link">Anis Express</a>
+          <a href="<?php echo url('/'); ?>" class="nav__brand nav__link">Anis Express</a>
         </li>
         <li class="nav__list">
-          <a href="cart.php" class="nav__link">
+          <a href="<?php echo url('/cart'); ?>" class="nav__link">
             <span><i class="fa-solid fa-cart-shopping"></i> </span>
             Cart 2 products - $124.40
           </a>
@@ -119,7 +119,7 @@ echo "<p>Product ID: $product_id</p>";
     </main>
 
     <!-- footer starts here  -->
-    <?php include '../layout/footer.php'; ?>
+    <?php include __DIR__ . '/../layout/footer.php'; ?>
     <!-- footer ends here  -->
     <script src="./scripts/index.js"></script>
   </body>

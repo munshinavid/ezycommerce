@@ -1,70 +1,15 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Profile - ShopEasy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="<?php echo url('/Customer/css/profile.css'); ?>">
-</head>
-<body>
-    <!-- Top Bar -->
-    <div class="top-bar">
-        <div class="top-bar-content">
-            <div class="top-bar-text">Free shipping on orders over $50</div>
-            <div class="top-bar-links">
-                <a href="#">Help</a>
-                <a href="#">Contact</a>
-                <a href="#">Order Tracking</a>
-            </div>
-        </div>
-    </div>
-
-    <!-- Header -->
-    <header>
-        <div class="header-content">
-            <a href="index.php" class="logo">
-                <i class="fas fa-shopping-bag"></i>
-                ShopEasy
-            </a>
-            
-            <div class="header-icons">
-                <button class="icon-btn">
-                    <i class="fas fa-user"></i>
-                </button>
-                <button class="icon-btn">
-                    <i class="fas fa-heart"></i>
-                    <span class="count" id="wishlist-count">3</span>
-                </button>
-                <button class="icon-btn">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="count" id="cart-count">5</span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Navigation -->
-    <nav>
-        <div class="nav-container">
-            <ul class="nav-menu">
-                <li><a href="index.php">Home</a></li>
-                <li><a href="#">New Arrivals</a></li>
-                <li><a href="#">Best Sellers</a></li>
-                <li><a href="#">Sale</a></li>
-                <li><a href="#">Electronics</a></li>
-                <li><a href="#">Clothing</a></li>
-                <li><a href="profile.html" class="active">My Account</a></li>
-            </ul>
-        </div>
-    </nav>
+<?php
+// Use minimal header (logo + user info + logout only)
+$minimalHeader = true;
+$extraCss = [url('/Customer/css/profile.css')];
+require_once __DIR__ . "/components/header.php";
+?>
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
         <div class="breadcrumb-container">
             <ul>
-                <li><a href="index.php">Home</a></li>
+                <li><a href="<?php echo url('/'); ?>">Home</a></li>
                 <li>My Account</li>
             </ul>
         </div>
@@ -106,7 +51,7 @@
                     </a>
                 </li>
                 <li class="profile-menu-item">
-                    <a href="logout.php" class="profile-menu-link" id="logout-btn">
+                    <a href="<?php echo url('/logout'); ?>" class="profile-menu-link" id="logout-btn">
                         <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </li>
@@ -336,8 +281,8 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <label for="phone">Phone Number</label>
-                    <input type="tel" id="phone" name="phone" required>
+                    <label for="address-phone">Phone Number</label>
+                    <input type="tel" id="address-phone" name="phone" required>
                 </div>
                 <div class="form-group">
                     <label class="checkbox-label">

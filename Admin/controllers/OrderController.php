@@ -15,7 +15,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit();
 }
 
+// Check admin authentication
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.']);
+    exit();
+}
+
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../../utils/UrlHelper.php';
 
 class OrderController {
     private $db;

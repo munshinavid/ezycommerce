@@ -249,7 +249,7 @@
                 return '/vendor';
             case 'customer':
             default:
-                return '/profile';
+                return '/';
         }
     }
 

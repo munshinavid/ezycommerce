@@ -135,32 +135,32 @@ class UserController {
         try {
             // Get total orders count
             $totalOrders = $this->db->select(
-                "SELECT COUNT(*) as count FROM Orders WHERE customer_id = ?",
+                "SELECT COUNT(*) as count FROM orders WHERE customer_id = ?",
                 [$this->user_id]
             )[0]['count'];
             
             // Get completed orders count
             $completedOrders = $this->db->select(
-                "SELECT COUNT(*) as count FROM Orders WHERE customer_id = ? AND order_status = 'Delivered'",
+                "SELECT COUNT(*) as count FROM orders WHERE customer_id = ? AND order_status = 'Delivered'",
                 [$this->user_id]
             )[0]['count'];
             
             // Get wishlist items count
             $wishlistItems = $this->db->select(
-                "SELECT COUNT(*) as count FROM Wishlist WHERE user_id = ?",
+                "SELECT COUNT(*) as count FROM wishlist WHERE user_id = ?",
                 [$this->user_id]
             )[0]['count'];
             
             // Get addresses count
             $addressesCount = $this->db->select(
-                "SELECT COUNT(*) as count FROM CustomerDetails WHERE user_id = ?",
+                "SELECT COUNT(*) as count FROM customerdetails WHERE user_id = ?",
                 [$this->user_id]
             )[0]['count'];
             
             // Get recent orders
             $recentOrders = $this->db->select(
                 "SELECT order_id as id, order_status as status, total_amount as total, created_at as orderDate 
-                 FROM Orders WHERE customer_id = ? 
+                 FROM orders WHERE customer_id = ? 
                  ORDER BY created_at DESC LIMIT 5",
                 [$this->user_id]
             );
@@ -190,14 +190,14 @@ class UserController {
             
             // Get total count for pagination
             $totalCount = $this->db->select(
-                "SELECT COUNT(*) as count FROM Orders WHERE customer_id = ?",
+                "SELECT COUNT(*) as count FROM orders WHERE customer_id = ?",
                 [$this->user_id]
             )[0]['count'];
             
             // Get orders with pagination
             $orders = $this->db->select(
                 "SELECT order_id as id, order_status as status, total_amount as total, created_at as orderDate 
-                 FROM Orders WHERE customer_id = ? 
+                 FROM orders WHERE customer_id = ? 
                  ORDER BY created_at DESC LIMIT ? OFFSET ?",
                 [$this->user_id, $limit, $offset]
             );
@@ -226,8 +226,8 @@ class UserController {
             $addresses = $this->db->select(
                 "SELECT detail_id as id, full_name, address as address_line1, '' as address_line2, 
                         '' as city, '' as state, '' as zip_code, '' as country, phone, 
-                        CASE WHEN detail_id = (SELECT MIN(detail_id) FROM CustomerDetails WHERE user_id = ?) THEN 1 ELSE 0 END as is_default
-                 FROM CustomerDetails WHERE user_id = ?",
+                        CASE WHEN detail_id = (SELECT MIN(detail_id) FROM customerdetails WHERE user_id = ?) THEN 1 ELSE 0 END as is_default
+                 FROM customerdetails WHERE user_id = ?",
                 [$this->user_id, $this->user_id]
             );
             
@@ -243,9 +243,9 @@ class UserController {
             $address = $this->db->select(
                 "SELECT detail_id as id, full_name, address as address_line1, '' as address_line2, 
                         '' as city, '' as state, '' as zip_code, '' as country, phone, 
-                        CASE WHEN detail_id = (SELECT MIN(detail_id) FROM CustomerDetails WHERE user_id = ?) THEN 1 ELSE 0 END as is_default,
+                        CASE WHEN detail_id = (SELECT MIN(detail_id) FROM customerdetails WHERE user_id = ?) THEN 1 ELSE 0 END as is_default,
                         'home' as type
-                 FROM CustomerDetails WHERE detail_id = ? AND user_id = ?",
+                 FROM customerdetails WHERE detail_id = ? AND user_id = ?",
                 [$this->user_id, $id, $this->user_id]
             );
             
@@ -297,7 +297,7 @@ class UserController {
             }
             
             $success = $this->db->execute(
-                "INSERT INTO CustomerDetails (user_id, full_name, address, phone) VALUES (?, ?, ?, ?)",
+                "INSERT INTO customerdetails (user_id, full_name, address, phone) VALUES (?, ?, ?, ?)",
                 [$this->user_id, $input['full_name'], $full_address, $input['phone']]
             );
             
@@ -323,7 +323,7 @@ class UserController {
             
             // Check if address exists and belongs to user
             $existing = $this->db->select(
-                "SELECT detail_id FROM CustomerDetails WHERE detail_id = ? AND user_id = ?",
+                "SELECT detail_id FROM customerdetails WHERE detail_id = ? AND user_id = ?",
                 [$id, $this->user_id]
             );
             
@@ -351,7 +351,7 @@ class UserController {
             }
             
             $success = $this->db->execute(
-                "UPDATE CustomerDetails SET full_name = ?, address = ?, phone = ? WHERE detail_id = ? AND user_id = ?",
+                "UPDATE customerdetails SET full_name = ?, address = ?, phone = ? WHERE detail_id = ? AND user_id = ?",
                 [$input['full_name'], $full_address, $input['phone'], $id, $this->user_id]
             );
             
@@ -370,7 +370,7 @@ class UserController {
         try {
             // Check if address exists and belongs to user
             $existing = $this->db->select(
-                "SELECT detail_id FROM CustomerDetails WHERE detail_id = ? AND user_id = ?",
+                "SELECT detail_id FROM customerdetails WHERE detail_id = ? AND user_id = ?",
                 [$id, $this->user_id]
             );
             
@@ -380,7 +380,7 @@ class UserController {
             }
             
             $success = $this->db->execute(
-                "DELETE FROM CustomerDetails WHERE detail_id = ? AND user_id = ?",
+                "DELETE FROM customerdetails WHERE detail_id = ? AND user_id = ?",
                 [$id, $this->user_id]
             );
             
@@ -398,7 +398,7 @@ class UserController {
     public function getProfile() {
         try {
             $user = $this->db->select(
-                "SELECT user_id as id, username, email, created_at FROM Users WHERE user_id = ?",
+                "SELECT user_id as id, username, email, created_at FROM users WHERE user_id = ?",
                 [$this->user_id]
             );
             
@@ -409,7 +409,7 @@ class UserController {
             
             // Get additional details if available
             $details = $this->db->select(
-                "SELECT full_name, phone FROM CustomerDetails WHERE user_id = ? LIMIT 1",
+                "SELECT full_name, phone FROM customerdetails WHERE user_id = ? LIMIT 1",
                 [$this->user_id]
             );
             
@@ -446,7 +446,7 @@ class UserController {
             // Update Users table
             if (isset($input['email'])) {
                 $this->db->execute(
-                    "UPDATE Users SET email = ? WHERE user_id = ?",
+                    "UPDATE users SET email = ? WHERE user_id = ?",
                     [$input['email'], $this->user_id]
                 );
             }
@@ -460,7 +460,7 @@ class UserController {
                 
                 // Verify current password
                 $currentUser = $this->db->select(
-                    "SELECT password FROM Users WHERE user_id = ?",
+                    "SELECT password FROM users WHERE user_id = ?",
                     [$this->user_id]
                 );
                 
@@ -472,7 +472,7 @@ class UserController {
                 // Update password
                 $hashedPassword = password_hash($input['new_password'], PASSWORD_DEFAULT);
                 $this->db->execute(
-                    "UPDATE Users SET password = ? WHERE user_id = ?",
+                    "UPDATE users SET password = ? WHERE user_id = ?",
                     [$hashedPassword, $this->user_id]
                 );
             }
@@ -483,20 +483,20 @@ class UserController {
                 
                 // Check if customer details exist
                 $existing = $this->db->select(
-                    "SELECT detail_id FROM CustomerDetails WHERE user_id = ? LIMIT 1",
+                    "SELECT detail_id FROM customerdetails WHERE user_id = ? LIMIT 1",
                     [$this->user_id]
                 );
                 
                 if (!empty($existing)) {
                     // Update existing
                     $this->db->execute(
-                        "UPDATE CustomerDetails SET full_name = ?, phone = ? WHERE user_id = ?",
+                        "UPDATE customerdetails SET full_name = ?, phone = ? WHERE user_id = ?",
                         [$fullName, $input['phone'] ?? '', $this->user_id]
                     );
                 } else {
                     // Create new
                     $this->db->execute(
-                        "INSERT INTO CustomerDetails (user_id, full_name, address, phone) VALUES (?, ?, ?, ?)",
+                        "INSERT INTO customerdetails (user_id, full_name, address, phone) VALUES (?, ?, ?, ?)",
                         [$this->user_id, $fullName, '', $input['phone'] ?? '']
                     );
                 }
@@ -518,8 +518,8 @@ class UserController {
             
             $wishlist = $this->db->select(
                 "SELECT w.wishlist_id, w.added_at, p.product_id, p.name, p.price, p.image_url, p.stock
-                 FROM Wishlist w 
-                 JOIN Products p ON w.product_id = p.product_id 
+                 FROM wishlist w 
+                 JOIN products p ON w.product_id = p.product_id 
                  WHERE w.user_id = ? 
                  ORDER BY w.added_at DESC 
                  LIMIT ? OFFSET ?",
@@ -527,7 +527,7 @@ class UserController {
             );
             
             $totalCount = $this->db->select(
-                "SELECT COUNT(*) as count FROM Wishlist WHERE user_id = ?",
+                "SELECT COUNT(*) as count FROM wishlist WHERE user_id = ?",
                 [$this->user_id]
             )[0]['count'];
             
@@ -556,7 +556,7 @@ class UserController {
             
             // Check if already in wishlist
             $existing = $this->db->select(
-                "SELECT wishlist_id FROM Wishlist WHERE user_id = ? AND product_id = ?",
+                "SELECT wishlist_id FROM wishlist WHERE user_id = ? AND product_id = ?",
                 [$this->user_id, $input['product_id']]
             );
             
@@ -566,7 +566,7 @@ class UserController {
             }
             
             $success = $this->db->execute(
-                "INSERT INTO Wishlist (user_id, product_id) VALUES (?, ?)",
+                "INSERT INTO wishlist (user_id, product_id) VALUES (?, ?)",
                 [$this->user_id, $input['product_id']]
             );
             
@@ -584,7 +584,7 @@ class UserController {
     public function removeFromWishlist($productId) {
         try {
             $success = $this->db->execute(
-                "DELETE FROM Wishlist WHERE user_id = ? AND product_id = ?",
+                "DELETE FROM wishlist WHERE user_id = ? AND product_id = ?",
                 [$this->user_id, $productId]
             );
             

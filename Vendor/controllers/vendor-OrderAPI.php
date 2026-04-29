@@ -10,6 +10,7 @@ header('Access-Control-Allow-Methods: GET, POST, PUT');
 header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../../utils/UrlHelper.php';
 
 // Get request method and action
 $method = $_SERVER['REQUEST_METHOD'];
@@ -122,7 +123,7 @@ function getVendorOrders($db, $vendor_id) {
         // Calculate vendor total
         $vendorTotal = 0;
         foreach ($products as &$product) {
-            $product['image'] = $product['image'] ?: 'https://via.placeholder.com/100';
+            $product['image'] = UrlHelper::normalizeImageUrl($product['image']);
             $vendorTotal += $product['price'] * $product['quantity'];
         }
         

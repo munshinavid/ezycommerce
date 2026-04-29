@@ -6,6 +6,7 @@ header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
 header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../../utils/UrlHelper.php';
 
 // Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -174,7 +175,7 @@ function getProducts($db, $vendor_id) {
                 'stock' => (int)$product['stock'],
                 'status' => $product['is_active'] ? 'active' : 'inactive',
                 'description' => $product['description'],
-                'image' => $product['image_url'] ?? 'https://via.placeholder.com/400',
+                'image' => UrlHelper::normalizeImageUrl($product['image_url']),
                 'sales' => (int)$product['total_sales'],
                 'rating' => 4.5 // You can add a ratings table later
             ];
@@ -233,7 +234,7 @@ function getProductById($db, $vendor_id) {
                 'stock' => (int)$product['stock'],
                 'status' => $product['is_active'] ? 'active' : 'inactive',
                 'description' => $product['description'],
-                'image' => $product['image_url'] ?? 'https://via.placeholder.com/400'
+                'image' => UrlHelper::normalizeImageUrl($product['image_url'])
             ]
         ]);
         

@@ -244,7 +244,7 @@ class CartController {
 
         // Validate product exists and has stock
         $product = $this->db->select(
-            "SELECT product_id, name, stock FROM Products WHERE product_id = ?",
+            "SELECT product_id, name, stock FROM products WHERE product_id = ?",
             [$productId]
         );
         
@@ -262,7 +262,7 @@ class CartController {
         
         // Check if item already exists in cart
         $existingItem = $this->db->select(
-            "SELECT cart_item_id, quantity FROM Cart_Items WHERE cart_id = ? AND product_id = ?",
+            "SELECT cart_item_id, quantity FROM cart_items WHERE cart_id = ? AND product_id = ?",
             [$cartId, $productId]
         );
         
@@ -276,7 +276,7 @@ class CartController {
             }
             
             $this->db->update(
-                "UPDATE Cart_Items SET quantity = ? WHERE cart_item_id = ?",
+                "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?",
                 [$newQuantity, $existingItem[0]['cart_item_id']]
             );
             
@@ -284,7 +284,7 @@ class CartController {
         } else {
             // Add new item
             $this->db->insert(
-                "INSERT INTO Cart_Items (cart_id, product_id, quantity) VALUES (?, ?, ?)",
+                "INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, ?)",
                 [$cartId, $productId, $quantity]
             );
             
@@ -319,9 +319,9 @@ class CartController {
         // Verify cart item belongs to user and get product info
         $cartItem = $this->db->select("
             SELECT ci.cart_item_id, ci.product_id, p.stock, p.name
-            FROM Cart_Items ci
-            JOIN Cart c ON ci.cart_id = c.cart_id
-            JOIN Products p ON ci.product_id = p.product_id
+            FROM cart_items ci
+            JOIN cart c ON ci.cart_id = c.cart_id
+            JOIN products p ON ci.product_id = p.product_id
             WHERE ci.cart_item_id = ? AND c.customer_id = ?
         ", [$cartItemId, $customerId]);
         
@@ -336,7 +336,7 @@ class CartController {
         }
 
         $this->db->update(
-            "UPDATE Cart_Items SET quantity = ? WHERE cart_item_id = ?",
+            "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?",
             [$quantity, $cartItemId]
         );
         
@@ -362,8 +362,8 @@ class CartController {
         // Verify cart item belongs to user
         $cartItem = $this->db->select("
             SELECT ci.cart_item_id
-            FROM Cart_Items ci
-            JOIN Cart c ON ci.cart_id = c.cart_id
+            FROM cart_items ci
+            JOIN cart c ON ci.cart_id = c.cart_id
             WHERE ci.cart_item_id = ? AND c.customer_id = ?
         ", [$cartItemId, $customerId]);
         
@@ -373,7 +373,7 @@ class CartController {
         }
 
         $this->db->delete(
-            "DELETE FROM Cart_Items WHERE cart_item_id = ?",
+            "DELETE FROM cart_items WHERE cart_item_id = ?",
             [$cartItemId]
         );
         
@@ -392,7 +392,7 @@ class CartController {
         $cartId = $this->getOrCreateCart($customerId);
         
         $this->db->delete(
-            "DELETE FROM Cart_Items WHERE cart_id = ?",
+            "DELETE FROM cart_items WHERE cart_id = ?",
             [$cartId]
         );
         
@@ -410,20 +410,52 @@ class CartController {
 
         // Get order details from POST data
         $paymentMethod = $_POST['payment_method'] ?? 'Cash on Delivery';
-        $customerDetails = $_POST['customer_details'] ?? null;
+        $customerDetailsRaw = $_POST['customer_details'] ?? null;
         
-        if (!$customerDetails) {
+        // Try to parse as JSON first (from JavaScript JSON.stringify)
+        $customerDetails = null;
+        if ($customerDetailsRaw) {
+            // Try JSON parsing first
+            $decoded = json_decode($customerDetailsRaw, true);
+            if ($decoded && is_array($decoded)) {
+                $customerDetails = $decoded;
+            } else {
+                // Fallback to treating as raw array
+                $customerDetails = $customerDetailsRaw;
+            }
+        }
+        
+        if (!$customerDetails || !is_array($customerDetails)) {
             $this->sendResponse(false, 'Customer details are required', null, 400);
             return;
         }
 
-        // Compose unified address if sent as line1/line2
-        if (!isset($customerDetails['address'])) {
-            $line1 = $customerDetails['address_line1'] ?? '';
-            $line2 = $customerDetails['address_line2'] ?? '';
+        // Ensure all customer details fields exist and are properly trimmed
+        $customerDetails['full_name'] = trim($customerDetails['full_name'] ?? '');
+        $customerDetails['phone'] = trim($customerDetails['phone'] ?? '');
+        $customerDetails['address'] = trim($customerDetails['address'] ?? '');
+        
+        // If address is still empty but address_line1 and address_line2 exist, compose it
+        if (empty($customerDetails['address'])) {
+            $line1 = trim($customerDetails['address_line1'] ?? '');
+            $line2 = trim($customerDetails['address_line2'] ?? '');
             $composed = trim($line1 . (empty($line2) ? '' : ', ' . $line2));
             if (!empty($composed)) {
                 $customerDetails['address'] = $composed;
+            }
+        }
+
+        // Fallback: check shipping_address and billing_address
+        if (empty($customerDetails['address'])) {
+            $shippingAddr = trim($customerDetails['shipping_address'] ?? '');
+            if (!empty($shippingAddr)) {
+                $customerDetails['address'] = $shippingAddr;
+            }
+        }
+        if (empty($customerDetails['address'])) {
+            $billingAddr = trim($customerDetails['billing_address'] ?? '');
+            if (!empty($billingAddr)) {
+                $customerDetails['address'] = $billingAddr;
             }
         }
 
@@ -449,9 +481,9 @@ class CartController {
                 (ci.quantity * p.price) as item_total,
                 COALESCE(d.discount_type, '') as discount_type,
                 COALESCE(d.discount_value, 0) as discount_value
-            FROM Cart_Items ci
-            JOIN Products p ON ci.product_id = p.product_id
-            LEFT JOIN Discounts d ON p.discount_id = d.discount_id 
+            FROM cart_items ci
+            JOIN products p ON ci.product_id = p.product_id
+            LEFT JOIN discounts d ON p.discount_id = d.discount_id 
                 AND CURDATE() BETWEEN d.start_date AND d.end_date
             WHERE ci.cart_id = ?
         ", [$cartId]);
@@ -493,25 +525,25 @@ class CartController {
         try {
             // Save/update customer details
             $existingDetails = $this->db->select(
-                "SELECT detail_id FROM CustomerDetails WHERE user_id = ?",
+                "SELECT detail_id FROM customerdetails WHERE user_id = ?",
                 [$customerId]
             );
             
             if (!empty($existingDetails)) {
                 $this->db->update(
-                    "UPDATE CustomerDetails SET full_name = ?, address = ?, phone = ? WHERE user_id = ?",
+                    "UPDATE customerdetails SET full_name = ?, address = ?, phone = ? WHERE user_id = ?",
                     [$customerDetails['full_name'], $customerDetails['address'], $customerDetails['phone'], $customerId]
                 );
             } else {
                 $this->db->insert(
-                    "INSERT INTO CustomerDetails (user_id, full_name, address, phone) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO customerdetails (user_id, full_name, address, phone) VALUES (?, ?, ?, ?)",
                     [$customerId, $customerDetails['full_name'], $customerDetails['address'], $customerDetails['phone']]
                 );
             }
 
             // Create order
             $orderId = $this->db->insert(
-                "INSERT INTO Orders (customer_id, order_status, total_amount) VALUES (?, 'Pending', ?)",
+                "INSERT INTO orders (customer_id, order_status, total_amount) VALUES (?, 'Pending', ?)",
                 [$customerId, $totalAmount]
             );
 
@@ -530,31 +562,31 @@ class CartController {
                 
                 // Insert order item
                 $this->db->insert(
-                    "INSERT INTO Order_Items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)",
+                    "INSERT INTO order_items (order_id, product_id, quantity, price_at_purchase) VALUES (?, ?, ?, ?)",
                     [$orderId, $item['product_id'], $item['quantity'], $finalPrice]
                 );
 
                 // Update product stock
                 $this->db->update(
-                    "UPDATE Products SET stock = stock - ? WHERE product_id = ?",
+                    "UPDATE products SET stock = stock - ? WHERE product_id = ?",
                     [$item['quantity'], $item['product_id']]
                 );
             }
 
             // Create payment record
             $this->db->insert(
-                "INSERT INTO Payments (order_id, amount, method, status) VALUES (?, ?, ?, 'Pending')",
+                "INSERT INTO payments (order_id, amount, method, status) VALUES (?, ?, ?, 'Pending')",
                 [$orderId, $totalAmount, $paymentMethod]
             );
 
             // Create shipping record
             $this->db->insert(
-                "INSERT INTO Shipping (order_id, shipping_status) VALUES (?, 'Pending')",
+                "INSERT INTO shipping (order_id, shipping_status) VALUES (?, 'Pending')",
                 [$orderId]
             );
 
             // Clear cart
-            $this->db->delete("DELETE FROM Cart_Items WHERE cart_id = ?", [$cartId]);
+            $this->db->delete("DELETE FROM cart_items WHERE cart_id = ?", [$cartId]);
 
             // Commit transaction
             $this->db->commit();
@@ -584,7 +616,7 @@ class CartController {
 
     private function getOrCreateCart($customerId) {
         $cart = $this->db->select(
-            "SELECT cart_id FROM Cart WHERE customer_id = ?",
+            "SELECT cart_id FROM cart WHERE customer_id = ?",
             [$customerId]
         );
         
@@ -593,7 +625,7 @@ class CartController {
         }
         
         return $this->db->insert(
-            "INSERT INTO Cart (customer_id) VALUES (?)",
+            "INSERT INTO cart (customer_id) VALUES (?)",
             [$customerId]
         );
     }

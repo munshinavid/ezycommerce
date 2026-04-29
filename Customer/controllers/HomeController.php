@@ -40,9 +40,15 @@ class RESTfulAPIController {
     }
     
     private function parsePath() {
-        $uri = $_SERVER['REQUEST_URI'];
-        $script = $_SERVER['SCRIPT_NAME'];
-        $this->path = trim(str_replace($script, '', $uri), '/');
+        // Use PATH_INFO if available (set by routing logic in public/index.php)
+        // Otherwise fall back to parsing REQUEST_URI
+        if (!empty($_SERVER['PATH_INFO'])) {
+            $this->path = trim($_SERVER['PATH_INFO'], '/');
+        } else {
+            $uri = $_SERVER['REQUEST_URI'];
+            $script = $_SERVER['SCRIPT_NAME'];
+            $this->path = trim(str_replace($script, '', $uri), '/');
+        }
         
         if (($pos = strpos($this->path, '?')) !== false) {
             $this->path = substr($this->path, 0, $pos);

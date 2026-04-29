@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Orders Management - E-Commerce Logistics</title>
+    <title>Orders Management - EzyCommerce Logistics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -689,7 +689,7 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-truck fa-2x"></i>
-                <h2>E-Commerce Logistics</h2>
+                <h2>EzyCommerce Logistics</h2>
             </div>
             
             <div class="sidebar-stats">
@@ -742,16 +742,17 @@
             
             <div class="sidebar-menu">
                 <ul>
-                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="active"><a href="allshipping.php#all" data-status="all"><i class="fas fa-list"></i> All Orders <span class="menu-badge" id="menu-all-count">122</span></a></li>
-                    <li><a href="allshipping.php#pending" data-status="pending"><i class="fas fa-clock" style="color: var(--pending);"></i> Pending <span class="menu-badge" id="menu-pending-count">24</span></a></li>
-                    <li><a href="allshipping.php#processing" data-status="processing"><i class="fas fa-cog" style="color: var(--processing);"></i> Processing <span class="menu-badge" id="menu-processing-count">18</span></a></li>
-                    <li><a href="allshipping.php#shipped" data-status="shipped"><i class="fas fa-shipping-fast" style="color: var(--shipped);"></i> Shipped <span class="menu-badge" id="menu-shipped-count">32</span></a></li>
-                    <li><a href="allshipping.php#delivered" data-status="delivered"><i class="fas fa-check-circle" style="color: var(--delivered);"></i> Delivered <span class="menu-badge" id="menu-delivered-count">45</span></a></li>
-                    <li><a href="allshipping.php#cancelled" data-status="cancelled"><i class="fas fa-times-circle" style="color: var(--cancelled);"></i> Cancelled <span class="menu-badge" id="menu-cancelled-count">3</span></a></li>
-                    <li><a href="return.php"><i class="fas fa-undo"></i> Returns</a></li>
+                    <li><a href="<?php echo url('/logistics'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="active"><a href="<?php echo url('/logistics/shipping'); ?>#all" data-status="all"><i class="fas fa-list"></i> All Orders <span class="menu-badge" id="menu-all-count">122</span></a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>#pending" data-status="pending"><i class="fas fa-clock" style="color: var(--pending);"></i> Pending <span class="menu-badge" id="menu-pending-count">24</span></a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>#processing" data-status="processing"><i class="fas fa-cog" style="color: var(--processing);"></i> Processing <span class="menu-badge" id="menu-processing-count">18</span></a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>#shipped" data-status="shipped"><i class="fas fa-shipping-fast" style="color: var(--shipped);"></i> Shipped <span class="menu-badge" id="menu-shipped-count">32</span></a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>#delivered" data-status="delivered"><i class="fas fa-check-circle" style="color: var(--delivered);"></i> Delivered <span class="menu-badge" id="menu-delivered-count">45</span></a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>#cancelled" data-status="cancelled"><i class="fas fa-times-circle" style="color: var(--cancelled);"></i> Cancelled <span class="menu-badge" id="menu-cancelled-count">3</span></a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>"><i class="fas fa-undo"></i> Returns</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-bar"></i> Analytics</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="<?php echo url('/logistics/logout'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>

@@ -10,7 +10,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
+// Check admin authentication
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.']);
+    exit();
+}
+
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../../utils/UrlHelper.php';
 
 class DiscountManagementAPI {
     private $db;
@@ -21,7 +33,14 @@ class DiscountManagementAPI {
     public function __construct() {
         $this->db = new Database();
         $this->requestMethod = $_SERVER['REQUEST_METHOD'];
-        $this->requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        
+        // Use PATH_INFO if set (from front controller routing), otherwise use REQUEST_URI
+        if (!empty($_SERVER['PATH_INFO'])) {
+            $this->requestUri = $_SERVER['PATH_INFO'];
+        } else {
+            $this->requestUri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        }
+        
         $this->uriSegments = explode('/', trim($this->requestUri, '/'));
     }
 

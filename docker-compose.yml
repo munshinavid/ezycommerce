@@ -8,6 +8,8 @@ services:
       - "8080:80"
     env_file:
       - .env
+    volumes:
+      - ./:/var/www/html
     depends_on:
       db:
         condition: service_healthy

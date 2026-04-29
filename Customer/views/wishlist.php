@@ -5,13 +5,13 @@
         <div class="container">
             <div class="section-header">
                 <h2 class="section-title">Your Wishlist</h2>
-                <a href="index.php" class="btn btn-primary">
+                <a href="<?php echo url('/'); ?>" class="btn btn-primary">
                     <i class="fas fa-arrow-left"></i> Continue Shopping
                 </a>
             </div>
 
             <div id="wishlist-empty" class="empty-state" style="display:none; text-align:center; padding: 40px 0;">
-                Your wishlist is empty. <a href="index.php">Start shopping!</a>
+                Your wishlist is empty. <a href="<?php echo url('/'); ?>">Start shopping!</a>
             </div>
 
             <div id="wishlist-container" class="product-grid">
@@ -74,7 +74,7 @@
 
             if (container && empty) {
                 container.innerHTML = '';
-                empty.innerHTML = 'Please <a href="login.php">log in</a> to view your wishlist.';
+                empty.innerHTML = 'Please <a href="<?php echo url('/login'); ?>">log in</a> to view your wishlist.';
                 empty.style.display = 'block';
             }
             return;

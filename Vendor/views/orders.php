@@ -695,12 +695,12 @@
             
             <div class="sidebar-menu">
                 <ul>
-                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="products.php"><i class="fas fa-box"></i> Products</a></li>
-                    <li class="active"><a href="orders.php"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+                    <li><a href="<?php echo url('/vendor'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="<?php echo url('/vendor/products'); ?>"><i class="fas fa-box"></i> Products</a></li>
+                    <li class="active"><a href="<?php echo url('/vendor/orders'); ?>"><i class="fas fa-shopping-cart"></i> Orders</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-line"></i> Sales Analytics</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-undo"></i> Returns</a></li>
-                    <li><a href="v-discount.php"><i class="fas fa-tag"></i> Discounts</a></li>
+                    <li><a href="<?php echo url('/vendor/discounts'); ?>"><i class="fas fa-tag"></i> Discounts</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-user"></i> Profile</a></li>
                     <li><a href="<?php echo url('/vendor/logout'); ?>" style="color: #e63946;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>

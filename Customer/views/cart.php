@@ -1,58 +1,15 @@
 <?php
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
+// Use minimal header (logo + user info + logout only)
+$minimalHeader = true;
+$extraCss = [url('/Customer/css/cart.css')];
+require_once __DIR__ . "/components/header.php";
 ?>
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Your Cart - ShopEasy</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="<?php echo url('/Customer/css/cart.css'); ?>">
-</head>
-<body>
-    <!-- Header -->
-    <header>
-        <div class="top-header">
-            <a href="index.php" class="logo">
-                <i class="fas fa-shopping-bag"></i>
-                ShopEasy
-            </a>
-            <div class="search-bar">
-                <i class="fas fa-search"></i>
-                <input type="text" placeholder="Search for products...">
-            </div>
-            <div class="header-icons">
-                <a href="profile.php" class="icon-btn" aria-label="Profile">
-                    <i class="fas fa-user"></i>
-                </a>
-                <a href="wishlist.php" class="icon-btn" aria-label="Wishlist">
-                    <i class="fas fa-heart"></i>
-                    <span class="wishlist-count" id="wishlist-count">0</span>
-                </a>
-                <a href="cart.php" class="icon-btn" aria-label="Cart">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span class="count" id="cart-count">3</span>
-                </a>
-            </div>
-        </div>
-        <nav>
-            <ul class="nav-menu">
-                <li><a href="index.php">Home</a></li>
-                <li><a href="wishlist.php">Wishlist</a></li>
-                <li><a href="cart.php">Cart</a></li>
-                <li><a href="profile.php">Profile</a></li>
-                <li><a href="login.php">Login</a></li>
-            </ul>
-        </nav>
-    </header>
+
 
     <!-- Breadcrumb -->
     <div class="breadcrumb">
         <ul>
-            <li><a href="index.php">Home</a></li>
+            <li><a href="<?php echo url('/'); ?>">Home</a></li>
             <li>Shopping Cart</li>
         </ul>
     </div>
@@ -74,7 +31,7 @@ if (session_status() === PHP_SESSION_NONE) {
                     <i class="fas fa-shopping-cart"></i>
                     <h3>Your cart is empty</h3>
                     <p>Looks like you haven't added anything to your cart yet.</p>
-                    <a href="index.php" class="btn btn-primary">Continue Shopping</a>
+                    <a href="<?php echo url('/'); ?>" class="btn btn-primary">Continue Shopping</a>
                 </div>
             </div>
         </div>
@@ -116,7 +73,7 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
             
             <button class="checkout-btn">Proceed to Checkout</button>
-            <a href="index.php" class="continue-shopping">Continue Shopping</a>
+            <a href="<?php echo url('/'); ?>" class="continue-shopping">Continue Shopping</a>
         </div>
     </div>
     <!-- Checkout Modal -->
@@ -226,7 +183,7 @@ if (session_status() === PHP_SESSION_NONE) {
     <footer>
         <div class="footer-content">
             <div class="footer-column">
-                <h3>ShopEasy</h3>
+                <h3>EzyCommerce</h3>
                 <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
                 <div class="social-icons">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -260,12 +217,12 @@ if (session_status() === PHP_SESSION_NONE) {
                 <ul>
                     <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St, City, Country</li>
                     <li><i class="fas fa-phone"></i> +1 234 567 8900</li>
-                    <li><i class="fas fa-envelope"></i> support@shopeasy.com</li>
+                    <li><i class="fas fa-envelope"></i> support@ezycommerce.com</li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2023 ShopEasy. All rights reserved.</p>
+            <p>&copy; 2026 EzyCommerce. All rights reserved.</p>
         </div>
     </footer>
 

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>E-Commerce Logistics Dashboard</title>
+    <title>EzyCommerce Logistics Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -91,6 +91,66 @@
             margin-right: 10px;
             width: 20px;
             text-align: center;
+        }
+
+        .sidebar-stats {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-item:last-child {
+            border-bottom: none;
+        }
+
+        .stat-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .stat-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+        }
+
+        .stat-icon.pending {
+            background-color: #f0ad4e;
+        }
+
+        .stat-icon.processing {
+            background-color: #5bc0de;
+        }
+
+        .stat-icon.shipped {
+            background-color: #0275d8;
+        }
+
+        .stat-icon.delivered {
+            background-color: #5cb85c;
+        }
+
+        .stat-label {
+            font-weight: 500;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: white;
         }
 
         /* Main Content Styles */
@@ -508,16 +568,55 @@
         <div class="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-truck fa-2x"></i>
-                <h2>E-Commerce Logistics</h2>
+                <h2>EzyCommerce Logistics</h2>
+            </div>
+            <div class="sidebar-stats">
+                <div class="stat-item">
+                    <div class="stat-info">
+                        <div class="stat-icon pending">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <div class="stat-label">Pending</div>
+                    </div>
+                    <div class="stat-value" id="sidebar-pending-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-info">
+                        <div class="stat-icon processing">
+                            <i class="fas fa-cog"></i>
+                        </div>
+                        <div class="stat-label">Processing</div>
+                    </div>
+                    <div class="stat-value" id="sidebar-processing-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-info">
+                        <div class="stat-icon shipped">
+                            <i class="fas fa-shipping-fast"></i>
+                        </div>
+                        <div class="stat-label">Shipped</div>
+                    </div>
+                    <div class="stat-value" id="sidebar-shipped-count">0</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-info">
+                        <div class="stat-icon delivered">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-label">Delivered</div>
+                    </div>
+                    <div class="stat-value" id="sidebar-delivered-count">0</div>
+                </div>
             </div>
             <div class="sidebar-menu">
                 <ul>
-                    <li class="active"><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="allshipping.php"><i class="fas fa-list"></i> All Orders</a></li>
-                    <li><a href="allshipping.php"><i class="fas fa-shipping-fast"></i> Shipping</a></li>
-                    <li><a href="return.php"><i class="fas fa-undo"></i> Returns</a></li>
+                    <li class="active"><a href="<?php echo url('/logistics'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>"><i class="fas fa-list"></i> All Orders</a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>"><i class="fas fa-shipping-fast"></i> Shipping</a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>"><i class="fas fa-undo"></i> Returns</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-bar"></i> Analytics</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="<?php echo url('/logistics/logout'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>

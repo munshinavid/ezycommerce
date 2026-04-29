@@ -24,7 +24,7 @@
   </head>
   <body>
     <!-- navbar starts here  -->
-    <?php include '../layout/navbar.php'; ?>
+    <?php include __DIR__ . '/../layout/navbar.php'; ?>
     <!-- navbar ends here  -->
     <main>
       <section class="register">
@@ -60,7 +60,7 @@
       </section>
     </main>
     <!-- footer starts here  -->
-    <?php include '../layout/footer.php'; ?>
+    <?php include __DIR__ . '/../layout/footer.php'; ?>
     <!-- footer ends here  -->
     <script src="./scripts/index.js"></script>
   </body>

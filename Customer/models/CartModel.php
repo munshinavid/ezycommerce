@@ -10,20 +10,20 @@ class CartModel {
 
     public function getCartItems($userId) {
         $query = "SELECT ci.cart_item_id, p.name, p.price, p.image_url, ci.quantity
-                  FROM Cart_Items ci
-                  JOIN Products p ON ci.product_id = p.product_id
-                  WHERE ci.cart_id = (SELECT cart_id FROM Cart WHERE customer_id = ?)";
+                  FROM cart_items ci
+                  JOIN products p ON ci.product_id = p.product_id
+                  WHERE ci.cart_id = (SELECT cart_id FROM cart WHERE customer_id = ?)";
         return $this->db->select($query, [$userId]);
     }
 
     public function addToCart($userId, $productId) {
         // Get or create the user's cart
-        $query = "SELECT cart_id FROM Cart WHERE customer_id = ?";
+        $query = "SELECT cart_id FROM cart WHERE customer_id = ?";
         $cart = $this->db->select($query, [$userId]);
 
         if (empty($cart)) {
             // Create a new cart if none exists
-            $query = "INSERT INTO Cart (customer_id) VALUES (?)";
+            $query = "INSERT INTO cart (customer_id) VALUES (?)";
             $this->db->execute($query, [$userId]);
             $cartId = $this->db->getLastInsertId();
         } else {
@@ -31,27 +31,27 @@ class CartModel {
         }
 
         // Check if the product already exists in the cart
-        $query = "SELECT cart_item_id FROM Cart_Items WHERE cart_id = ? AND product_id = ?";
+        $query = "SELECT cart_item_id FROM cart_items WHERE cart_id = ? AND product_id = ?";
         $existingItem = $this->db->select($query, [$cartId, $productId]);
 
         if (!empty($existingItem)) {
             // Update quantity if product exists
-            $query = "UPDATE Cart_Items SET quantity = quantity + 1 WHERE cart_id = ? AND product_id = ?";
+            $query = "UPDATE cart_items SET quantity = quantity + 1 WHERE cart_id = ? AND product_id = ?";
             return $this->db->execute($query, [$cartId, $productId]);
         } else {
             // Add new product to cart
-            $query = "INSERT INTO Cart_Items (cart_id, product_id, quantity) VALUES (?, ?, 1)";
+            $query = "INSERT INTO cart_items (cart_id, product_id, quantity) VALUES (?, ?, 1)";
             return $this->db->execute($query, [$cartId, $productId]);
         }
     }
 
     public function removeFromCart($cartItemId) {
-        $query = "DELETE FROM Cart_Items WHERE cart_item_id = ?";
+        $query = "DELETE FROM cart_items WHERE cart_item_id = ?";
         return $this->db->execute($query, [$cartItemId]);
     }
 
     public function updateQuantity($cartItemId, $quantity) {
-        $query = "UPDATE Cart_Items SET quantity = ? WHERE cart_item_id = ?";
+        $query = "UPDATE cart_items SET quantity = ? WHERE cart_item_id = ?";
         return $this->db->execute($query, [$quantity, $cartItemId]);
     }
 }

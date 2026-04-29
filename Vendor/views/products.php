@@ -1,9 +1,23 @@
-<!DOCTYPE html>
+<?php
+// Debug: Verify url() function is accessible and working
+if (!function_exists('url')) {
+    die('ERROR: url() function not found. This file must be included via the front controller in public/index.php');
+}
+// Test the url() function output
+$_DEBUG_URLS = [
+    '/vendor' => url('/vendor'),
+    '/vendor/products' => url('/vendor/products'),
+    '/vendor/orders' => url('/vendor/orders'),
+    '/vendor/discounts' => url('/vendor/discounts'),
+    '/vendor/logout' => url('/vendor/logout'),
+];
+?><!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Products Management - Vendor Dashboard</title>
+    <!-- DEBUG: Generated URLs: <?php echo htmlspecialchars(json_encode($_DEBUG_URLS)); ?> -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -748,12 +762,12 @@
             
             <div class="sidebar-menu">
                 <ul>
-                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li class="active"><a href="products.php"><i class="fas fa-box"></i> Products</a></li>
-                    <li><a href="orders.php"><i class="fas fa-shopping-cart"></i> Orders</a></li>
+                    <li><a href="<?php echo url('/vendor'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li class="active"><a href="<?php echo url('/vendor/products'); ?>"><i class="fas fa-box"></i> Products</a></li>
+                    <li><a href="<?php echo url('/vendor/orders'); ?>"><i class="fas fa-shopping-cart"></i> Orders</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-line"></i> Sales Analytics</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-undo"></i> Returns</a></li>
-                    <li><a href="v-discount.php"><i class="fas fa-tag"></i> Discounts</a></li>
+                    <li><a href="<?php echo url('/vendor/discounts'); ?>"><i class="fas fa-tag"></i> Discounts</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-user"></i> Profile</a></li>
                     <li><a href="<?php echo url('/vendor/logout'); ?>" style="color: #e63946;"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>

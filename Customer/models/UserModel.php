@@ -23,7 +23,7 @@ class UserModel {
     }
 
     public function isEmailTaken2($email) {
-        $query = "SELECT COUNT(*) FROM Users WHERE email = ?";
+        $query = "SELECT COUNT(*) FROM users WHERE email = ?";
         $result = $this->db->select($query, [$email]);
         
         // If the result is greater than 0, the email is already taken
@@ -40,7 +40,7 @@ class UserModel {
             $userId = $this->db->getLastInsertId();
 
             // Insert into CustomerDetails table
-            $query = "INSERT INTO CustomerDetails (user_id, full_name, phone, billing_address, shipping_address) 
+            $query = "INSERT INTO customerdetails (user_id, full_name, phone, billing_address, shipping_address) 
                       VALUES (?, ?, ?, ?, ?)";
             $this->db->execute($query, [$userId, $fullName, $phone, $billingAddress, $shippingAddress]);
 
@@ -75,7 +75,7 @@ class UserModel {
     }
     public function updateCustomerDetails($userId, $fullName, $phone, $billingAddress, $shippingAddress) {
         // Prepare the update query for customer details
-        $query = "UPDATE CustomerDetails SET full_name = ?, phone = ?, billing_address = ?, shipping_address = ? WHERE user_id = ?";
+        $query = "UPDATE customerdetails SET full_name = ?, phone = ?, billing_address = ?, shipping_address = ? WHERE user_id = ?";
         $result = $this->db->execute($query, [$fullName, $phone, $billingAddress, $shippingAddress, $userId]);
 
         return $result !== false;
@@ -93,9 +93,9 @@ class UserModel {
                     c.billing_address,
                     c.shipping_address
                 FROM 
-                    Users u
+                    users u
                 JOIN 
-                    CustomerDetails c ON u.user_id = c.user_id
+                    customerdetails c ON u.user_id = c.user_id
                 WHERE 
                     u.user_id = ?;";
         $result = $this->db->select($query, [$userId]);

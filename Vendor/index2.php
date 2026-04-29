@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ShopEasy - Online Shopping</title>
+    <title>EzyCommerce - Online Shopping</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -529,7 +529,7 @@
         <div class="top-header">
             <a href="index.php" class="logo">
                 <i class="fas fa-shopping-bag"></i>
-                ShopEasy
+                EzyCommerce
             </a>
             <div class="search-bar">
                 <i class="fas fa-search"></i>
@@ -898,7 +898,7 @@
     <footer>
         <div class="footer-content">
             <div class="footer-column">
-                <h3>ShopEasy</h3>
+                <h3>EzyCommerce</h3>
                 <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
                 <div class="social-icons">
                     <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -932,12 +932,12 @@
                 <ul>
                     <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St, City, Country</li>
                     <li><i class="fas fa-phone"></i> +1 234 567 8900</li>
-                    <li><i class="fas fa-envelope"></i> support@shopeasy.com</li>
+                    <li><i class="fas fa-envelope"></i> support@ezycommerce.com</li>
                 </ul>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2023 ShopEasy. All rights reserved.</p>
+            <p>&copy; 2026 EzyCommerce. All rights reserved.</p>
         </div>
     </footer>
 

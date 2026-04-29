@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Returns Management - E-Commerce Logistics</title>
+    <title>Returns Management - EzyCommerce Logistics</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -735,8 +735,8 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="sidebar-header">
-                <i class="fas fa-undo fa-2x"></i>
-                <h2>E-Commerce Logistics</h2>
+                <i class="fas fa-truck fa-2x"></i>
+                <h2>EzyCommerce Logistics</h2>
             </div>
             
             <div class="sidebar-stats">
@@ -789,16 +789,17 @@
             
             <div class="sidebar-menu">
                 <ul>
-                    <li><a href="dashboard.php"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-                    <li><a href="allshipping.php"><i class="fas fa-list"></i> All Orders</a></li>
-                    <li class="active"><a href="return.php#all" data-status="refresh-all"><i class="fas fa-undo"></i> Returns <span class="menu-badge" id="menu-all-count">92</span></a></li>
-                    <li><a href="return.php#pending" data-status="pending"><i class="fas fa-clock" style="color: var(--pending);"></i> Pending <span class="menu-badge" id="menu-pending-count">18</span></a></li>
-                    <li><a href="return.php#processing" data-status="processing"><i class="fas fa-cog" style="color: var(--processing);"></i> Processing <span class="menu-badge" id="menu-processing-count">12</span></a></li>
-                    <li><a href="return.php#approved" data-status="approved"><i class="fas fa-check-circle" style="color: var(--approved);"></i> Approved <span class="menu-badge" id="menu-approved-count">25</span></a></li>
-                    <li><a href="return.php#rejected" data-status="rejected"><i class="fas fa-times-circle" style="color: var(--rejected);"></i> Rejected <span class="menu-badge" id="menu-rejected-count">5</span></a></li>
-                    <li><a href="return.php#completed" data-status="completed"><i class="fas fa-flag-checkered" style="color: var(--completed);"></i> Completed <span class="menu-badge" id="menu-completed-count">32</span></a></li>
+                    <li><a href="<?php echo url('/logistics'); ?>"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
+                    <li><a href="<?php echo url('/logistics/shipping'); ?>"><i class="fas fa-list"></i> All Orders</a></li>
+                    <li class="active"><a href="<?php echo url('/logistics/returns'); ?>#all" data-status="refresh-all"><i class="fas fa-undo"></i> Returns <span class="menu-badge" id="menu-all-count">92</span></a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>#pending" data-status="pending"><i class="fas fa-clock" style="color: var(--pending);"></i> Pending <span class="menu-badge" id="menu-pending-count">18</span></a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>#processing" data-status="processing"><i class="fas fa-cog" style="color: var(--processing);"></i> Processing <span class="menu-badge" id="menu-processing-count">12</span></a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>#approved" data-status="approved"><i class="fas fa-check-circle" style="color: var(--approved);"></i> Approved <span class="menu-badge" id="menu-approved-count">25</span></a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>#rejected" data-status="rejected"><i class="fas fa-times-circle" style="color: var(--rejected);"></i> Rejected <span class="menu-badge" id="menu-rejected-count">5</span></a></li>
+                    <li><a href="<?php echo url('/logistics/returns'); ?>#completed" data-status="completed"><i class="fas fa-flag-checkered" style="color: var(--completed);"></i> Completed <span class="menu-badge" id="menu-completed-count">32</span></a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-chart-bar"></i> Analytics</a></li>
                     <li><a href="#" aria-disabled="true" tabindex="-1" style="pointer-events:none;opacity:0.45;cursor:not-allowed;"><i class="fas fa-cog"></i> Settings</a></li>
+                    <li><a href="<?php echo url('/logistics/logout'); ?>"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                 </ul>
             </div>
         </div>

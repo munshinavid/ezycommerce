@@ -86,6 +86,16 @@ function updateDashboardCards(counts, returnsData) {
     document.getElementById('processing-count').textContent = counts.processing;
     document.getElementById('shipped-count').textContent = counts.shipped;
     document.getElementById('returns-count').textContent = returnsData.length;
+    
+    // Update sidebar stats
+    const sidebarPending = document.getElementById('sidebar-pending-count');
+    const sidebarProcessing = document.getElementById('sidebar-processing-count');
+    const sidebarShipped = document.getElementById('sidebar-shipped-count');
+    const sidebarDelivered = document.getElementById('sidebar-delivered-count');
+    if (sidebarPending) sidebarPending.textContent = counts.pending || 0;
+    if (sidebarProcessing) sidebarProcessing.textContent = counts.processing || 0;
+    if (sidebarShipped) sidebarShipped.textContent = counts.shipped || 0;
+    if (sidebarDelivered) sidebarDelivered.textContent = counts.delivered || 0;
 }
 
 // Render recent orders table

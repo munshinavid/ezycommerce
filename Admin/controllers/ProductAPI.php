@@ -1,10 +1,27 @@
 <?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE');
-header('Access-Control-Allow-Headers: Content-Type');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization');
+
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(200);
+    exit();
+}
+
+// Check admin authentication
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.']);
+    exit();
+}
 
 require_once(__DIR__ . '/../models/Database.php');
+require_once(__DIR__ . '/../../utils/UrlHelper.php');
 
 class ProductAPI {
     private $db;
@@ -28,7 +45,8 @@ class ProductAPI {
                       LEFT JOIN discounts d ON p.discount_id = d.discount_id
                       ORDER BY p.product_id DESC";
             
-            return $this->db->select($query);
+            $products = $this->db->select($query);
+            return UrlHelper::normalizeProductsArray($products);
         } catch (Exception $e) {
             return ['success' => false, 'message' => 'Error loading products: ' . $e->getMessage()];
         }
@@ -50,7 +68,8 @@ class ProductAPI {
             $result = $this->db->select($query, [$id]);
             
             if (!empty($result)) {
-                return ['success' => true, 'data' => $result[0]];
+                $product = UrlHelper::normalizeProductData($result[0]);
+                return ['success' => true, 'data' => $product];
             }
             
             return ['success' => false, 'message' => 'Product not found'];

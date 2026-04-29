@@ -392,10 +392,10 @@ async function placeOrder(customerDetails, paymentMethod = 'Cash on Delivery') {
         formData.append('payment_method', paymentMethod);
         formData.append('user_id', CURRENT_USER_ID);
         
-        // Add customer details
-        Object.keys(customerDetails).forEach(key => {
-            formData.append(`customer_details[${key}]`, customerDetails[key]);
-        });
+        // Add customer details as JSON for better compatibility
+        formData.append('customer_details', JSON.stringify(customerDetails));
+        
+        console.log('Sending placeOrder with details:', customerDetails);
 
         const res = await fetch('/api/cart', {
             method: 'POST',
@@ -547,15 +547,42 @@ function renderAddressOptions(addresses) {
 				if (errorEl) { errorEl.textContent = 'Please select an address.'; errorEl.style.display = 'block'; }
 				return;
 			}
-            alert("confirm cliked");
 			if (errorEl) errorEl.style.display = 'none';
 			const selected = addresses.find(a => String(a.id) === String(selectedAddressId));
+			if (!selected) {
+				if (errorEl) { errorEl.textContent = 'Selected address not found.'; errorEl.style.display = 'block'; }
+				return;
+			}
+			// Build address from all available fields (priority order)
+			const addressParts = [];
+			if (selected.address_line1) addressParts.push(selected.address_line1.trim());
+			if (selected.address_line2) addressParts.push(selected.address_line2.trim());
+			if (addressParts.length === 0 && selected.address) addressParts.push(selected.address.trim());
+			if (addressParts.length === 0 && selected.shipping_address) addressParts.push(selected.shipping_address.trim());
+			if (addressParts.length === 0 && selected.billing_address) addressParts.push(selected.billing_address.trim());
+
+			const composedAddress = addressParts.join(', ').trim();
+			if (!composedAddress) {
+				if (errorEl) { errorEl.textContent = 'Selected address has no address details. Please add a complete address first.'; errorEl.style.display = 'block'; }
+				return;
+			}
+
 			const customerDetails = {
-                full_name: selected.full_name || '',
-                address: [selected.address_line1 || selected.address || '', selected.address_line2 || '']
-                          .filter(Boolean).join(', '),
-                phone: selected.phone || ''
+                full_name: String(selected.full_name || '').trim(),
+                address: composedAddress,
+                phone: String(selected.phone || '').trim()
               };
+
+			if (!customerDetails.full_name) {
+				if (errorEl) { errorEl.textContent = 'Selected address is missing a name. Please update it.'; errorEl.style.display = 'block'; }
+				return;
+			}
+			if (!customerDetails.phone) {
+				if (errorEl) { errorEl.textContent = 'Selected address is missing a phone number. Please update it.'; errorEl.style.display = 'block'; }
+				return;
+			}
+
+			console.log('Customer Details to send:', customerDetails);
 			const methodEl = document.querySelector('input[name="payment_method"]:checked');
 			const paymentMethod = methodEl ? methodEl.value : 'Cash on Delivery';
 			const res = await placeOrder(customerDetails, paymentMethod);

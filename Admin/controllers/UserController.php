@@ -39,6 +39,17 @@ try {
     exit();
 }
 
+// Check admin authentication
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.']);
+    exit();
+}
+
 class UserController {
     private $db;
     private $method;
@@ -60,13 +71,18 @@ class UserController {
     }
 
     private function parseRequest() {
-        // Get the request URI and remove query string
-        $requestUri = $_SERVER['REQUEST_URI'];
-        $scriptName = $_SERVER['SCRIPT_NAME'];
-        
-        // Remove script name from URI to get the path
-        $path = str_replace(dirname($scriptName), '', parse_url($requestUri, PHP_URL_PATH));
-        $path = str_replace(basename($scriptName), '', $path);
+        // Use PATH_INFO if set (from front controller routing), otherwise parse from REQUEST_URI
+        if (!empty($_SERVER['PATH_INFO'])) {
+            $path = $_SERVER['PATH_INFO'];
+        } else {
+            // Fallback: Get the request URI and remove query string
+            $requestUri = $_SERVER['REQUEST_URI'];
+            $scriptName = $_SERVER['SCRIPT_NAME'];
+            
+            // Remove script name from URI to get the path
+            $path = str_replace(dirname($scriptName), '', parse_url($requestUri, PHP_URL_PATH));
+            $path = str_replace(basename($scriptName), '', $path);
+        }
         $path = trim($path, '/');
         
         // Split path into parts

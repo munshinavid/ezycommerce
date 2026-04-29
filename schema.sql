@@ -216,5 +216,5 @@ ON DUPLICATE KEY UPDATE role_name = role_name;
 -- SEED DATA: Default Admin Account (password: admin123)
 -- ============================================================
 INSERT INTO users (username, email, password, role_id) VALUES
-    ('admin', 'admin@ezycommerce.com', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2)
+    ('admin', 'admin@ezycommerce.com', '$2y$10$BRRQyHe6fZfXuHTZszBFVO0nsauF3B8tnTkh310krhlyLadxQ9t0W', 2)
 ON DUPLICATE KEY UPDATE username = username;

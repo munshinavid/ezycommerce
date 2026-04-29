@@ -10,6 +10,7 @@ header('Access-Control-Allow-Methods: GET, POST, PUT');
 header('Access-Control-Allow-Headers: Content-Type');
 
 require_once __DIR__ . '/../models/Database.php';
+require_once __DIR__ . '/../../utils/UrlHelper.php';
 
 // Get request method and action
 $method = $_SERVER['REQUEST_METHOD'];
@@ -249,7 +250,7 @@ function getProducts($db, $vendor_id) {
             'category' => $product['category'] ?? 'Uncategorized',
             'price' => number_format((float)$product['price'], 2, '.', ''),
             'stock' => (int)$product['stock'],
-            'image' => $product['image_url'] ?: 'https://via.placeholder.com/40'
+            'image' => UrlHelper::normalizeImageUrl($product['image_url'])
         ];
     }
     
@@ -290,7 +291,7 @@ function getProductById($db, $vendor_id, $product_id) {
         'description' => $product['description'],
         'price' => number_format((float)$product['price'], 2, '.', ''),
         'stock' => (int)$product['stock'],
-        'image_url' => $product['image_url'],
+        'image_url' => UrlHelper::normalizeImageUrl($product['image_url']),
         'category_id' => $product['category_id'],
         'category_name' => $product['category_name']
     ]);

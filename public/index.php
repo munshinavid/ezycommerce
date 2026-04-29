@@ -11,6 +11,9 @@ error_reporting(E_ALL);
 // Define the root directory of the application
 define('BASE_PATH', dirname(__DIR__));
 
+// Require the Global Error Handler
+require_once BASE_PATH . '/utils/ErrorHandler.php';
+
 /**
  * URL Helper Function
  * Automatically handles subdirectories if running without Docker (e.g. XAMPP)
@@ -20,7 +23,11 @@ function url($path = '') {
     // For local XAMPP testing, prefix with /ezycommerce. 
     // In Docker or Production (where DocumentRoot is public), prefix with /
     $basePath = (strpos($_SERVER['REQUEST_URI'], '/ezycommerce') === 0) ? '/ezycommerce' : '';
-    return rtrim($basePath . '/' . $path, '/');
+    // For root path, always return with trailing slash to ensure proper redirect
+    if ($path === '') {
+        return $basePath . '/';
+    }
+    return $basePath . '/' . $path;
 }
 
 // Parse the request URI (e.g., /admin?foo=bar -> /admin)
@@ -56,6 +63,7 @@ $routes = [
 
     // Customer APIs / Controllers
     '/api/auth' => '/Customer/controllers/AuthController.php',
+    '/api/logout' => '/Customer/controllers/AuthController.php',
     '/api/cart' => '/Customer/controllers/CartController.php',
     '/api/home' => '/Customer/controllers/HomeController.php',
     '/api/order' => '/Customer/controllers/OrderController.php',
@@ -66,9 +74,12 @@ $routes = [
     // Admin Views
     '/admin' => '/Admin/views/index.php',
     '/admin/discounts' => '/Admin/views/discounts_management.php',
+    '/admin/logout' => '/Customer/views/logout.php',
     '/admin/orders' => '/Admin/views/order_management.php',
     '/admin/products' => '/Admin/views/product_management.php',
     '/admin/users' => '/Admin/views/user_management.php',
+    '/admin/reports' => '/Admin/reports.php',
+    '/admin/settings' => '/Admin/settings.php',
 
     // Admin APIs
     '/api/admin/dashboard' => '/Admin/controllers/DashboardAPI.php',
@@ -88,11 +99,15 @@ $routes = [
     '/api/logistics/dashboard' => '/Logistics/controllers/DashboardAPI.php',
     '/api/logistics/returns' => '/Logistics/controllers/ReturnAPI.php',
 
+    // Logistics Logout
+    '/logistics/logout' => '/Customer/views/logout.php',
+
     // Vendor Views
     '/vendor' => '/Vendor/views/dashboard.php',
     '/vendor/orders' => '/Vendor/views/orders.php',
     '/vendor/products' => '/Vendor/views/products.php',
     '/vendor/discounts' => '/Vendor/views/v-discount.php',
+    '/vendor/logout' => '/Customer/views/logout.php',
     '/vendor/test' => '/Vendor/views/test.php',
 
     // Vendor APIs

@@ -5,15 +5,15 @@ const userData = JSON.parse(localStorage.getItem("userData"));
 const API_BASE_URL = '/api/home'; // Routed through front controller
 const CURRENT_USER_ID = userData ? userData.id : null;
 
-initializeEcommerce();
-
-// State management
+// State management - MUST be declared before initializeEcommerce()
 let currentPage = 1;
 let currentFilter = 'all';
 let currentSort = 'newest';
 let currentCategory = '';
 let currentSearch = '';
 let isLoading = false;
+
+initializeEcommerce();
 
 // DOM Content Loaded
 document.addEventListener('DOMContentLoaded', function() {

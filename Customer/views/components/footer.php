@@ -3,7 +3,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-column">
-                    <h3>ShopEase</h3>
+                    <h3>EzyCommerce</h3>
                     <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
                     <div class="social-icons">
                         <a href="#"><i class="fab fa-facebook-f"></i></a>
@@ -37,12 +37,12 @@
                     <ul class="footer-links">
                         <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St, City, State 12345</li>
                         <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
-                        <li><i class="fas fa-envelope"></i> support@shopease.com</li>
+                        <li><i class="fas fa-envelope"></i> support@ezycommerce.com</li>
                     </ul>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2023 ShopEase. All rights reserved.</p>
+                <p>&copy; 2026 EzyCommerce. All rights reserved.</p>
             </div>
         </div>
     </footer>

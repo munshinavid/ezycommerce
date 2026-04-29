@@ -58,6 +58,8 @@ function initProductsPage() {
 function setupEventListeners() {
     // Navigation
     document.querySelectorAll('.sidebar-menu a').forEach(link => {
+        const href = link.getAttribute('href');
+        console.log('Sidebar menu link:', link.innerText, '=> href:', href);
         link.addEventListener('click', (e) => {
             if (!link.getAttribute('href') || link.getAttribute('href') === '#') {
                 e.preventDefault();

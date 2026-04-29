@@ -50,36 +50,10 @@ function initVendorDashboard() {
 
 // Setup event listeners
 function setupEventListeners() {
-    // Navigation
-    document.getElementById('nav-products')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = 'products.php';
-    });
+    // Navigation: Links are handled by proper href values in HTML, no need for JS hijacking
+    // The sidebar menu links in the HTML have proper url() generated hrefs
+    // Removed the old hardcoded 'products.php' redirects that were overriding the correct href values
     
-    document.getElementById('nav-orders')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = 'orders.php';
-    });
-    
-    document.getElementById('nav-sales')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Sales analytics page would load here');
-    });
-    
-    document.getElementById('nav-returns')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Returns page would load here');
-    });
-    
-    document.getElementById('nav-discounts')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        window.location.href = 'v-discount.php';
-    });
-    
-    document.getElementById('nav-profile')?.addEventListener('click', (e) => {
-        e.preventDefault();
-        alert('Profile page would load here');
-    });
     
     // Buttons
     addProductBtn.addEventListener('click', () => openProductModal());

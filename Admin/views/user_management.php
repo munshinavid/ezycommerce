@@ -82,7 +82,7 @@
 </head>
 <body>
     <!-- Sidebar -->
-    <?php include '../layout/sidebar.php'; ?>
+    <?php include __DIR__ . '/../layout/sidebar.php'; ?>
 
     <!-- Main Content -->
     <div class="main-content">
