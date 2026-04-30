@@ -95,17 +95,9 @@ class AuthController {
             }
             
             $user = $user[0];
-            $passwordMatch = false;
             
-            // Check bcrypt hashed password first
-            if (password_verify($password, $user['password'])) {
-                $passwordMatch = true;
-            } else if ($password === $user['password']) {
-                // TEMPORARY: Allow plain text password for testing (remove in production)
-                $passwordMatch = true;
-            }
-            
-            if (!$passwordMatch) {
+            // Verify password against bcrypt hash
+            if (!password_verify($password, $user['password'])) {
                 $this->sendResponse(['error' => 'Invalid credentials'], 401);
                 return;
             }

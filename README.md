@@ -4,16 +4,26 @@
     A full-stack, multi-role e-commerce platform built from scratch with PHP — no framework.
     <br />
     Custom routing · Role-based access · Docker deployment · CI/CD pipeline
-    <br />
-    <br />
-    <a href="#-features">Features</a>
-    ·
-    <a href="#-architecture">Architecture</a>
-    ·
-    <a href="#-api-reference">API Reference</a>
-    ·
-    <a href="#-getting-started">Getting Started</a>
   </p>
+</p>
+
+<p align="center">
+  <a href="https://ezycommerce.munshinavid.me"><img src="https://img.shields.io/badge/🌐_Live-ezycommerce.munshinavid.me-0ea5e9?style=for-the-badge" alt="Live" /></a>
+  <a href="https://www.php.net/"><img src="https://img.shields.io/badge/PHP_8.2-777BB4?style=for-the-badge&logo=php&logoColor=white" alt="PHP" /></a>
+  <a href="https://www.mysql.com/"><img src="https://img.shields.io/badge/MySQL_8-4479A1?style=for-the-badge&logo=mysql&logoColor=white" alt="MySQL" /></a>
+  <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript"><img src="https://img.shields.io/badge/JavaScript_ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" /></a>
+  <a href="https://www.docker.com/"><img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" /></a>
+  <a href="https://github.com/features/actions"><img src="https://img.shields.io/badge/CI/CD-GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white" alt="CI/CD" /></a>
+</p>
+
+<p align="center">
+  <a href="#-features">Features</a>
+  ·
+  <a href="#-architecture">Architecture</a>
+  ·
+  <a href="#-api-reference">API Reference</a>
+  ·
+  <a href="#-getting-started">Getting Started</a>
 </p>
 
 <br />
