@@ -1,6 +1,10 @@
-<?php require_once __DIR__ . "/components/header.php"; ?>
+<?php
+$pageTitle = 'EzyCommerce — Discover Premium Products Online';
+$pageDescription = 'Shop the latest trends in fashion, electronics, and lifestyle at EzyCommerce. Free shipping on orders over $50 with 30-day returns.';
+require_once __DIR__ . "/components/header.php";
+?>
 
-    <!-- Hero Section (Premium Glassmorphism) -->
+    <!-- Hero Section -->
     <section class="hero">
         <div class="hero-banner" id="discount-banners">
             <div class="hero-content">
@@ -16,8 +20,7 @@
                     </a>
                 </div>
             </div>
-            <!-- Dynamic hero image (using a premium unsplash image with transparent bg or just a stunning model image) -->
-            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fashion Model" class="hero-image" style="border-radius: 24px; box-shadow: var(--shadow-lg);">
+            <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80" alt="Fashion Collection" class="hero-image" style="border-radius: 20px;">
         </div>
     </section>
 

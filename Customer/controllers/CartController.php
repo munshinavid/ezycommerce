@@ -180,15 +180,7 @@ class CartController {
         $item['final_price'] = $finalPrice;
         $item['item_total'] = $itemPrice; // Original price before discount
         
-        // Debug info (remove in production)
-        $item['debug'] = [
-            'has_product_discount' => !empty($item['pd_id']),
-            'has_category_discount' => !empty($item['cd_id']),
-            'pd_active' => $item['pd_active'],
-            'cd_active' => $item['cd_active'],
-            'current_date' => $currentDate,
-            'discount_applied' => $discountSource
-        ];
+        
         
         // Add to totals
         $subtotal += $finalPrice;

@@ -5,3 +5,11 @@ Vendor/composer/
 Vendor/nikic/
 Vendor/autoload.php
 *.cache
+
+# Environment config (contains credentials)
+.env
+
+# Test/debug files
+test.php
+test2.php
+test3.php

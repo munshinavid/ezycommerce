@@ -10,6 +10,7 @@ function initializeCart() {
     console.log('Cart page initialized');
     loadCartData();
     setupCartEventListeners();
+    setupCheckoutListeners();
 }
 
 // --- Event Listeners ---
@@ -103,17 +104,26 @@ function renderCartItems(items) {
     if (!container) return;
 
     if (!items || items.length === 0) {
-        emptyCart.style.display = 'block';
+        if (emptyCart) emptyCart.style.display = 'block';
         container.innerHTML = '';
-        document.getElementById('cart-item-count').textContent = "0 items";
-        document.getElementById('cart-count').textContent = "0";
-        document.getElementById('subtotal').textContent = "৳0";
-        document.getElementById('shipping').textContent = "৳0";
-        document.getElementById('total').textContent = "৳0";
+        const itemCountEl = document.getElementById('cart-item-count');
+        const cartCountEl = document.getElementById('cart-count');
+        const subtotalEl = document.getElementById('subtotal');
+        const shippingEl = document.getElementById('shipping');
+        const taxEl = document.getElementById('tax');
+        const discountEl = document.getElementById('discount');
+        const totalEl = document.getElementById('total');
+        if (itemCountEl) itemCountEl.textContent = "0 items";
+        if (cartCountEl) cartCountEl.textContent = "0";
+        if (subtotalEl) subtotalEl.textContent = "$0.00";
+        if (shippingEl) shippingEl.textContent = "$0.00";
+        if (taxEl) taxEl.textContent = "$0.00";
+        if (discountEl) discountEl.textContent = "$0.00";
+        if (totalEl) totalEl.textContent = "$0.00";
         return;
     }
 
-    emptyCart.style.display = 'none';
+    if (emptyCart) emptyCart.style.display = 'none';
     let html = '';
     items.forEach(item => {
         html += `
@@ -121,7 +131,7 @@ function renderCartItems(items) {
             <img src="${item.image_url}" alt="${item.name}" class="cart-item-image">
             <div class="cart-item-details">
                 <h3 class="cart-item-name">${item.name}</h3>
-                <div class="cart-item-price">৳${item.price}</div>
+                <div class="cart-item-price">$${item.price}</div>
                 <div class="cart-item-actions">
                     <div class="quantity-control">
                         <button type="button" class="quantity-btn quantity-minus" ${item.quantity <= 1 ? 'disabled' : ''}>-</button>
@@ -140,11 +150,14 @@ function renderCartItems(items) {
 
 // --- Update Cart Summary ---
 function updateCartSummary(data) {
-    document.getElementById('subtotal').textContent = `৳${data.subtotal}`;
-    document.getElementById('shipping').textContent = `৳${data.shippingCost}`;
-    document.getElementById('total').textContent = `৳${data.totalCost}`;
-    //discount if any
-    document.getElementById('discount').textContent = `৳${data.totalDiscounts || 0}`;
+    const subtotalEl = document.getElementById('subtotal');
+    const shippingEl = document.getElementById('shipping');
+    const totalEl = document.getElementById('total');
+    const discountEl = document.getElementById('discount');
+    if (subtotalEl) subtotalEl.textContent = `$${data.subtotal}`;
+    if (shippingEl) shippingEl.textContent = `$${data.shippingCost}`;
+    if (totalEl) totalEl.textContent = `$${data.totalCost}`;
+    if (discountEl) discountEl.textContent = `$${data.totalDiscounts || 0}`;
 }
 
 // --- Optimistic UI Updates ---
@@ -304,7 +317,7 @@ function updateCartItemCountAndTotal() {
         
         if (qtyInput && priceElement) {
             const qty = parseInt(qtyInput.value) || 0;
-            const price = parseFloat(priceElement.textContent.replace('৳', '')) || 0;
+            const price = parseFloat(priceElement.textContent.replace('$', '')) || 0;
             totalQty += qty;
             subtotal += qty * price;
         }
@@ -318,7 +331,7 @@ function updateCartItemCountAndTotal() {
     if (cartCountElement) cartCountElement.textContent = totalQty;
 
     // Calculate shipping
-    const shipping = subtotal > 0 ? (subtotal >= 1000 ? 0 : 50) : 0; // Free shipping over ৳1000
+    const shipping = subtotal > 0 ? (subtotal >= 1000 ? 0 : 50) : 0; // Free shipping over $1000
     const total = subtotal + shipping;
 
     // Update price displays
@@ -326,9 +339,9 @@ function updateCartItemCountAndTotal() {
     const shippingElement = document.getElementById('shipping');
     const totalElement = document.getElementById('total');
     
-    if (subtotalElement) subtotalElement.textContent = `৳${subtotal.toFixed(2)}`;
-    if (shippingElement) shippingElement.textContent = `৳${shipping.toFixed(2)}`;
-    if (totalElement) totalElement.textContent = `৳${total.toFixed(2)}`;
+    if (subtotalElement) subtotalElement.textContent = `$${subtotal.toFixed(2)}`;
+    if (shippingElement) shippingElement.textContent = `$${shipping.toFixed(2)}`;
+    if (totalElement) totalElement.textContent = `$${total.toFixed(2)}`;
 
     // Show/hide empty cart message
     const emptyCart = document.getElementById('empty-cart');
@@ -434,23 +447,38 @@ async function clearCart() {
 }
 
 // --- Checkout Button Handler ---
-const checkoutBtn = document.querySelector('.checkout-btn');
-const checkoutModal = document.getElementById('checkout-modal');
-const closeBtn = document.querySelector('.close-btn');
+function setupCheckoutListeners() {
+    const checkoutBtn = document.querySelector('.checkout-btn');
+    const checkoutModal = document.getElementById('checkout-modal');
+    // Scope close-btn to checkout modal only to avoid conflicts with other modals
+    const closeBtn = checkoutModal ? checkoutModal.querySelector('.close-btn') : null;
 
-if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', async function () {
-        console.log('Checkout button clicked');
-        // Show modal
-        checkoutModal.style.display = 'block';
-        await loadAddresses();
-    });
-}
+    if (checkoutBtn && checkoutModal) {
+        checkoutBtn.addEventListener('click', async function () {
+            console.log('Checkout button clicked');
+            // Show modal - remove hidden class AND set display
+            checkoutModal.classList.remove('hidden');
+            checkoutModal.style.display = 'flex';
+            await loadAddresses();
+        });
+    }
 
-if (closeBtn) {
-    closeBtn.addEventListener('click', () => {
-        checkoutModal.style.display = 'none';
-    });
+    if (closeBtn && checkoutModal) {
+        closeBtn.addEventListener('click', () => {
+            checkoutModal.classList.add('hidden');
+            checkoutModal.style.display = 'none';
+        });
+    }
+
+    // Close modal on backdrop click
+    if (checkoutModal) {
+        checkoutModal.addEventListener('click', (e) => {
+            if (e.target === checkoutModal) {
+                checkoutModal.classList.add('hidden');
+                checkoutModal.style.display = 'none';
+            }
+        });
+    }
 }
 async function loadAddresses() {
     // const userData = JSON.parse(localStorage.getItem("userData"));
@@ -537,7 +565,7 @@ function renderAddressOptions(addresses) {
 	const modal = document.getElementById('checkout-modal');
 	const cancelBtn = document.getElementById('cancel-checkout-btn');
 	if (cancelBtn && !cancelBtn._bound) {
-		cancelBtn.addEventListener('click', () => { if (modal) modal.style.display = 'none'; });
+		cancelBtn.addEventListener('click', () => { if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; } });
 		cancelBtn._bound = true;
 	}
 
@@ -588,7 +616,7 @@ function renderAddressOptions(addresses) {
 			const res = await placeOrder(customerDetails, paymentMethod);
 			if (res && res.success) {
 				alert('Order placed successfully!');
-				if (modal) modal.style.display = 'none';
+				if (modal) { modal.classList.add('hidden'); modal.style.display = 'none'; }
 				loadCartData();
 			} else {
 				alert('Failed to place order: ' + (res && res.message ? res.message : 'Unknown error'));

@@ -93,7 +93,7 @@ async function loadOrdersPage() {
                 <i class="fas fa-user-lock fa-3x"></i>
                 <h3>Please Login</h3>
                 <p>You need to be logged in to view your orders.</p>
-                <a href="login.php" class="login-btn">
+                <a href="/login" class="login-btn">
                     <i class="fas fa-sign-in-alt"></i> Login
                 </a>
             </div>
@@ -124,7 +124,7 @@ async function loadOrdersPage() {
                     <button onclick="loadOrdersPage()" class="retry-btn">
                         <i class="fas fa-redo"></i> Retry
                     </button>
-                    <a href="index.php" class="continue-shopping-btn">
+                    <a href="/" class="continue-shopping-btn">
                         <i class="fas fa-arrow-left"></i> Continue Shopping
                     </a>
                 </div>
@@ -193,7 +193,7 @@ function renderOrdersPage(data) {
                 <i class="fas fa-clipboard-list fa-4x"></i>
                 <h2>No orders yet</h2>
                 <p>You haven't placed any orders yet. Start shopping to see your orders here.</p>
-                <a href="index.php" class="start-shopping-btn">
+                <a href="/" class="start-shopping-btn">
                     <i class="fas fa-shopping-cart"></i> Start Shopping
                 </a>
             </div>
@@ -579,7 +579,7 @@ async function reorder(orderId) {
             
             // Redirect to cart after a delay
             setTimeout(() => {
-                window.location.href = 'cart.php';
+                window.location.href = '/cart';
             }, 2000);
         } else {
             throw new Error(result.message || 'Failed to reorder items');

@@ -1,6 +1,7 @@
 <?php
 // Use minimal header (logo + user info + logout only)
 $minimalHeader = true;
+$pageTitle = 'My Account — EzyCommerce';
 $extraCss = [url('/Customer/css/profile.css')];
 require_once __DIR__ . "/components/header.php";
 ?>
@@ -76,21 +77,21 @@ require_once __DIR__ . "/components/header.php";
                         <div class="stat-label">Total Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background-color: var(--success);">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #00B894, #55EFC4);">
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="stat-value" id="completed-orders">3</div>
                         <div class="stat-label">Completed Orders</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background-color: var(--warning);">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #FDCB6E, #F9CA24);">
                             <i class="fas fa-heart"></i>
                         </div>
                         <div class="stat-value" id="wishlist-items">8</div>
                         <div class="stat-label">Wishlist Items</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background-color: var(--accent);">
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #00CEC9, #55EFC4);">
                             <i class="fas fa-map-marker-alt"></i>
                         </div>
                         <div class="stat-value" id="addresses-count">2</div>

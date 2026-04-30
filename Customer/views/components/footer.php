@@ -4,12 +4,12 @@
             <div class="footer-content">
                 <div class="footer-column">
                     <h3>EzyCommerce</h3>
-                    <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
+                    <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices with a premium shopping experience.</p>
                     <div class="social-icons">
-                        <a href="#"><i class="fab fa-facebook-f"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                        <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+                        <a href="#" aria-label="Pinterest"><i class="fab fa-pinterest"></i></a>
                     </div>
                 </div>
                 <div class="footer-column">
@@ -25,7 +25,7 @@
                 <div class="footer-column">
                     <h3>Customer Service</h3>
                     <ul class="footer-links">
-                        <li><a href="<?php echo url('/contact'); ?>">Contact</a></li>
+                        <li><a href="<?php echo url('/contact'); ?>">Contact Us</a></li>
                         <li><a href="<?php echo url('/cart'); ?>">Review Cart</a></li>
                         <li><a href="<?php echo url('/wishlist'); ?>">View Wishlist</a></li>
                         <li><a href="<?php echo url('/profile'); ?>">Order History</a></li>

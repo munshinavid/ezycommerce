@@ -14,14 +14,14 @@ if (isset($_POST['update'])) {
     $billingAddress = $_POST['billing_address'];
     $shippingAddress = $_POST['shipping_address'];
 
+    $userModel = new UserModel();
+
     // Check if the new email is duplicated
     if ($userModel->isEmailTaken($email, $userId)) {
         $_SESSION['error_message'] = 'This email is already in use. Please choose another one.';
         header('Location: ' . url('/profile'));
         exit();
     }
-
-    $userModel= new UserModel();
 
     // Update user data
     $userUpdated = $userModel->updateUser($userId, $username, $email, $newPassword);

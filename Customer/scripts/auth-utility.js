@@ -61,7 +61,7 @@ class AuthManager {
             console.error('Logout error:', error);
         } finally {
             this.clearAuth();
-            window.location.href = 'login.php';
+            window.location.href = '/login';
         }
     }
 
@@ -102,8 +102,8 @@ class AuthManager {
     requireAuth(redirectUrl = null) {
         if (!this.isAuthenticated()) {
             const loginUrl = redirectUrl ?
-                `login.php?redirect=${encodeURIComponent(redirectUrl)}` :
-                'login.php';
+                `/login?redirect=${encodeURIComponent(redirectUrl)}` :
+                '/login';
             window.location.href = loginUrl;
             return false;
         }
@@ -130,7 +130,7 @@ class AuthManager {
 
         if (response.status === 401) {
             this.clearAuth();
-            window.location.href = 'login.php';
+            window.location.href = '/login';
             throw new Error('Session expired');
         }
 
@@ -150,11 +150,11 @@ function hasRole(role) { return authManager.hasRole(role); }
 
 // DOM helpers
 function initializeAuth() {
-    const isLoginPage = window.location.pathname.includes('login.php');
+    const isLoginPage = window.location.pathname.includes('/login');
 
     if (isLoginPage) {
         authManager.verifySession().then(() => {
-            window.location.href = 'index.php';
+            window.location.href = '/';
         }).catch(() => {});
         return true;
     }
@@ -163,7 +163,7 @@ function initializeAuth() {
         updateUserInterface();
     }).catch(() => {
         const currentUrl = window.location.href;
-        window.location.href = `login.php?redirect=${encodeURIComponent(currentUrl)}`;
+        window.location.href = `/login?redirect=${encodeURIComponent(currentUrl)}`;
     });
 
     return true;
@@ -199,7 +199,7 @@ document.addEventListener('DOMContentLoaded', initializeAuth);
 function handleLoginRedirect() {
     const redirectUrl = new URLSearchParams(window.location.search).get('redirect');
     if (redirectUrl) window.location.href = decodeURIComponent(redirectUrl);
-    else window.location.href = 'index.php';
+    else window.location.href = '/';
 }
 
 // Export for modules

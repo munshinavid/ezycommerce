@@ -627,14 +627,8 @@ async function getProduct(productId) {
 
 // Handle product click for details
 function handleProductClick(productId) {
-    // In a real application, you would navigate to product detail page
-    // For now, we'll just show product info in console
-    getProduct(productId).then(product => {
-        console.log('Product details:', product);
-        showToast(`Viewing ${product.name}`, 'success');
-    }).catch(error => {
-        showToast('Failed to load product details', 'error');
-    });
+    // Navigate to product detail page
+    window.location.href = `/product?id=${productId}`;
 }
 
 // Load specific page

@@ -22,7 +22,11 @@ $minimalHeader = $minimalHeader ?? false;
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EzyCommerce - Your Online Shopping Destination</title>
+    <title><?php echo $pageTitle ?? 'EzyCommerce — Your Online Shopping Destination'; ?></title>
+    <meta name="description" content="<?php echo $pageDescription ?? 'Discover premium products at EzyCommerce. Quality meets modern design with free shipping on orders over $50.'; ?>">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="<?php echo url('/Customer/css/index.css'); ?>">
     <?php if (!empty($extraCss)): ?>
@@ -31,13 +35,13 @@ $minimalHeader = $minimalHeader ?? false;
         <?php endforeach; ?>
     <?php endif; ?>
 </head>
-<body>
+<body<?php echo !empty($bodyClass) ? ' class="' . $bodyClass . '"' : ''; ?>>
     <?php if (!$minimalHeader): ?>
     <!-- Top Header -->
     <div class="top-header">
         <div class="container">
             <div class="top-header-text">
-                <span>Free shipping on orders over $50 | 30-day money-back guarantee</span>
+                <span><i class="fas fa-truck"></i> Free shipping on orders over $50 | 30-day money-back guarantee</span>
             </div>
             <div class="top-header-links">
                 <a href="tel:+15551234567"><i class="fas fa-phone"></i> +1 (555) 123-4567</a>
@@ -59,8 +63,8 @@ $minimalHeader = $minimalHeader ?? false;
                     
                     <?php if (!$minimalHeader): ?>
                     <div class="search-bar">
-                        <input type="text" placeholder="Search for products...">
-                        <button><i class="fas fa-search"></i></button>
+                        <input type="text" placeholder="Search for products, brands and more...">
+                        <button aria-label="Search"><i class="fas fa-search"></i></button>
                     </div>
                     <?php endif; ?>
                     

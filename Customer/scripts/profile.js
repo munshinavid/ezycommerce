@@ -905,12 +905,148 @@ async function addToCart(productId) {
 
 
 // View order details
-function viewOrderDetails(orderId) {
+async function viewOrderDetails(orderId) {
     console.log('Viewing order details for:', orderId);
-    showToast(`Loading order #${orderId} details`, 'info');
-    
-    // You could implement this to show order details in a modal or navigate to a details page
-    // window.location.href = `order-details.html?id=${orderId}`;
+
+    // Create or get order detail modal
+    let modal = document.getElementById('order-detail-modal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'order-detail-modal';
+        modal.className = 'modal';
+        modal.style.cssText = `
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(26,26,46,0.6); backdrop-filter: blur(4px);
+            z-index: 1100; padding: 20px; overflow-y: auto;
+            justify-content: center; align-items: flex-start;
+        `;
+        modal.innerHTML = `
+            <div class="modal-content" style="
+                background: #fff; padding: 28px; width: 100%; max-width: 720px;
+                margin: 40px auto; border-radius: 20px;
+                box-shadow: 0 25px 60px rgba(0,0,0,0.2);
+                animation: modalSlideIn 0.3s ease;
+            ">
+                <div class="modal-header" style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #E8ECF1;padding-bottom:14px;margin-bottom:24px;">
+                    <h3 id="order-detail-title" style="font-size:20px;font-weight:700;color:#2D3436;">Order Details</h3>
+                    <button class="close-order-modal" style="cursor:pointer;border:none;background:transparent;font-size:24px;color:#636E72;width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;">&times;</button>
+                </div>
+                <div id="order-detail-body" style="min-height:100px;">
+                    <p>Loading...</p>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+
+        // Close handlers
+        modal.querySelector('.close-order-modal').addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.style.display = 'none';
+        });
+    }
+
+    // Show modal with loading state
+    modal.style.display = 'flex';
+    document.getElementById('order-detail-title').textContent = `Order #${orderId}`;
+    document.getElementById('order-detail-body').innerHTML = '<p style="text-align:center;padding:40px 0;color:#636E72;">Loading order details...</p>';
+
+    try {
+        const response = await makeApiRequest(`${API_BASE_URL}?endpoint=orders&id=${orderId}`);
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch order details');
+        }
+
+        const data = await response.json();
+        const order = data.order || data;
+
+        let itemsHTML = '';
+        const items = order.items || order.order_items || [];
+
+        if (items.length > 0) {
+            itemsHTML = `
+                <table style="width:100%;border-collapse:collapse;margin-bottom:20px;">
+                    <thead>
+                        <tr style="border-bottom:2px solid #E8ECF1;">
+                            <th style="text-align:left;padding:10px 8px;font-size:13px;font-weight:700;color:#636E72;">Product</th>
+                            <th style="text-align:center;padding:10px 8px;font-size:13px;font-weight:700;color:#636E72;">Qty</th>
+                            <th style="text-align:right;padding:10px 8px;font-size:13px;font-weight:700;color:#636E72;">Price</th>
+                            <th style="text-align:right;padding:10px 8px;font-size:13px;font-weight:700;color:#636E72;">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${items.map(item => `
+                            <tr style="border-bottom:1px solid #F0F3F6;">
+                                <td style="padding:12px 8px;font-size:14px;font-weight:600;color:#2D3436;">
+                                    ${item.name || item.product_name || 'Product'}
+                                </td>
+                                <td style="text-align:center;padding:12px 8px;font-size:14px;color:#636E72;">
+                                    ${item.quantity || 1}
+                                </td>
+                                <td style="text-align:right;padding:12px 8px;font-size:14px;color:#636E72;">
+                                    $${parseFloat(item.price || 0).toFixed(2)}
+                                </td>
+                                <td style="text-align:right;padding:12px 8px;font-size:14px;font-weight:700;color:#2D3436;">
+                                    $${(parseFloat(item.price || 0) * parseInt(item.quantity || 1)).toFixed(2)}
+                                </td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        } else {
+            itemsHTML = '<p style="color:#636E72;font-size:14px;margin-bottom:20px;">No item details available.</p>';
+        }
+
+        const statusColors = {
+            pending: '#FDCB6E', processing: '#0984E3', shipped: '#00CEC9',
+            delivered: '#00B894', completed: '#00B894', cancelled: '#FF6B6B'
+        };
+        const status = (order.status || 'pending').toLowerCase();
+        const statusColor = statusColors[status] || '#636E72';
+
+        document.getElementById('order-detail-body').innerHTML = `
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:24px;">
+                <div style="background:#F7F8FC;border-radius:12px;padding:16px;">
+                    <div style="font-size:12px;color:#636E72;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px;">Status</div>
+                    <span style="background:${statusColor};color:#fff;padding:4px 12px;border-radius:20px;font-size:13px;font-weight:700;">${order.status || 'Pending'}</span>
+                </div>
+                <div style="background:#F7F8FC;border-radius:12px;padding:16px;">
+                    <div style="font-size:12px;color:#636E72;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px;">Order Date</div>
+                    <div style="font-weight:700;color:#2D3436;">${formatDate(order.orderDate || order.order_date || order.created_at)}</div>
+                </div>
+                <div style="background:#F7F8FC;border-radius:12px;padding:16px;">
+                    <div style="font-size:12px;color:#636E72;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px;">Payment</div>
+                    <div style="font-weight:700;color:#2D3436;">${order.payment_method || 'N/A'}</div>
+                </div>
+                <div style="background:#F7F8FC;border-radius:12px;padding:16px;">
+                    <div style="font-size:12px;color:#636E72;text-transform:uppercase;letter-spacing:0.05em;font-weight:600;margin-bottom:4px;">Total</div>
+                    <div style="font-weight:800;color:#6C5CE7;font-size:18px;">$${parseFloat(order.total || order.total_amount || 0).toFixed(2)}</div>
+                </div>
+            </div>
+
+            ${order.shipping_address || order.address ? `
+                <div style="margin-bottom:24px;">
+                    <h4 style="font-size:14px;font-weight:700;color:#2D3436;margin-bottom:8px;">Shipping Address</h4>
+                    <p style="color:#636E72;font-size:14px;line-height:1.6;">${order.shipping_address || order.address || 'N/A'}</p>
+                </div>
+            ` : ''}
+
+            <h4 style="font-size:14px;font-weight:700;color:#2D3436;margin-bottom:12px;">Order Items</h4>
+            ${itemsHTML}
+        `;
+
+    } catch (error) {
+        console.error('Error loading order details:', error);
+        document.getElementById('order-detail-body').innerHTML = `
+            <div style="text-align:center;padding:40px 0;">
+                <i class="fas fa-exclamation-circle" style="font-size:36px;color:#FF6B6B;margin-bottom:12px;display:block;"></i>
+                <p style="color:#636E72;">Failed to load order details. Please try again.</p>
+            </div>
+        `;
+    }
 }
 
 // Utility functions

@@ -1,4 +1,7 @@
-<?php require_once __DIR__ . '/components/header.php'; ?>
+<?php
+$pageTitle = 'Your Wishlist — EzyCommerce';
+require_once __DIR__ . '/components/header.php';
+?>
 
 <main>
     <section class="products-section" style="padding-top: 60px;">
@@ -93,7 +96,7 @@
 
     async function addItemToCart(productId) {
         if (!currentUserId) {
-            window.location.href = 'login.php';
+            window.location.href = '<?php echo url('/login'); ?>';
             return;
         }
 
@@ -102,7 +105,7 @@
 
     async function removeFromWishlist(productId) {
         if (!currentUserId) {
-            window.location.href = 'login.php';
+            window.location.href = '<?php echo url('/login'); ?>';
             return;
         }
 

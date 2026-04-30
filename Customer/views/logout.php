@@ -24,15 +24,6 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 
-// Determine redirect based on user role first, then referer as fallback
-if ($userRole === 'admin' || strpos($referer, '/admin') !== false) {
-    header('Location: /ezycommerce/login');
-} elseif ($userRole === 'logistics' || strpos($referer, '/logistics') !== false) {
-    header('Location: /ezycommerce/login');
-} elseif ($userRole === 'vendor' || strpos($referer, '/vendor') !== false) {
-    header('Location: /ezycommerce/login');
-} else {
-    // Customer logout - redirect to login page
-    header('Location: /ezycommerce/login');
-}
+// Redirect to login page
+header('Location: ' . url('/login'));
 exit;

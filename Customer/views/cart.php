@@ -1,6 +1,7 @@
 <?php
 // Use minimal header (logo + user info + logout only)
 $minimalHeader = true;
+$pageTitle = 'Shopping Cart — EzyCommerce';
 $extraCss = [url('/Customer/css/cart.css')];
 require_once __DIR__ . "/components/header.php";
 ?>
@@ -25,14 +26,14 @@ require_once __DIR__ . "/components/header.php";
             
             <div class="cart-items" id="cart-items">
                 <!-- Cart items will be loaded dynamically -->
-                
-                <!-- Empty cart state (hidden by default) -->
-                <div class="empty-cart" id="empty-cart" style="display: none;">
-                    <i class="fas fa-shopping-cart"></i>
-                    <h3>Your cart is empty</h3>
-                    <p>Looks like you haven't added anything to your cart yet.</p>
-                    <a href="<?php echo url('/'); ?>" class="btn btn-primary">Continue Shopping</a>
-                </div>
+            </div>
+
+            <!-- Empty cart state (hidden by default) -->
+            <div class="empty-cart" id="empty-cart" style="display: none;">
+                <i class="fas fa-shopping-cart"></i>
+                <h3>Your cart is empty</h3>
+                <p>Looks like you haven't added anything to your cart yet.</p>
+                <a href="<?php echo url('/'); ?>" class="btn btn-primary">Continue Shopping</a>
             </div>
         </div>
 
@@ -181,48 +182,47 @@ require_once __DIR__ . "/components/header.php";
 
     <!-- Footer -->
     <footer>
-        <div class="footer-content">
-            <div class="footer-column">
-                <h3>EzyCommerce</h3>
-                <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
-                <div class="social-icons">
-                    <a href="#"><i class="fab fa-facebook-f"></i></a>
-                    <a href="#"><i class="fab fa-twitter"></i></a>
-                    <a href="#"><i class="fab fa-instagram"></i></a>
-                    <a href="#"><i class="fab fa-pinterest"></i></a>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>EzyCommerce</h3>
+                    <p>Your one-stop destination for all your shopping needs. Quality products at affordable prices.</p>
+                    <div class="social-icons">
+                        <a href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-pinterest"></i></a>
+                    </div>
+                </div>
+                <div class="footer-column">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="<?php echo url('/'); ?>">Home</a></li>
+                        <li><a href="<?php echo url('/cart'); ?>">Cart</a></li>
+                        <li><a href="<?php echo url('/wishlist'); ?>">Wishlist</a></li>
+                        <li><a href="<?php echo url('/profile'); ?>">My Account</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Customer Service</h3>
+                    <ul>
+                        <li><a href="<?php echo url('/contact'); ?>">Contact Us</a></li>
+                        <li><a href="#">Shipping & Returns</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Contact Info</h3>
+                    <ul>
+                        <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St, City, State 12345</li>
+                        <li><i class="fas fa-phone"></i> +1 (555) 123-4567</li>
+                        <li><i class="fas fa-envelope"></i> support@ezycommerce.com</li>
+                    </ul>
                 </div>
             </div>
-            <div class="footer-column">
-                <h3>Shop</h3>
-                <ul>
-                    <li><a href="#">Electronics</a></li>
-                    <li><a href="#">Clothing</a></li>
-                    <li><a href="#">Home & Kitchen</a></li>
-                    <li><a href="#">Books</a></li>
-                    <li><a href="#">Sports</a></li>
-                </ul>
+            <div class="footer-bottom">
+                <p>&copy; 2026 EzyCommerce. All rights reserved.</p>
             </div>
-            <div class="footer-column">
-                <h3>Customer Service</h3>
-                <ul>
-                    <li><a href="#">Contact Us</a></li>
-                    <li><a href="#">FAQs</a></li>
-                    <li><a href="#">Shipping & Returns</a></li>
-                    <li><a href="#">Track Order</a></li>
-                    <li><a href="#">Privacy Policy</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Contact Info</h3>
-                <ul>
-                    <li><i class="fas fa-map-marker-alt"></i> 123 Commerce St, City, Country</li>
-                    <li><i class="fas fa-phone"></i> +1 234 567 8900</li>
-                    <li><i class="fas fa-envelope"></i> support@ezycommerce.com</li>
-                </ul>
-            </div>
-        </div>
-        <div class="footer-bottom">
-            <p>&copy; 2026 EzyCommerce. All rights reserved.</p>
         </div>
     </footer>
 

@@ -3,10 +3,17 @@
  * Single Entry Point (Front Controller)
  */
 
-// Enable error reporting (disable or configure for true production environments)
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
+// Configure error reporting based on environment
+$appEnv = getenv('APP_ENV') ?: 'development';
+if ($appEnv === 'production') {
+    ini_set('display_errors', 0);
+    ini_set('display_startup_errors', 0);
+    error_reporting(0);
+} else {
+    ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+}
 
 // Define the root directory of the application
 define('BASE_PATH', dirname(__DIR__));
@@ -53,7 +60,6 @@ $routes = [
     '/' => '/Customer/views/index.php',
     '/cart' => '/Customer/views/cart.php',
     '/contact' => '/Customer/views/contact.php',
-    '/debugging' => '/Customer/views/debugging.php',
     '/login' => '/Customer/views/login.php',
     '/logout' => '/Customer/views/logout.php',
     '/product' => '/Customer/views/product.php',
@@ -108,7 +114,6 @@ $routes = [
     '/vendor/products' => '/Vendor/views/products.php',
     '/vendor/discounts' => '/Vendor/views/v-discount.php',
     '/vendor/logout' => '/Customer/views/logout.php',
-    '/vendor/test' => '/Vendor/views/test.php',
 
     // Vendor APIs
     '/api/vendor/products' => '/Vendor/controllers/ProductsAPI.php',

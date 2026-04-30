@@ -47,7 +47,6 @@ class UserController {
             case 'orders':
                 if ($method === 'GET') {
                     $this->getOrders();
-                    alert("orders");
                 } else {
                     $this->sendResponse(['error' => 'Method not allowed for orders'], 405);
                 }
