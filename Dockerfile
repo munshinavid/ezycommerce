@@ -7,6 +7,7 @@ RUN a2enmod rewrite
 RUN apt-get update && apt-get install -y \
     unzip \
     git \
+    curl \
     && docker-php-ext-install mysqli pdo pdo_mysql \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
@@ -33,10 +34,15 @@ RUN if [ -f composer.json ]; then composer install --no-dev --optimize-autoloade
 # Copy full project
 COPY . .
 
-# Permissions (important for uploads)
+# Ensure uploads and logs directories exist
+RUN mkdir -p /var/www/html/uploads/images \
+    && mkdir -p /var/www/html/logs
+
+# Permissions (important for uploads and logs)
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html \
-    && chmod -R 775 /var/www/html/uploads || true
+    && chmod -R 775 /var/www/html/uploads \
+    && chmod -R 775 /var/www/html/logs
 
 EXPOSE 80
 

@@ -9,7 +9,8 @@ services:
     env_file:
       - .env
     volumes:
-      - ./:/var/www/html
+      - upload_data:/var/www/html/uploads
+      - log_data:/var/www/html/logs
     depends_on:
       db:
         condition: service_healthy
@@ -21,17 +22,18 @@ services:
     container_name: ezycommerce_db
     restart: unless-stopped
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: ecomm
-      MYSQL_USER: ezy_user
-      MYSQL_PASSWORD: ezy_pass
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
+      MYSQL_DATABASE: ${DB_NAME:-ecomm}
+      MYSQL_USER: ${DB_USER:-ezy_user}
+      MYSQL_PASSWORD: ${DB_PASS:-ezy_pass}
     ports:
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
       - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./db/seeds/seed_data.sql:/docker-entrypoint-initdb.d/02-seed-data.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password}"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -48,7 +50,7 @@ services:
     environment:
       PMA_HOST: db
       PMA_USER: root
-      PMA_PASSWORD: root_password
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
     depends_on:
       - db
     networks:
@@ -56,6 +58,8 @@ services:
 
 volumes:
   mysql_data:
+  upload_data:
+  log_data:
 
 networks:
   ezycommerce_network:

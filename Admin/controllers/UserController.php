@@ -46,7 +46,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
 if (!isset($_SESSION['user']) || $_SESSION['user']['role'] !== 'admin') {
     http_response_code(401);
-    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.']);
+    echo json_encode(['success' => false, 'message' => 'Unauthorized access. Admin privileges required.{$_SESSION["user"]["role"]}']);
     exit();
 }
 

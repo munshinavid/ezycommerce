@@ -36,11 +36,14 @@ final class InitialSchema extends AbstractMigration
         // Discounts Table
         $discounts = $this->table('discounts', ['id' => 'discount_id']);
         $discounts->addColumn('discount_name', 'string', ['limit' => 100, 'null' => true])
-                  ->addColumn('discount_type', 'string', ['limit' => 20]) // PostgreSQL standard
+                  ->addColumn('discount_type', 'string', ['limit' => 20])
                   ->addColumn('discount_value', 'decimal', ['precision' => 10, 'scale' => 2])
                   ->addColumn('start_date', 'date')
                   ->addColumn('end_date', 'date')
+                  ->addColumn('apply_to', 'string', ['limit' => 20, 'default' => 'all'])
                   ->addColumn('is_active', 'boolean', ['default' => true])
+                  ->addColumn('created_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP'])
+                  ->addColumn('updated_at', 'timestamp', ['default' => 'CURRENT_TIMESTAMP', 'update' => 'CURRENT_TIMESTAMP'])
                   ->create();
 
         // Categories Table
@@ -61,6 +64,7 @@ final class InitialSchema extends AbstractMigration
                  ->addColumn('category_id', 'integer', ['null' => true])
                  ->addColumn('discount_id', 'integer', ['null' => true])
                  ->addColumn('vendor_id', 'integer', ['null' => true])
+                 ->addColumn('is_active', 'boolean', ['default' => true])
                  ->addForeignKey('category_id', 'categories', 'category_id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
                  ->addForeignKey('discount_id', 'discounts', 'discount_id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
                  ->addForeignKey('vendor_id', 'vendors', 'vendor_id', ['delete' => 'SET_NULL', 'update' => 'NO_ACTION'])
@@ -91,6 +95,7 @@ final class InitialSchema extends AbstractMigration
                    ->addColumn('product_id', 'integer')
                    ->addColumn('quantity', 'integer')
                    ->addColumn('price_at_purchase', 'decimal', ['precision' => 10, 'scale' => 2])
+                   ->addColumn('vendor_status', 'string', ['limit' => 20, 'default' => 'Pending'])
                    ->addForeignKey('order_id', 'orders', 'order_id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
                    ->addForeignKey('product_id', 'products', 'product_id', ['delete' => 'CASCADE', 'update' => 'NO_ACTION'])
                    ->create();

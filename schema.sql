@@ -206,10 +206,10 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- SEED DATA: Default Roles
 -- ============================================================
 INSERT INTO roles (role_name) VALUES
-    ('Customer'),
-    ('Admin'),
-    ('Vendor'),
-    ('Logistics')
+    ('customer'),
+    ('admin'),
+    ('vendor'),
+    ('logistics')
 ON DUPLICATE KEY UPDATE role_name = role_name;
 
 -- ============================================================

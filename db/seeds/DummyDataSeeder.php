@@ -37,9 +37,9 @@ class DummyDataSeeder extends AbstractSeed
 
         // ---------- 1. Roles ----------
         $this->table('roles')->insert([
-            ['role_name' => 'Admin'],
-            ['role_name' => 'Customer'],
-            ['role_name' => 'Vendor']
+            ['role_name' => 'admin'],
+            ['role_name' => 'customer'],
+            ['role_name' => 'vendor']
         ])->save();
 
         // ---------- 2. Users ----------
@@ -110,7 +110,7 @@ class DummyDataSeeder extends AbstractSeed
                 'description' => "High quality $name for everyday use.",
                 'price' => rand(10, 300),
                 'stock' => rand(10, 150),
-                'image_url' => "/ezycommerce/uploads/images/product{$imgIndex}.jpg",
+                'image_url' => "uploads/images/product{$imgIndex}.jpg",
                 'category_id' => ($i % 3) + 1,
                 'vendor_id' => ($i % 2) + 1
             ];
