@@ -93,7 +93,6 @@ $minimalHeader = $minimalHeader ?? false;
                         <?php if ($isLoggedIn): ?>
                             <a href="<?php echo $logoutUrl; ?>" class="header-action">Logout</a>
                         <?php elseif (!$minimalHeader): ?>
-                            <a href="<?php echo $loginUrl; ?>" class="header-action">Login</a>
                         <?php endif; ?>
                     </div>
                 </div>
