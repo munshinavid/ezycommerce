@@ -28,7 +28,7 @@ class Database {
             );
             $this->conn->set_charset($cfg['charset'] ?? 'utf8mb4');
         } catch (mysqli_sql_exception $e) {
-            die("DB Connection Failed: " . $e->getMessage());
+            throw new Exception("DB Connection Failed: " . $e->getMessage(), 0, $e);
         }
     }
 
