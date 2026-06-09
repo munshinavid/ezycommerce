@@ -13,6 +13,10 @@ class Database {
         $this->connect();
     }
 
+    public function __destruct() {
+        $this->close();
+    }
+
     private function connect() {
         $cfg = require __DIR__ . '/../../config/db.php';
 

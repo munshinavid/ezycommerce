@@ -21,11 +21,26 @@ services:
     image: mysql:8
     container_name: ezycommerce_db
     restart: unless-stopped
+    mem_limit: 512m
+    memswap_limit: 512m
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-root_password}
       MYSQL_DATABASE: ${DB_NAME:-ecomm}
       MYSQL_USER: ${DB_USER:-ezy_user}
       MYSQL_PASSWORD: ${DB_PASS:-ezy_pass}
+    command: >
+      --innodb-buffer-pool-size=64M
+      --innodb-log-file-size=16M
+      --innodb-flush-method=O_DIRECT
+      --innodb-flush-log-at-trx-commit=2
+      --max-connections=30
+      --performance-schema=OFF
+      --table-open-cache=200
+      --tmp-table-size=16M
+      --max-heap-table-size=16M
+      --key-buffer-size=8M
+      --thread-cache-size=4
+      --host-cache-size=0
     ports:
       - "3307:3306"
     volumes:
@@ -33,11 +48,11 @@ services:
       - ./schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
       - ./db/seeds/seed_data.sql:/docker-entrypoint-initdb.d/02-seed-data.sql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password}"]
-      interval: 5s
-      timeout: 5s
-      retries: 10
-      start_period: 30s
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-root_password}", "--silent"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
     networks:
       - ezycommerce_network
 
