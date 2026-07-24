@@ -279,7 +279,7 @@ All APIs return JSON. Protected endpoints require an active session with the app
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/ezycommerce.git
+git clone https://github.com/munshinavid/ezycommerce.git
 cd ezycommerce
 
 # Create environment file
